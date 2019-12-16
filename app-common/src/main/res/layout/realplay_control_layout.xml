@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/realplay_control_rl"
+    android:layout_width="match_parent"
+    android:layout_height="40dp"
+    android:layout_below="@+id/realplay_sv"
+    android:background="@color/play_translucent_bg" >
+
+    <!-- 播放按钮 -->
+
+    <ImageButton
+        android:id="@+id/realplay_play_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="14dp"
+        android:background="@drawable/play_play_selector"
+        android:onClick="onClick" />
+
+    <ImageButton
+        android:id="@+id/realplay_sound_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="13dp"
+        android:layout_toRightOf="@+id/realplay_play_btn"
+        android:background="@drawable/play_voice_selector"
+        android:onClick="onClick" />
+	
+    <Button
+        android:id="@+id/realplay_quality_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="13dp"
+        android:layout_toRightOf="@+id/realplay_sound_btn"
+        android:background="@drawable/video_quality_selector"
+        android:onClick="onClick"
+        android:text="@string/quality_balanced"
+        android:textColor="@color/white"
+        android:textSize="@dimen/realplay_text_size" />
+
+    <!-- 播放速度 -->
+  
+    <TextView
+        android:id="@+id/realplay_flow_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="13dp"
+        android:layout_toLeftOf="@+id/fullscreen_button"
+        android:text="12k/s 5MB"
+        android:textColor="@color/white"
+        android:textSize="@dimen/realplay_text_size"
+        android:visibility="gone" />
+            
+    <com.videogo.widget.CheckTextButton
+        android:id="@+id/fullscreen_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="11dp"
+        android:background="@drawable/fullscreen_button_selector" />    
+</RelativeLayout>

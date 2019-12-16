@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/preview_selection_bg"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:paddingBottom="20dp">
+
+    <Button
+        android:id="@+id/rate_16x"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:text="16x"
+        android:textColor="@color/quality_color_selector"
+        android:textSize="@dimen/realplay_text_size"
+        android:background="@color/transparent" />
+
+    <Button
+        android:id="@+id/rate_8x"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:text="8x"
+        android:textColor="@color/quality_color_selector"
+        android:textSize="@dimen/realplay_text_size"
+        android:background="@color/transparent" />
+
+    <Button
+        android:id="@+id/rate_4x"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:text="4x"
+        android:textColor="@color/quality_color_selector"
+        android:textSize="@dimen/realplay_text_size"
+        android:background="@color/transparent" />
+
+    <Button
+        android:id="@+id/rate_1x"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:text="1x"
+        android:textColor="@color/quality_color_selector"
+        android:textSize="@dimen/realplay_text_size"
+        android:background="@color/transparent" />
+    
+</LinearLayout>

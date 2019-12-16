@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg"
+    android:orientation="vertical" >
+
+    <ImageView
+        android:id="@+id/shipin7_logo_lyt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/login_logo"
+        android:layout_marginTop="100dp"
+        >
+    </ImageView>
+
+    <RelativeLayout
+        android:id="@+id/handle_lyt"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_below="@id/shipin7_logo_lyt"
+        >
+
+        <Button
+            android:id="@+id/web_login_btn"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="63dp"
+            android:background="@drawable/interface_call_btn_selector"
+            android:text="@string/ui_call_demo_txt"
+            android:gravity="center_horizontal|center_vertical"
+            android:textColor="@color/white"
+            android:textSize="@dimen/login_text_size"
+            android:onClick="onClick" />
+
+        <Button
+            android:id="@+id/btn_landevice"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/interface_call_btn_selector"
+            android:text="Landevice"
+            android:textColor="@color/white"
+            android:textSize="@dimen/login_text_size"
+            android:layout_below="@id/web_login_btn"
+            android:onClick="onClick" />
+
+        <Button
+            android:id="@+id/platform_login_btn"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:paddingTop="160dp"
+            android:background="@drawable/login_btn_selector"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="@string/platform_login_button_txt"
+            android:textColor="@color/white"
+            android:textSize="@dimen/login_text_size"
+            android:layout_below="@id/web_login_btn"
+            android:visibility="gone"
+            android:onClick="onClick" />
+
+
+
+        <LinearLayout
+            android:id="@+id/id_ll_join_qq_group"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="25dp"
+            android:gravity="center_horizontal|center_vertical"
+            android:orientation="horizontal"
+            android:onClick="onClick"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="官方交流群 "
+                android:textColor="@color/gray"
+                android:id="@+id/id_tv_join_qq_group"/>
+
+            <Button
+                android:id="@+id/id_btn_join_qq_group"
+                android:layout_width="90px"
+                android:layout_height="22px"
+                android:background="@drawable/join_qq_group"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/login_text_size"
+                android:onClick="onClick" />
+        </LinearLayout>
+    </RelativeLayout>
+</RelativeLayout>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:gesture-image="http://schemas.monkey.com/android"
+    android:id="@+id/realplay_display_view"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/application_bg"
+    android:orientation="vertical" >
+
+     <RelativeLayout
+         android:id="@+id/realplay_area"
+         android:layout_width="fill_parent"
+         android:layout_height="fill_parent" >
+         
+         <SurfaceView
+             android:id="@+id/realplay_wnd_sv"
+             android:layout_width="fill_parent"
+             android:layout_height="wrap_content"
+             android:layout_centerInParent="true" />
+         
+	     <FrameLayout
+	   	   android:layout_width="fill_parent"
+	   	   android:layout_height="fill_parent"
+	   	   android:background="@color/transparent" >
+	   	
+	       <com.videogo.widget.PagesGallery
+	           android:id="@+id/realplay_pages_gallery"
+	           android:layout_width="fill_parent"
+	           android:layout_height="fill_parent"
+	           android:spacing="0dp" />
+	
+	    </FrameLayout> 
+            
+     </RelativeLayout>
+
+     <RelativeLayout
+         android:id="@+id/realplay_top_bar"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:background="@drawable/top_bar_bg" >
+
+            <ImageButton
+                android:id="@+id/realplay_back_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerInParent="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp"
+                android:background="@drawable/backbtn_selector" />
+
+        <TextView
+            android:id="@+id/realplay_title_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:gravity="center_vertical|center_horizontal"
+            android:singleLine="true"
+            android:textColor="@color/black"
+            android:textSize="@dimen/title_text_size"
+            android:textStyle="normal" />             
+     </RelativeLayout>
+        
+     <RelativeLayout
+         android:id="@+id/realplay_control_bar"
+         android:layout_width="fill_parent"
+         android:layout_height="50dp"
+         android:layout_alignParentBottom="true"
+         android:background="@drawable/control_bar_bg" 
+         android:orientation="horizontal" >
+     
+         <RelativeLayout
+             android:layout_width="50dp"
+             android:layout_height="fill_parent"
+             android:gravity="center|center_vertical"
+             android:layout_alignParentLeft="true" >
+
+          <ImageButton
+             android:id="@+id/realplay_play_btn"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:background="@drawable/playbtn_selector"
+             android:visibility="gone" />
+          
+         <ImageButton
+             android:id="@+id/realplay_stop_btn"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:background="@drawable/stopbtn_selector" />
+         </RelativeLayout>
+     
+     </RelativeLayout>
+    
+</RelativeLayout>

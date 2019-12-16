@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/wifi_config_bg"
+    android:orientation="vertical">
+
+    <ezviz.ezopensdkcommon.common.TitleBar
+        android:id="@+id/title_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="50dp"
+        android:layout_marginBottom="50dp"
+        android:layout_centerInParent="true">
+
+        <Button
+            android:id="@+id/btn_to_ap"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/string_ap_connection"/>
+
+        <Button
+            android:id="@+id/btn_to_smart_config"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/string_smart_connection"
+            android:layout_marginTop="20dp"/>
+
+        <Button
+            android:id="@+id/btn_to_sound_wave"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/string_sound_wave_connection"
+            android:layout_marginTop="20dp"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

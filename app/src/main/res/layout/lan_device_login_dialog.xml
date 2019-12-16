@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+
+    <TextView
+        android:id="@+id/safe_box_tip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:text="@string/lan_device_pwd_tip"
+        android:textColor="@color/c2"
+
+        android:textSize="@dimen/button_text_size"
+        />
+
+    <EditText
+        android:id="@+id/login_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dip"
+        android:layout_marginRight="10dip"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/edittext_bg"
+        android:hint="@string/user_name_txt"
+        android:inputType="textPersonName"
+        android:minHeight="44dp"
+        android:singleLine="true"
+        android:text="@string/lan_device_login_default_name"
+        />
+
+    <EditText
+        android:id="@+id/login_pwd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dip"
+        android:layout_marginRight="10dip"
+        android:background="@drawable/edittext_bg"
+        android:hint="@string/password_et_hint"
+        android:inputType="text"
+        android:maxLength="16"
+        android:minHeight="44dp"
+        android:singleLine="true"
+        android:text="test1234"
+        />
+
+
+</LinearLayout>

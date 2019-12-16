@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/common_bg"
+    android:orientation="vertical" >
+
+    <com.videogo.widget.TitleBar
+        android:id="@+id/title_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <com.videogo.widget.GroupLayout
+                style="@style/CommonGroupLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/device_set_layout_padding" >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/device_set_layout_height"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingLeft="@dimen/device_set_padding"
+                    android:paddingRight="@dimen/device_set_padding" >
+
+                    <EditText
+                        android:id="@+id/name_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="#0000"
+                        android:hint="@string/ez_device_name_hint"
+                        android:imeOptions="actionDone"
+                        android:inputType="text"
+                        android:maxLength="50"
+                        android:singleLine="true"
+                        android:textColor="@color/common_text"
+                        android:textSize="@dimen/device_set_text_size" />
+
+                    <TextView
+                        android:id="@+id/detector_type"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0"
+                        android:textColor="@color/setting_hint_text"
+                        android:textSize="@dimen/device_set_text_size"
+                        android:visibility="gone" />
+
+                    <ImageButton
+                        android:id="@+id/name_del"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20dp"
+                        android:layout_weight="0"
+                        android:background="#0000"
+                        android:src="@drawable/name_del_selector" />
+                </LinearLayout>
+            </com.videogo.widget.GroupLayout>
+
+            <TextView
+                android:id="@+id/input_hint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/common_bg"
+                android:gravity="left"
+                android:paddingLeft="@dimen/device_set_padding"
+                android:paddingRight="@dimen/device_set_padding"
+                android:paddingTop="@dimen/device_set_text_padding"
+                android:text="@string/detail_modify_device_name_limit_tip"
+                android:textColor="@color/setting_hint_text"
+                android:textSize="@dimen/device_set_text_size" />
+            
+            <Button
+	            android:id="@+id/btn_id_save_name"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:layout_marginTop="30dp"
+	            android:layout_marginLeft="20dp"
+	            android:layout_marginRight="20dp"
+	            android:background="@drawable/login_btn_selector"
+	            android:text="@string/ez_save"
+	            android:textColor="@color/white"
+	            android:textSize="@dimen/login_text_size"
+	            android:onClick="onClick" />
+
+            <LinearLayout
+                android:id="@+id/common_name_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/device_set_padding"
+                android:orientation="vertical"
+                android:paddingLeft="@dimen/device_set_padding"
+                android:paddingRight="@dimen/device_set_padding" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/setting_hint_text"
+                    android:textSize="@dimen/device_set_text_size" />
+<!-- 
+                <com.videogo.widget.UnscrollableGridView
+                    android:id="@+id/common_name_gridview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:columnWidth="70dp"
+                    android:horizontalSpacing="8dp"
+                    android:numColumns="auto_fit"
+                    android:verticalSpacing="8dp" />
+                     -->
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

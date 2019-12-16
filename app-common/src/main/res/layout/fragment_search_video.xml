@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+      <TextView 
+        android:id="@+id/labelbelongType"
+        android:layout_marginTop="30dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="belongType"
+        android:gravity="center_horizontal"
+        android:textSize="24sp"
+        />
+    
+    <EditText 
+        android:id="@+id/belongType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="6dp"
+        android:layout_marginRight="3dp"
+        android:layout_toRightOf="@id/labelbelongType"
+        android:layout_toEndOf="@id/labelbelongType"
+        android:layout_alignTop="@id/labelbelongType"
+        android:hint="belongType"
+        />
+       
+     <TextView 
+        android:id="@+id/labelLocation"
+        android:layout_marginTop="30dp"
+        android:layout_below="@id/labelbelongType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Location"
+        android:gravity="center_horizontal"
+        android:textSize="24sp"
+        />
+    
+    <EditText 
+        android:id="@+id/latitude"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="6dp"
+        android:layout_marginRight="3dp"
+        android:layout_toRightOf="@id/labelLocation"
+        android:layout_toEndOf="@id/labelLocation"
+        android:layout_alignTop="@id/labelLocation"
+        android:hint="Latitude"
+        />
+    
+    <EditText 
+        android:id="@+id/longitude"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/latitude"
+        android:layout_alignLeft="@id/latitude"
+        android:layout_alignStart="@id/latitude"
+        android:hint="Longitude"
+        />
+    
+    <TextView 
+        android:id="@+id/labelFilter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/longitude"
+        android:layout_alignRight="@id/labelLocation"
+        android:layout_alignEnd="@id/labelLocation"
+        android:text="Filter"
+        android:gravity="center_horizontal"
+        android:textSize="24sp"
+        />
+    
+    <EditText 
+        android:id="@+id/range"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/longitude"
+        android:layout_alignTop="@id/labelFilter"
+        android:layout_toRightOf="@id/labelFilter"
+        android:layout_toEndOf="@id/labelFilter"
+        android:layout_alignLeft="@id/longitude"
+        android:layout_alignStart="@id/longitude"
+        android:hint="range"/>
+    
+    <EditText 
+        android:id="@+id/cameraName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/range"
+        android:layout_alignLeft="@id/range"
+        android:layout_alignStart="@id/range"
+        android:hint="cameraName"/>
+    
+    <TextView 
+        android:id="@+id/labelSort"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/cameraName"
+        android:layout_alignRight="@id/labelFilter"
+        android:layout_alignEnd="@id/labelFilter"
+        android:text="Sort"
+        android:gravity="center_horizontal"
+        android:textSize="24sp"
+        />
+    
+    <CheckBox 
+        android:id="@+id/viewSort"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="viewSort"
+        android:layout_toRightOf="@id/labelSort"
+        android:layout_toEndOf="@id/labelSort"
+        android:layout_alignTop="@id/labelSort"
+        android:layout_alignLeft="@id/cameraName"
+        android:layout_alignStart="@id/cameraName"
+        android:layout_below="@id/cameraName"
+        />
+    
+    <CheckBox 
+        android:id="@+id/cameraNameSort"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="cameraNameSort"
+        android:layout_below="@id/viewSort"
+        android:layout_alignLeft="@id/viewSort"
+        android:layout_alignStart="@id/viewSort"/>
+    
+    <CheckBox 
+        android:id="@+id/rangeSort"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="rangeSort"
+        android:layout_below="@+id/cameraNameSort"
+        android:layout_alignLeft="@id/cameraNameSort"
+        android:layout_alignStart="@id/cameraNameSort"/>
+    
+    <Button 
+        android:id="@+id/submit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="search"
+        android:layout_alignParentBottom="true"/>
+</RelativeLayout>

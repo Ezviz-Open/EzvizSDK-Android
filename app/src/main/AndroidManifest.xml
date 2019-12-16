@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="ezviz.ezopensdk">
+
+    <!-- 以下是sdk所需权限 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.READ_LOGS"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!--以上是sdk所需权限 -->
+    <!--以下是demo所需权限 -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> <!-- App receives push messages."my_app_package.push.sdk.permission.EZVIZ_MESSAGE" -->
+    <permission
+        android:name="ezviz.ezopensdk.push.sdk.permission.EZVIZ_MESSAGE"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="ezviz.ezopensdk.push.sdk.permission.EZVIZ_MESSAGE" />
+    <permission
+        android:name="ezviz.ezopensdk.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="ezviz.ezopensdk.permission.C2D_MESSAGE" /> <!-- App receives GCM messages. -->
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" /> <!-- GCM connects to Google Services. -->
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- GCM requires a Google account. -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" /> <!-- Keeps the processor from sleeping when a message is received. -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!--以上是demo所需权限 -->
+    <application
+        android:name="com.videogo.EzvizApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/videogo_icon"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        tools:ignore="GoogleAppIndexingWarning">
+        <activity
+            android:name="com.videogo.MainActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:screenOrientation="portrait"
+            android:theme="@style/FullAppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".debug.TestActivityForFullSdk"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".add.AddDeviceToAccountActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name="com.videogo.main.EzvizWebViewActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.videogo.remoteplayback.list.EZPlayBackListActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="nosensor" />
+        <activity
+            android:name="com.videogo.ui.cameralist.EZCameraListActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.videogo.ui.realplay.EZRealPlayActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.videogo.ui.message.EZMessageImageActivity2"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.videogo.ui.message.EZMessageActivity2"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.videogo.ui.remoteplayback.EZRemotePlayBackActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.videogo.devicemgt.EZDeviceSettingActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.videogo.devicemgt.ModifyDeviceNameActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.videogo.scan.main.CaptureActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.videogo.ui.devicelist.SeriesNumSearchActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name="com.videogo.ui.devicelist.AutoWifiConnectingActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.videogo.devicemgt.EZUpgradeDeviceActivity"
+            android:label="@string/title_activity_ezupgrade_device" />
+        <activity
+            android:name="com.videogo.ui.LanDevice.LanDeviceActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.videogo.ui.LanDevice.LanDevicePlayActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.videogo.ui.LanDevice.LanDeviceActivateActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.videogo.SelectDeviceList"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.videogo.ui.ddns.EZDDNSListActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.videogo.OptionActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.videogo.SupportActivity"
+            android:screenOrientation="portrait" /> <!-- receiver -->
+        <receiver android:name="com.videogo.RootActivity$NotificationReceiver" />
+    </application>
+
+</manifest>

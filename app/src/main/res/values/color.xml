@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- common -->
+    <color name="mode_bg">#88000000</color>
+    <color name="black_bg">#000000</color>
+    <color name="shadow">#80000000</color>
+    <color name="dark_bg_70p">#bb000000</color>
+    <color name="dark_bg_20p">#33000000</color>
+    <color name="common_bg">#f0f0f3</color>
+    <color name="title_text">#333333</color>
+    <color name="title_line">#b2b2b2</color>
+    <color name="common_line">#c8c7cc</color>
+    <color name="common_text">#333333</color>
+    <color name="common_text_sel">#3aa3ee</color>
+    <color name="common_sub_text">#888888</color>
+    <color name="common_hint_text">#adadad</color>
+    <color name="setting_hint_text">#adadad</color>
+    <color name="state_normal_text">#71c211</color>
+    <color name="state_abnormal_text">#eb0303</color>
+    <color name="state_off_text">#adadad</color>
+    <color name="bar_text">#676767</color>
+    <color name="bar_text_sel">#3aa3ee</color>
+    <color name="page_bg_color">#f8f8f8</color>
+    <color name="pureblack">#ff000000</color>
+    <color name="black">#333333</color>
+    <color name="black_text">#333333</color>
+    <color name="blue">#205ba9</color>
+    <color name="gray">#adadad</color>
+    <color name="cameralist_gray">#e3e3e3</color>
+    <color name="page_change_gray">#8f8f8f</color>
+    <color name="gray_text">#adadad</color>
+    <color name="red">#bd2228</color>
+    <color name="transparent">#00ffffff</color>
+    <color name="translucent_black">#c0000000</color>
+    <color name="text_black">#353535</color>
+    <color name="white">#ffffff</color>
+    <color name="yahei">#626262</color>
+    <color name="articletext_backcolor">#f7f7f7</color>
+    <color name="trans_bg_color">#c0ffffff</color>
+    <color name="gray_bg">#ffe5e7e9</color>
+    <color name="unopen">#748dac</color>
+    <!-- scan color -->
+    <color name="viewfinder_frame">#929292</color>
+    <color name="viewfinder_laser">#fe5600</color>
+    <color name="viewfinder_mask">#000000</color>
+    <color name="result_view">#b0000000</color>
+    <color name="possible_result_points">#c0ffff00</color>
+    <!-- camera -->
+    <color name="transparent_bg">#00000000</color>
+    <!-- records -->
+    <color name="record_normal">#8cc6d7</color>
+    <color name="record_alarm">#ff7c59</color>
+    <color name="record_point">#bbbbbb</color>
+    <color name="record_time">#919191</color>
+    <color name="record_osd">#ff4300</color>
+    <!-- background -->
+    <color name="application_bg">@color/common_bg</color>
+    <color name="table_value">#7f7f7f</color>
+    <color name="loading_text">#686868</color>
+    <color name="realplay_loading_text">#7d755d</color>
+    <color name="grey">#777777</color>
+    <!-- 橘色字体 -->
+    <color name="orange_text">#df2d10</color>
+    <color name="yellow_text">#ff6600</color>
+    <color name="blue_text">#39a4cb</color>
+    <color name="green_text">#3fb895</color>
+    <color name="green">#4CAF50</color>
+    <!-- tab页面 -->
+    <color name="tab_color">#f9f9f9</color>
+    <color name="tab_sel_color">#1e1e1e</color>
+    <color name="tip_bg">#fff7e0</color>
+    <color name="tip_color">#a85f03</color>
+    <color name="event_message_from_tv">#818181</color>
+    <color name="event_message_play_btn">#eeeeee</color>
+    <!-- 画的线框的颜色 -->
+    <color name="line_color">#bebdbc</color>
+    <color name="fragment_line_color">#e6e7e8</color>
+    <color name="upgrade_orange">#fd8f06</color>
+    <color name="upgrade_green">#71c211</color>
+    <color name="upgrade_red">#ff2222</color>
+    <color name="upgrade_gray">#888888</color>
+    <color name="version_gray">#b4b4b4</color>
+    <color name="reg_deal_text_bule">#007aff</color>
+    <color name="share_green">#6ac949</color>
+    <color name="share_bule">#56abff</color>
+    <color name="share_red">#fc6969</color>
+    <color name="share_tip_red">#fe4343</color>
+
+    <drawable name="translucent">#00000000</drawable>
+
+    <!-- wifi一键配置 -->
+    <color name="auto_wifi_red">#fe4343</color>
+    <color name="auto_wifi_blue">#40a2ee</color>
+    <color name="auto_tip_text">#888888</color>
+    <color name="auto_blue_text">#2554bd</color>
+
+    <!-- R1文件上传 -->
+    <color name="active_color">#f08300</color>
+    <color name="normal_color">#6c6b6b</color>
+    <color name="upload_sel_count">#ff6c00</color>
+    <color name="progress_back">#646669</color>
+    <color name="progress_select">#58c01f</color>
+    <color name="r1_item_bg">#dddddd</color>
+    <color name="color_r1_cancel_color">#ff6969</color>
+    <color name="divider">#c7c7c7</color>
+    <!-- 消息 -->
+    <color name="message_bg">#fff</color>
+    <color name="message_button_text">#555</color>
+    <color name="play_translucent_bg">#c0000000</color>
+    <color name="channel_item_bg">#47a3ff</color>
+    <color name="leavemessage_text_color">#3aa3ee</color>
+    <color name="leavemessage_time_text_color">#adadad</color>
+    <color name="leavemessage_gray">#888888</color>
+    <!-- 我的 -->
+
+    <color name="remotefile_timebar_color">#39a3ed</color>
+    <color name="remotefile_timebar_alarm_color">#ff8261</color>
+    <color name="remotefile_line_color">#fe2b2b</color>
+
+    <!-- 回放列表 -->
+    <color name="remotelist_item_select">#249bff</color>
+    <color name="remotelist_item_duration_text_color">#c6c6c6</color>
+
+    <!-- 引导和登录 -->
+    <color name="login_line_color">#e0e0e3</color>
+    <color name="a1_blue_color">#1ea1ff</color>
+    <color name="a1_orange_color">#ff7e00</color>
+    <color name="my_list_deviver">#b2b2b2</color>
+    <color name="corsor_color">#adadad</color>
+    <color name="quality_focused_color">#448cf3</color>
+    <color name="source_detection_btn_color">#48a9fb</color>
+    <color name="preview_quality_color">#3eaefa</color>
+    
+    <color name="more_color">#3ea6ef</color>
+    <color name="scan_yellow">#e56b19</color>
+    <color name="tv_my_blue">#1b9ee2</color>
+	<color name="auto_wifi_tip_red">#FF4000</color>
+	<color name="add_title_text_color">#666666</color>
+    <color name="help_link">#527ddb</color>
+    <color name="opensdk_cameralist_bg">#f0f0f1</color>
+    <color name="on_off_text_selector">#3ea6ef</color>
+    <color name="grouplayout_item_bg_sel">#f3f4f5</color>
+
+    <color name="device_top_item_text_normal">#FF646464</color>
+    <color name="topbar_title_color">#FF323232</color>
+    <color name="orange">#df2d10</color>
+    <color name="color_white">#FFFFFFFF</color>
+    
+</resources>

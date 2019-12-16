@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black" >
+
+    <com.videogo.widget.TitleBar
+        android:id="@+id/title_bar"
+        style="@style/TitleBar_Dark"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <ImageView
+        android:id="@+id/alarm_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="centerInside"
+        android:layout_centerVertical="true"
+        />
+    </RelativeLayout>
+    <RelativeLayout
+        android:id="@+id/bottom_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@color/dark_bg_70p"
+        android:paddingBottom="30dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:paddingTop="10dp" >
+
+        <TextView
+            android:id="@+id/message_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:textColor="@android:color/white"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/message_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/message_type"
+            android:layout_marginTop="3dp"
+            android:textColor="@color/common_sub_text"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/message_from"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/message_time"
+            android:layout_marginTop="3dp"
+            android:textColor="@color/common_sub_text"
+            android:textSize="15sp" />
+
+        <Button
+            android:id="@+id/video_button"
+            android:layout_width="match_parent"
+            android:layout_height="39dp"
+            android:layout_below="@+id/message_from"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/login_btn_selector"
+            android:textColor="#ffffff"
+            android:textSize="14sp"
+            android:text="@string/message_video"
+            />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/menu_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="134dp"
+        android:layout_gravity="top|right"
+        android:layout_marginRight="2dp"
+        android:layout_marginTop="37dp"
+        android:background="@drawable/title_down_bg"
+        android:gravity="center"
+        android:minWidth="109.5dp"
+        android:orientation="vertical"
+        android:paddingTop="7dp"
+        android:visibility="gone" >
+
+        <TextView
+            android:id="@+id/menu_play"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableLeft="@drawable/title_down_play_selector"
+            android:drawablePadding="2dp"
+            android:gravity="center_vertical"
+            android:paddingLeft="7dp"
+            android:paddingRight="7dp"
+            android:text="@string/realplay"
+            android:textColor="@color/title_down_text_selector"
+            android:textSize="15sp" />
+    </LinearLayout>
+
+</FrameLayout>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" >
+
+    <TextView
+        android:id="@+id/serial_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="45344323"
+        android:layout_marginLeft="5dp"
+        android:textColor="@color/black_text"
+        android:textSize="@dimen/tab_text_size" />
+    
+	<LinearLayout
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_marginLeft="5dp"
+	    android:orientation="vertical"  >    
+		<LinearLayout
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:orientation="horizontal"  >
+	    <TextView
+	        android:id="@+id/wifi_tv"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/wifi_connected"
+	        android:textColor="@color/black_text"
+	        android:textSize="@dimen/tab_text_size" />
+	
+	    <TextView
+	        android:id="@+id/plat_tv"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/plat_connected"
+	        android:textColor="@color/black_text"
+	        android:textSize="@dimen/tab_text_size" />
+	</LinearLayout>
+	    <TextView
+	        android:id="@+id/ip_tv"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="192.168.0.1:5200"
+	        android:textColor="@color/black_text"
+	        android:textSize="@dimen/tab_text_size" />	
+    </LinearLayout>
+        
+    <Button
+        android:id="@+id/add_btn"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/btn_auto_blue_selector"
+        android:text="@string/add_device"
+        android:textColor="@color/auto_wifi_blue"
+        android:layout_margin="5dp"
+        android:onClick="onClick" /> 
+        
+    <Button
+        android:id="@+id/local_realplay_btn"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/btn_auto_blue_selector"
+        android:text="@string/local_realplay"
+        android:textColor="@color/auto_wifi_blue"
+        android:layout_margin="5dp"
+        android:onClick="onClick" />     
+</LinearLayout> 

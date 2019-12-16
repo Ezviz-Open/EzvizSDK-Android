@@ -1,0 +1,506 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/common_bg"
+    android:orientation="vertical" >
+
+    <com.videogo.widget.TitleBar
+        android:id="@+id/title_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/common_bg"
+            android:orientation="vertical"
+            android:paddingBottom="20dp"
+            android:paddingTop="@dimen/device_set_layout_padding" >
+
+            <com.videogo.widget.GroupLayout
+                style="@style/CommonGroupLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                 >
+
+                <LinearLayout
+                    android:id="@+id/device_info_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/device_set_layout_height"
+                    android:background="@android:color/white"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingLeft="@dimen/device_set_padding"
+                    android:paddingRight="@dimen/device_set_padding" >
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical" >
+
+                        <TextView
+                            android:id="@+id/device_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/common_text"
+                            android:textSize="@dimen/device_set_text_size" />
+
+                        <TextView
+                            android:id="@+id/device_type_sn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:textColor="@color/common_sub_text"
+                            android:textSize="@dimen/device_set_sub_text_size" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/device_set_arrow_padding"
+                        android:layout_weight="0"
+                        android:src="@drawable/arrow_next" />
+               </LinearLayout>
+            </com.videogo.widget.GroupLayout>
+            
+            <LinearLayout
+                    android:id="@+id/ez_device_serial_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/device_set_layout_height"
+                    android:background="@android:color/white"
+                    android:layout_marginTop="@dimen/device_set_layout_padding"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingLeft="@dimen/device_set_padding"
+                    android:paddingRight="@dimen/device_set_padding" >
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="horizontal" >
+                    
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:textColor="@color/common_text"
+                            android:layout_weight="1"
+                            android:text="@string/ez_settings_device_serial"
+                            android:textSize="@dimen/device_set_sub_text_size" />
+                        
+                        <TextView
+                            android:id="@+id/ez_device_serial"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/common_sub_text"
+                            android:layout_weight="0"
+                            android:text="123456789"
+                            android:layout_gravity="center_vertical"
+                            android:textSize="@dimen/device_set_text_size" />
+
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/device_set_arrow_padding"
+                        android:layout_weight="0"
+                        android:src="@drawable/arrow_next" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/defence_plan_parent_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <com.videogo.widget.GroupLayout
+                    style="@style/CommonGroupLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/device_set_layout_padding" >
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/device_set_layout_height"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingLeft="@dimen/device_set_padding"
+                        android:paddingRight="@dimen/device_set_padding" >
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/defence_plan"
+                            android:textColor="@color/common_text"
+                            android:textSize="@dimen/device_set_text_size" />
+
+                        <ImageView
+                            android:id="@+id/defence_plan_new"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="@dimen/device_set_arrow_padding"
+                            android:layout_weight="1"
+                            android:scaleType="fitStart" />
+
+                        <Button
+                            android:id="@+id/defence_plan_button"
+                            android:layout_width="60dp"
+                            android:layout_height="25dp"
+                            android:layout_gravity="center_vertical"
+                            android:background="@drawable/autologin_off" />
+
+                        <ProgressBar
+                            android:id="@+id/defence_plan_status_progress"
+                            style="@android:style/Widget.ProgressBar.Small"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0"
+                            android:visibility="gone" />
+
+                        <TextView
+                            android:id="@+id/defence_plan_status_retry"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0"
+                            android:drawableLeft="@drawable/common_title_refresh"
+                            android:drawablePadding="3dp"
+                            android:gravity="center_vertical"
+                            android:text="@string/refresh"
+                            android:textColor="@color/common_sub_text"
+                            android:textSize="@dimen/device_set_sub_text_size"
+                            android:visibility="gone" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/defence_plan_set_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:minHeight="@dimen/device_set_layout_height"
+                        android:orientation="horizontal"
+                        android:paddingLeft="@dimen/device_set_padding"
+                        android:paddingRight="@dimen/device_set_padding" >
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/set_defence_plan"
+                            android:textColor="@color/common_text"
+                            android:textSize="@dimen/device_set_text_size" />
+
+                        <TextView
+                            android:id="@+id/defence_plan_state"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="right"
+                            android:textColor="@color/on_off_text_selector"
+                            android:textSize="@dimen/device_set_sub_text_size" />
+
+                        <ProgressBar
+                            android:id="@+id/defence_plan_progress"
+                            style="@android:style/Widget.ProgressBar.Small"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0"
+                            android:visibility="gone" />
+
+                        <TextView
+                            android:id="@+id/defence_plan_retry"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0"
+                            android:drawableLeft="@drawable/common_title_refresh"
+                            android:drawablePadding="3dp"
+                            android:gravity="center_vertical"
+                            android:text="@string/refresh"
+                            android:textColor="@color/common_sub_text"
+                            android:textSize="@dimen/device_set_sub_text_size"
+                            android:visibility="gone" />
+
+                        <ImageView
+                            android:id="@+id/defence_plan_arrow"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="@dimen/device_set_arrow_padding"
+                            android:layout_weight="0"
+                            android:src="@drawable/arrow_next" />
+                    </LinearLayout>
+                </com.videogo.widget.GroupLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/common_bg"
+                    android:paddingLeft="@dimen/device_set_padding"
+                    android:paddingRight="@dimen/device_set_padding"
+                    android:paddingTop="@dimen/device_set_text_padding"
+                    android:text="@string/defence_plan_tip"
+                    android:textColor="@color/setting_hint_text"
+                    android:textSize="@dimen/device_set_text_size" />
+            </LinearLayout>
+
+            <com.videogo.widget.GroupLayout
+                style="@style/CommonGroupLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/device_set_layout_padding" >
+
+                <LinearLayout
+                    android:id="@+id/current_version_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/device_set_layout_height"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingLeft="@dimen/device_set_padding"
+                    android:paddingRight="@dimen/device_set_padding" >
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/ez_current_version"
+                        android:textColor="@color/common_text"
+                        android:textSize="@dimen/device_set_text_size" />
+                    <TextView
+                        android:id="@+id/current_version"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0"
+                        android:text=""
+                        android:textColor="@color/common_sub_text"
+                        android:textSize="@dimen/device_set_sub_text_size" />
+                </LinearLayout>
+                
+                <LinearLayout
+                    android:id="@+id/version_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:minHeight="@dimen/device_set_layout_height"
+                    android:orientation="horizontal"
+                    android:paddingLeft="@dimen/device_set_padding"
+                    android:paddingRight="@dimen/device_set_padding" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ez_latest_version"
+                        android:textColor="@color/common_text"
+                        android:textSize="@dimen/device_set_text_size" />
+
+                    <ImageView
+                        android:id="@+id/version_notice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0"
+                        android:background="@drawable/upgrade" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="right"
+                        android:orientation="vertical" >
+
+                        <TextView
+                            android:id="@+id/version"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="right"
+                            android:textColor="@color/common_text"
+                            android:textSize="@dimen/device_set_sub_text_size" />
+
+                        <TextView
+                            android:id="@+id/version_newest"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="right"
+                            android:text="@string/version_newest"
+                            android:textColor="@color/common_sub_text"
+                            android:textSize="@dimen/device_set_sub_text_size" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/version_arrow"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/device_set_arrow_padding"
+                        android:layout_weight="0"
+                        android:src="@drawable/arrow_next" />
+                </LinearLayout>
+            </com.videogo.widget.GroupLayout>
+
+            <com.videogo.widget.GroupLayout
+                style="@style/CommonGroupLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/device_set_layout_padding" >
+
+                <LinearLayout
+                    android:id="@+id/defence_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/device_set_layout_height"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingLeft="@dimen/device_set_padding"
+                    android:paddingRight="@dimen/device_set_padding" >
+
+                    <TextView
+                        android:id="@+id/defence"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/detail_defend_c1_c2_f1"
+                        android:textColor="@color/common_text"
+                        android:textSize="@dimen/device_set_text_size" />
+
+                    <TextView
+                        android:id="@+id/defence_state"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="right"
+                        android:textColor="@color/common_sub_text"
+                        android:textSize="@dimen/device_set_sub_text_size" />
+
+                    <Button
+                        android:id="@+id/defence_toggle_button"
+                        android:layout_width="60dp"
+                        android:layout_height="25dp"
+                        android:layout_gravity="center_vertical"
+                        android:background="@drawable/autologin_off" />
+                </LinearLayout>
+            </com.videogo.widget.GroupLayout>
+
+            <LinearLayout
+                android:id="@+id/encrypt_parent_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <com.videogo.widget.GroupLayout
+                    style="@style/CommonGroupLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/device_set_layout_padding" >
+
+                    <LinearLayout
+                        android:id="@+id/encrypt_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/device_set_layout_height"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingLeft="@dimen/device_set_padding"
+                        android:paddingRight="@dimen/device_set_padding" >
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/detail_safe_mode"
+                            android:textColor="@color/common_text"
+                            android:textSize="@dimen/device_set_text_size" />
+
+                        <Button
+                            android:id="@+id/encrypt_button"
+                            android:layout_width="60dp"
+                            android:layout_height="25dp"
+                            android:layout_gravity="center_vertical"
+                            android:background="@drawable/autologin_off" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/modify_password_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/device_set_layout_height"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingLeft="@dimen/device_set_padding"
+                        android:paddingRight="@dimen/device_set_padding" >
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/password_security_txt"
+                            android:textColor="@color/common_text"
+                            android:textSize="@dimen/device_set_text_size" />
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="@dimen/device_set_arrow_padding"
+                            android:layout_weight="0"
+                            android:src="@drawable/arrow_next" />
+                    </LinearLayout>
+                </com.videogo.widget.GroupLayout>
+            </LinearLayout>
+            <com.videogo.widget.GroupLayout
+                style="@style/CommonGroupLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:layout_marginTop="@dimen/device_set_layout_padding" >
+            
+                <LinearLayout
+                    android:id="@+id/storage_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/device_set_layout_height"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingLeft="@dimen/device_set_padding"
+                    android:paddingRight="@dimen/device_set_padding" >
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/storage_status"
+                        android:textColor="@color/common_text"
+                        android:textSize="@dimen/device_set_text_size" />
+
+                    <View
+                        android:id="@+id/storage_notice"
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        android:layout_weight="0"
+                        android:background="@drawable/common_number_bg" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/device_set_arrow_padding"
+                        android:layout_weight="0"
+                        android:src="@drawable/arrow_next" />
+                </LinearLayout>
+            </com.videogo.widget.GroupLayout>
+            <com.videogo.widget.GroupLayout
+                style="@style/CommonGroupLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/device_set_layout_padding" >
+
+                <TextView
+                    android:id="@+id/device_delete"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/device_set_layout_height"
+                    android:gravity="center"
+                    android:text="@string/delete"
+                    android:textColor="#ff0000"
+                    android:textSize="@dimen/device_set_text_size" />
+            </com.videogo.widget.GroupLayout>
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

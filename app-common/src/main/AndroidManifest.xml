@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="ezviz.ezopensdkcommon">
+
+    <application
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".configwifi.ManualInputDeviceHotspotInfoActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".configwifi.AutoWifiPrepareStepOneActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".configwifi.AutoWifiNetConfigActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".configwifi.AutoWifiResetActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".configwifi.ManualChooseConfigWifiWayActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".configwifi.ConfigWifiExecutingActivity"
+            android:screenOrientation="portrait"/>
+    </application>
+
+</manifest>

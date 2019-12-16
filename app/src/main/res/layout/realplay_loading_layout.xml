@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/realplay_loading_rl"
+    android:layout_width="match_parent"
+    android:layout_height="200dp"
+    android:background="@color/black_bg" >
+
+    <TextView
+        android:id="@+id/realplay_tip_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:text="设备不在线"
+        android:textColor="@color/white"
+        android:textSize="@dimen/realplay_tip_text_size"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/realplay_play_iv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:onClick="onClick"
+        android:scaleType="fitXY"
+        android:src="@drawable/ez_leave_message_play_selector"
+        android:visibility="gone" />
+
+    <com.videogo.widget.loading.LoadingTextView
+        android:id="@+id/realplay_loading"
+        style="@style/LoadingTextView_Percent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" />
+
+    <LinearLayout
+        android:id="@+id/realplay_privacy_ly"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone" >
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/preview_close1_video_ico"
+            android:scaleType="fitXY" />
+
+        <TextView
+            android:id="@+id/realplay_privacy_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/camera_lens_closed"
+            android:textColor="@color/viewfinder_frame"
+            android:textSize="@dimen/realplay_button_text_size" />
+    </LinearLayout>
+    
+    <ImageView
+        android:id="@+id/realplay_page_anim_iv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />           
+</RelativeLayout>

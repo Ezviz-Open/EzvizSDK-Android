@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg"
+    android:orientation="vertical" >
+
+    <ImageView
+        android:id="@+id/shipin7_logo_lyt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/login_logo"
+        android:layout_marginTop="100dp"
+        >
+    </ImageView>
+
+    <RelativeLayout
+        android:id="@+id/handle_lyt"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_below="@id/shipin7_logo_lyt"
+        >
+
+
+        <Button
+            android:id="@+id/btn_online_device"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/interface_call_btn_selector"
+            android:text="@string/ezviz_device"
+            android:textColor="@color/white"
+            android:textSize="@dimen/login_text_size"
+            android:onClick="onClick" />
+
+        <Button
+            android:id="@+id/btn_ddns"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/interface_call_btn_selector"
+            android:text="@string/ddns_device"
+            android:textColor="@color/white"
+            android:textSize="@dimen/login_text_size"
+            android:layout_below="@id/btn_online_device"
+            android:onClick="onClick" />
+
+
+    </RelativeLayout>
+</RelativeLayout>

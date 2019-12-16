@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.test.TestConfigWifiActivity">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/btn_start_ap"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="开始AP配网" />
+            <Button
+                android:id="@+id/btn_stop_ap"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="停止AP配网" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+    <RelativeLayout
+        android:id="@+id/handle_lyt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        >
+
+        <Button
+            android:id="@+id/btn_landevice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/interface_call_btn_selector"
+            android:text="Landevice"
+            android:textColor="@color/white"
+            android:textSize="@dimen/login_text_size"
+            android:layout_below="@id/web_login_btn"
+            android:onClick="onClick" />
+
+        <Button
+            android:id="@+id/btn_get_device_list"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/interface_call_btn_selector"
+            android:text="Get_DeviceList"
+            android:layout_below="@id/btn_landevice"
+            android:textColor="@color/white"
+            android:textSize="@dimen/login_text_size"
+            android:onClick="onClick" />
+
+        <Button
+            android:id="@+id/btn_capture"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/interface_call_btn_selector"
+            android:text="capture"
+            android:textColor="@color/white"
+            android:textSize="@dimen/login_text_size"
+            android:layout_below="@id/btn_get_device_list"
+            android:onClick="onClick" />
+
+        <Button
+            android:id="@+id/btn_to_device_list"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/interface_call_btn_selector"
+            android:text="to ezviz device list"
+            android:textColor="@color/white"
+            android:textSize="@dimen/login_text_size"
+            android:layout_below="@id/btn_capture"
+            android:onClick="onClick" />
+
+
+        <Button
+            android:id="@+id/btn_to_alarm_list"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/interface_call_btn_selector"
+            android:text="to ezviz alarm list"
+            android:textColor="@color/white"
+            android:textSize="@dimen/login_text_size"
+            android:layout_below="@id/btn_to_device_list"
+            android:onClick="onClick" />
+
+
+    </RelativeLayout>
+</RelativeLayout>

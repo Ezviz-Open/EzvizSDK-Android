@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/wifi_config_bg"
+    android:orientation="vertical"
+    android:keepScreenOn="true">
+
+    <!--title-->
+    <RelativeLayout
+        android:id="@+id/title_layout"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:background="@color/white"
+        >
+
+        <ImageView
+            android:id="@+id/back_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:background="@drawable/common_title_back_selector"
+            android:onClick="onClickExit"/>
+
+        <TextView
+            android:id="@+id/app_common_tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/config_wifi_page"
+            android:textColor="@color/title_text"
+            android:textSize="@dimen/title_text_size"
+            />
+    </RelativeLayout>
+
+    <!--配网进度展示-->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="50dp"
+            android:gravity="center_vertical"
+            android:layout_gravity="center_horizontal">
+
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginRight="20dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/configuring_wifi"
+                android:textSize="@dimen/txt_size_title" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_connecting_to_device"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ap_config_connecting_to_device"
+            android:textSize="@dimen/txt_size_notify"
+            android:layout_marginBottom="@dimen/margin_line_widget"
+            android:textColor="@color/black"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/tv_registering_to_platform"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ap_config_device_try_registering_ezviz_platform"
+            android:textSize="@dimen/txt_size_content"
+            android:layout_marginBottom="@dimen/margin_line_widget"
+            android:textColor="@color/gray"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/tv_adding_to_account"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/step3_adding_device_to_account"
+            android:textSize="@dimen/txt_size_content"
+            android:textColor="@color/gray"
+            android:visibility="gone"/>
+
+    </LinearLayout>
+
+    <!--配网结果展示-->
+    <RelativeLayout
+        android:id="@+id/app_common_vg_config_result"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black"
+        android:alpha="1"
+        android:visibility="visible">
+
+        <LinearLayout
+            android:id="@+id/app_common_config_result_fail"
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:visibility="visible">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/failure_wifi" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/failed_to_config_wifi"
+                android:textColor="@color/red"
+                android:layout_marginTop="30dp"
+                android:layout_marginBottom="30dp"/>
+
+            <TextView
+                android:id="@+id/app_common_all_config_error_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="50dp"
+                android:layout_marginBottom="50dp"
+                android:textSize="10dp"
+                android:text="这里用于展示具体的错误信息"
+                android:textColor="@color/red"
+                android:textStyle="bold"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/content_text_size"
+                android:text="@string/try_again"
+                android:onClick="onClickRetryConfigWifi"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/app_common_config_result_success"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/success_img" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/config_wifi_succeeded"
+                android:textColor="@color/green"
+                android:layout_marginTop="30dp"
+                android:layout_marginBottom="30dp"
+                android:textSize="20dp"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/content_text_size"
+                android:text="@string/config_wifi_for_another_device"
+                android:onClick="onClickToConfigAnother"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

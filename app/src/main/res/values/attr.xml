@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources> 
+    <declare-styleable name="LoadingTextView">
+        <attr name="textStyle">
+            <enum name="noText" value="-1" />
+            <enum name="horizontal" value="0" />
+            <enum name="vertical" value="1" />
+        </attr>
+        <attr name="gravity" format="integer" />
+        <attr name="textSize" format="dimension" />
+        <attr name="textColor" format="color" />
+        <attr name="textPadding" format="dimension" />
+        <attr name="android:text" />
+    </declare-styleable>
+    <declare-styleable name="TitleBar">
+        <attr name="textColor" />
+        <attr name="background" format="reference" />
+        <attr name="backButton" format="reference" />
+    </declare-styleable>
+  <declare-styleable name="PullToRefresh"> 
+    <attr name="ptrRefreshableViewBackground" format="reference|color"/>  
+    <attr name="ptrOverScroll" format="reference|boolean"/>  
+    <attr name="ptrScrollingWhileRefreshingEnabled" format="reference|boolean"/>  
+    <attr name="ptrListViewExtrasEnabled" format="reference|boolean"/> 
+  </declare-styleable> 
+    <declare-styleable name="GroupLayout">
+        <attr name="dividerPadding" format="dimension" />
+        <attr name="dividerHeight" format="dimension" />
+        <attr name="dividerColor" format="color" />
+        <attr name="itemSelector" format="reference" />
+    </declare-styleable>
+
+    <declare-styleable name="ImageViewFixedRatio">
+        <attr name="ratio" format="float"/>
+    </declare-styleable>
+    <declare-styleable name="TopBar">
+        <attr name="hideLeft" format="boolean" />
+        <attr name="hideRight" format="boolean" />
+        <attr name="leftIcon" format="reference" />
+        <attr name="rightIcon" format="reference" />
+        <attr name="topBarTitle" format="string" />
+        <attr name="topBarLeft" format="string" />
+        <attr name="topBarRight" format="string" />
+    </declare-styleable>
+</resources>

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:id="@+id/realplay_full_operate_layout"
+   android:layout_alignBottom="@+id/realplay_sv"
+   android:layout_width="match_parent"
+   android:layout_height="wrap_content" >
+	<RelativeLayout 
+	    android:id="@+id/realplay_full_operate_bar"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="horizontal"
+	    android:paddingBottom="15dp"
+	    android:visibility="gone">
+	
+	    <ImageButton
+	        android:id="@+id/realplay_full_play_btn"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentLeft="true"
+	        android:layout_marginLeft="15dp"
+	        android:background="@drawable/play_full_play_selector"
+	        android:onClick="onClick" />
+	
+	    <ImageButton
+	        android:id="@+id/realplay_full_sound_btn"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginLeft="9dp"
+	        android:layout_toRightOf="@+id/realplay_full_play_btn"
+	        android:background="@drawable/play_full_soundon_btn_selector"
+	        android:onClick="onClick" />
+	
+	    <ImageButton
+	        android:id="@+id/realplay_full_talk_btn"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginLeft="9dp"
+	        android:layout_toRightOf="@+id/realplay_full_sound_btn"
+	        android:background="@drawable/speech_full_selector"
+	        android:onClick="onClick" />
+	
+	    <ImageButton
+	        android:id="@+id/realplay_full_previously_btn"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginLeft="9dp"
+	        android:layout_toRightOf="@+id/realplay_full_talk_btn"
+	        android:background="@drawable/play_full_previously_selector"
+	        android:onClick="onClick" />
+	
+	    <FrameLayout
+	        android:id="@+id/realplay_full_video_container"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginLeft="9dp"
+	        android:layout_toRightOf="@+id/realplay_full_previously_btn" >
+	
+	        <ImageButton
+	            android:id="@+id/realplay_full_video_btn"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:background="@drawable/play_full_video_selector"
+	            android:onClick="onClick" />
+	
+	        <ImageButton
+	            android:id="@+id/realplay_full_video_start_btn"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:background="@drawable/play_full_video_now_selector"
+	            android:onClick="onClick"
+	            android:visibility="gone" />
+	    </FrameLayout>
+	
+	    <ImageButton
+	        android:id="@+id/realplay_full_ptz_btn"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginLeft="9dp"
+	        android:layout_toRightOf="@+id/realplay_full_video_container"
+	        android:background="@drawable/play_full_ptz_selector"
+	        android:onClick="onClick" />
+	    	
+	    <LinearLayout
+	        android:id="@+id/realplay_full_flow_ly"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginRight="74dp"
+	        android:layout_alignParentRight="true"
+	        android:background="@anim/play_full_multiple_anim_bg"
+	        android:gravity="center"
+	        android:orientation="vertical" >
+	
+	        <TextView
+	            android:id="@+id/realplay_full_rate_tv"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:paddingLeft="4dp"
+	            android:paddingRight="4dp"
+	            android:text="523k/s"
+	            android:textColor="@color/white"
+	            android:textSize="@dimen/realplay_channel_text_size" />
+	
+	        <TextView
+	            android:id="@+id/realplay_full_flow_tv"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:paddingLeft="4dp"
+	            android:paddingRight="4dp"
+	            android:text="345MB"
+	            android:textColor="@color/white"
+	            android:textSize="@dimen/realplay_channel_text_size" />
+	    </LinearLayout>
+	</RelativeLayout>
+	
+	<ImageButton
+	    android:id="@+id/realplay_full_talk_anim_btn"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_marginBottom="15dp"
+	    android:layout_marginLeft="15dp"
+	    android:background="@drawable/speech"
+	    android:onClick="onClick"
+	    android:visibility="gone" />
+	
+	<ImageButton
+	    android:id="@+id/realplay_full_ptz_anim_btn"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_marginBottom="15dp"
+	    android:layout_marginLeft="15dp"
+	    android:background="@drawable/yuntai_pressed"
+	    android:onClick="onClick"
+	    android:visibility="gone" />
+	
+	<com.videogo.widget.CheckTextButton
+	    android:id="@+id/fullscreen_full_button"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentRight="true"
+	    android:layout_marginRight="15dp"
+	    android:layout_marginBottom="15dp"
+	    android:background="@drawable/horizontal_fullscreen_button_selector"
+	    android:visibility="gone" />	
+</RelativeLayout>

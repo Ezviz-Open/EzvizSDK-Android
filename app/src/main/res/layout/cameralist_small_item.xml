@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/camera_item_rl"
+    android:layout_width="fill_parent"
+    android:layout_height="73dp"
+    android:background="@drawable/display_frame"
+    android:clickable="true"
+    android:orientation="horizontal" >
+    <RelativeLayout
+        android:id="@+id/item_icon_area"
+        android:layout_width="112dp"
+        android:layout_height="63dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/my_cover" >
+
+        <ImageView
+            android:id="@+id/item_icon"
+            android:layout_width="112dp"
+            android:layout_height="63dp"
+            android:scaleType="fitXY"
+            android:visibility="invisible" />
+
+        <ImageButton
+            android:id="@+id/item_play_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:background="@drawable/play_smallbtn_selector" />
+
+        <ImageView
+            android:id="@+id/item_offline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/offline"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/offline_bg"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_alignParentRight="true"
+            android:background="#30000000"
+            android:visibility="gone" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="73dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/item_icon_area"
+        android:orientation="vertical"
+        android:paddingLeft="5dp" >
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="20dp"
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal"
+            android:paddingRight="10dp" >
+	        <TextView
+	            android:id="@+id/camera_name_tv"
+	            android:layout_width="fill_parent"
+	            android:layout_height="wrap_content"
+	            android:layout_weight="1"
+	            android:ellipsize="end"
+	            android:paddingLeft="5dp"
+	            android:paddingRight="8dp"
+	            android:singleLine="true"
+	            android:text="camera1"
+	            android:textColor="#333333"
+	            android:textSize="15sp" />
+            <ImageButton
+                android:id="@+id/camera_del_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="40px"
+                android:gravity="center"
+                android:background="@null"
+                android:visibility="gone"
+                android:src="@drawable/palyback_close_selector" />	        
+		</LinearLayout>
+		
+        <LinearLayout
+            android:layout_width="170dp"
+            android:layout_height="40dp"
+            android:gravity="left|center_vertical|start"
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp"
+            android:paddingRight="15dp" >
+
+            <RelativeLayout
+                android:id="@+id/tab_remoteplayback_rl"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="3"
+                android:background="@null"
+                android:gravity="center"
+                android:orientation="vertical" >
+
+                <ImageButton
+                    android:id="@+id/tab_remoteplayback_btn"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_centerHorizontal="true"
+                    android:background="@null"
+                    android:gravity="center"
+                    android:src="@drawable/open_cameralist_remotepb_selector" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/tab_alarmlist_rl"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="3"
+                android:background="@null"
+                android:gravity="center"
+                android:orientation="vertical" >
+
+                <ImageButton
+                    android:id="@+id/tab_alarmlist_btn"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_centerHorizontal="true"
+                    android:background="@null"
+                    android:gravity="center"
+                    android:src="@drawable/open_cameralist_alarmlist_selector" />
+            </RelativeLayout>            
+            <RelativeLayout
+                android:id="@+id/tab_setdevice_rl"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="3"
+                android:background="@null"
+                android:gravity="center"
+                android:orientation="vertical" >
+
+                <ImageButton
+                    android:id="@+id/tab_setdevice_btn"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_centerHorizontal="true"
+                    android:background="@null"
+                    android:gravity="center"
+                    android:src="@drawable/open_cameralist_setup_selector"/>
+            </RelativeLayout>            
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:gravity="center_vertical|left"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            android:paddingRight="5dp" >
+
+            <RelativeLayout
+                android:id="@+id/tab_devicepicture_rl"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="3"
+                android:background="@drawable/small_button_cameralist"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone" >
+
+                <ImageButton
+                    android:id="@+id/tab_devicepicture_btn"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_centerHorizontal="true"
+                    android:background="@drawable/cameralist_button_selector"
+                    android:gravity="center"
+                    android:src="@drawable/capturebtn_selector" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/tab_devicevideo_rl"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="3"
+                android:background="@drawable/small_button_cameralist"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone" >
+
+                <ImageButton
+                    android:id="@+id/tab_devicevideo_btn"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_centerHorizontal="true"
+                    android:background="@drawable/cameralist_button_selector"
+                    android:gravity="center"
+                    android:src="@drawable/playback_cut_btn_selector" />
+            </RelativeLayout>            
+            <RelativeLayout
+                android:id="@+id/tab_devicedefence_rl"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="3"
+                android:background="@drawable/small_button_cameralist"
+                android:gravity="center"
+                android:orientation="vertical" >
+
+                <ImageButton
+                    android:id="@+id/tab_devicedefence_btn"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_centerHorizontal="true"
+                    android:background="@drawable/cameralist_button_selector"
+                    android:gravity="center"
+                    android:src="@drawable/my_switch_selector"/>
+            </RelativeLayout>            
+        </LinearLayout>        
+    </LinearLayout>
+
+</RelativeLayout>

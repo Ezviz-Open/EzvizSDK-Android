@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/common_bg"
+    android:orientation="vertical" >
+
+    <com.videogo.widget.TitleBar
+        android:id="@+id/title_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:id="@+id/main_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/title_bar"
+        android:orientation="vertical" >
+<!-- 
+        <LinearLayout
+            android:id="@+id/check_mode_top"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:background="#fff"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone" >
+
+ 			<CheckBox
+                android:id="@+id/check_all"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:button="@drawable/check_selector" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/select_all"
+                android:textColor="@color/common_text"
+                android:textSize="15sp" />
+        </LinearLayout>
+ -->
+        <View
+            android:id="@+id/check_mode_top_divider"
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="#d8d8d8"
+            android:visibility="gone" />
+
+        <com.videogo.widget.pulltorefresh.PullToRefreshPinnedSectionListView
+            android:id="@+id/message_list"
+            style="@style/CommonListView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:divider="@color/c8"
+            android:dividerHeight="0.5dp" />
+
+        <View
+            android:id="@+id/check_mode_bottom_divider"
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:layout_weight="0"
+            android:background="@color/title_line"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/check_mode_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="49dp"
+            android:layout_weight="0"
+            android:background="#f9f9f9"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:weightSum="2"
+            android:visibility="gone" >
+            
+        <LinearLayout
+            android:id="@+id/check_mode_top"
+            android:layout_width="1dp"
+            android:layout_height="wrap_content"
+            android:background="#fff"
+            android:layout_weight="0"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone" >
+
+ 			<CheckBox
+                android:id="@+id/check_all"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:button="@drawable/check_selector" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/select_all"
+                android:background="@null"
+                android:textColor="@color/common_text"
+                android:textSize="15sp" />
+        </LinearLayout>
+
+            <Button
+                android:id="@+id/del_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/delete"
+                android:background="@null"
+                android:textColor="@color/del_button_text_selector"
+                android:textSize="15sp" />
+            <!--     android:background="@drawable/del_button_selector" -->
+            
+            <Button
+                android:id="@+id/read_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="1"
+                android:background="@null"
+                android:text="@string/ez_check_all_message"
+                android:textColor="@color/read_button_text_selector"
+                android:textSize="15sp" />
+            <!--                 android:background="@drawable/read_button_selector"
+             -->
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/no_message_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/title_bar"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:visibility="gone" >
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/no_message" />
+
+        <TextView
+            android:id="@+id/no_message_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/ez_no_message"
+            android:textColor="@color/c2"
+            android:textSize="@dimen/f6" />
+        <Button
+            android:id="@+id/no_message_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:visibility="gone"
+            android:background="@drawable/login_btn_selector"
+            android:gravity="center"
+            android:text="@string/goto_mall_to_see"
+            android:textColor="@color/white"
+            android:textSize="@dimen/login_text_size" />
+    </LinearLayout>
+
+    <include
+        android:id="@+id/refresh_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/title_bar"
+        layout="@layout/network_error_retry_page"
+        android:visibility="gone" />
+
+</RelativeLayout>
