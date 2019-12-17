@@ -41,18 +41,8 @@ android {
     }
 }
 
-
 dependencies {
-    api 'com.hikvision.ezviz:ezviz-sdk:4.9.0.3'
+    api 'com.ezviz.sdk:ezviz-sdk:4.9.0.4'
     api project(':app-common')
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'javax.jmdns:jmdns:3.4.1'
-    implementation 'com.google.code.gson:gson:2.8.0'
-    implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-}
-repositories {
-    google()
-    jcenter()
+    api fileTree(include: ['*.jar'], dir: 'libs')
 }
