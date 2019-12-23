@@ -42,7 +42,7 @@ android {
 }
 
 dependencies {
-    api 'com.ezviz.sdk:ezviz-sdk:4.9.0.4'
+    api 'com.ezviz.sdk:ezviz-sdk:4.9.0.5'
     api project(':app-common')
     api fileTree(include: ['*.jar'], dir: 'libs')
 }
