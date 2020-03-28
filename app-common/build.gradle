@@ -33,5 +33,5 @@ android {
 
 dependencies {
     // 最终依赖由Application所在的module提供
-    compileOnly 'com.ezviz.sdk:ezviz-sdk:4.9.0.4'
+    compileOnly 'com.ezviz.sdk:ezviz-sdk:+'
 }
