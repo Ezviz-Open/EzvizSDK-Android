@@ -24,6 +24,9 @@ import android.widget.Toast;
 
 import com.videogo.constants.ReceiverKeys;
 import com.videogo.download.DownLoadTaskRecordAbstract;
+import com.videogo.openapi.EZGlobalSDK;
+import com.videogo.openapi.EZOpenSDK;
+import com.videogo.openapi.EzvizAPI;
 import com.videogo.util.LogUtil;
 import com.videogo.widget.WaitDialog;
 
@@ -413,6 +416,10 @@ public class RootActivity extends Activity {
                 RootActivity.toastMsg("canceled to downloaded!");
             }
         }
+    }
+
+    public static EZOpenSDK getOpenSDK(){
+        return EzvizApplication.getOpenSDK();
     }
 
 }

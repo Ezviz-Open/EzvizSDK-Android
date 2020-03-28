@@ -565,4 +565,21 @@
     <string name="give_up_adding">Give Up</string>
     <string name="app_add_device_success">Added device to account!</string>
 
+    <!--儿童手表-视频通话-->
+    <string name="video_talk_sdk_toast_hang_up">通话已结束</string>
+    <string name="video_talk_sdk_toast_nobody">对方无应答</string>
+    <string name="device_setting">设备管理</string>
+    <string name="video_talk_call_cancel">已取消</string>
+    <string name="video_talk_call_is_accepted">聊天已被人接收</string>
+    <string name="video_talk_watch_is_busy">手表正在通话，请稍后再试</string>
+    <string name="video_talk_is_playing">手表正被远程看护，请稍后再试</string>
+    <string name="video_talk_watch_temperature_high_hang">手表温度过高，通话已结束</string>
+    <string name="video_talk_watch_temperature_high_reject">手表温度较高，为避免手表过度发热，请稍后再试</string>
+    <string name="video_talk_watch_temperature_high_warn">手表温度过高，大约30S后将自动结束通话</string>
+    <string name="video_talk_watch_temperature_high_hint">天气温度或长时间通话会导致手表发热、电量过快消耗</string>
+    <string name="video_talk_signal_weak">网络信号弱</string>
+    <string name="main_tab_second_tab">智能</string>
+    <string name="goto_ad_close_page">可前往关闭广告</string>
+    <!--儿童手表-视频通话-->
+
 </resources>

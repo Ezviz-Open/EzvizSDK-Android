@@ -121,8 +121,6 @@ import java.util.TimerTask;
 import ezviz.ezopensdk.debug.VideoFileUtil;
 import ezviz.ezopensdk.demo.DemoConfig;
 import ezviz.ezopensdk.R;
-import ezviz.ezopensdk.debug.VideoFileUtil;
-import ezviz.ezopensdk.demo.DemoConfig;
 
 import static com.videogo.openapi.EZConstants.MSG_GOT_STREAM_TYPE;
 import static com.videogo.openapi.EZConstants.MSG_VIDEO_SIZE_CHANGED;
@@ -343,6 +341,19 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             }
         }
         mIsOnStop = false;
+        updateQualityBtnVisibility();
+    }
+
+    /**
+     * 更新清晰切换按钮可见性
+     */
+    private void updateQualityBtnVisibility(){
+        // 获取不到清晰度数据时，不展示清晰度
+        if (mCameraInfo != null && mCameraInfo.getVideoQualityInfos() != null && mCameraInfo.getVideoQualityInfos().size() > 0){
+            mRealPlayQualityBtn.setVisibility(View.VISIBLE);
+        }else{
+            mRealPlayQualityBtn.setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override
@@ -891,7 +902,6 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             mRealPlayFullCaptureBtn.setVisibility(View.VISIBLE);
             mRealPlayRecordContainerLy.setVisibility(View.VISIBLE);
             mRealPlayFullRecordContainer.setVisibility(View.VISIBLE);
-            mRealPlayQualityBtn.setVisibility(View.VISIBLE);
             mRealPlayFullSoundBtn.setVisibility(View.VISIBLE);
             mRealPlayFullPtzAnimBtn.setVisibility(View.GONE);
             mRealPlayFullPtzPromptIv.setVisibility(View.GONE);
@@ -902,9 +912,8 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
                 mLandscapeTitleBar.setTitle(mRealPlaySquareInfo.mCameraName);
             }
             mRealPlaySoundBtn.setVisibility(View.GONE);
-            mRealPlayQualityBtn.setVisibility(View.GONE);
         }
-
+        updateQualityBtnVisibility();
         if (mOrientation == Configuration.ORIENTATION_LANDSCAPE) {
             updateOperatorUI();
         }

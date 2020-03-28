@@ -7,7 +7,6 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 import com.videogo.RootActivity;
 import com.videogo.exception.BaseException;
 import com.videogo.exception.ErrorCode;
-import com.videogo.openapi.EZOpenSDK;
 import com.videogo.ui.util.ActivityUtils;
 
 import ezviz.ezopensdk.R;
@@ -52,7 +51,7 @@ public class AddDeviceToAccountActivity extends RootActivity {
                 String verifyCode = getIntent().getStringExtra(IntentConstants.DEVICE_VERIFY_CODE);
                 boolean isAddSuc = false;
                 try {
-                    EZOpenSDK.getInstance().addDevice(serial, verifyCode);
+                    getOpenSDK().addDevice(serial, verifyCode);
                     isAddSuc = true;
                 } catch (BaseException e) {
                     e.printStackTrace();

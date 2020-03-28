@@ -36,7 +36,6 @@ import com.videogo.errorlayer.ErrorInfo;
 import com.videogo.exception.BaseException;
 import com.videogo.exception.ErrorCode;
 import com.videogo.openapi.EZConstants;
-import com.videogo.openapi.EZOpenSDK;
 import com.videogo.openapi.EZOpenSDKListener;
 import com.videogo.openapi.bean.EZProbeDeviceInfoResult;
 import com.videogo.ui.cameralist.EZCameraListActivity;
@@ -570,11 +569,11 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
         boolean  support_Wifi = getIntent().getBooleanExtra("support_Wifi", false);
         boolean isStartedConfigWifi = true;
         if (support_Wifi){
-            EZOpenSDK.getInstance().stopConfigWiFi();
-            EZOpenSDK.getInstance().startConfigWifi(AutoWifiConnectingActivity.this, serialNo, wifiSSID, wifiPassword,
+            getOpenSDK().stopConfigWiFi();
+            getOpenSDK().startConfigWifi(AutoWifiConnectingActivity.this, serialNo, wifiSSID, wifiPassword,
                     EZConstants.EZWiFiConfigMode.EZWiFiConfigSmart, mEZStartConfigWifiCallback);
         }else if(support_sound_wave){
-            EZOpenSDK.getInstance().startConfigWifi(AutoWifiConnectingActivity.this, serialNo, wifiSSID, wifiPassword,
+            getOpenSDK().startConfigWifi(AutoWifiConnectingActivity.this, serialNo, wifiSSID, wifiPassword,
                     EZConstants.EZWiFiConfigMode.EZWiFiConfigWave, mEZStartConfigWifiCallback);
         }else{
             isStartedConfigWifi = false;
@@ -1367,7 +1366,7 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
                 public void run() {
                     while (isMonitoring){
                         boolean isOnline =false;
-                        EZProbeDeviceInfoResult result = EZOpenSDK.getInstance().probeDeviceInfo(mDeviceSerial,null);
+                        EZProbeDeviceInfoResult result = getOpenSDK().probeDeviceInfo(mDeviceSerial,null);
                         // online && not added by anyone
                         if (result.getBaseException() == null){
                             isOnline = true;

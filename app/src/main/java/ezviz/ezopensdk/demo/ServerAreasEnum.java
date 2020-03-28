@@ -14,55 +14,72 @@ public enum ServerAreasEnum {
     /**
      * 国内
      */
-    ASIA_CHINA(0,"Asia-China", "https://open.ys7.com", "https://openauth.ys7.com", "26810f3acd794862b608b6cfbc32a6b8"),
+    ASIA_CHINA(0,"Asia-China", "https://open.ys7.com",
+            "https://openauth.ys7.com",
+            "26810f3acd794862b608b6cfbc32a6b8"),
     /**
      * 海外：俄罗斯
      */
-    ASIA_Russia(5, "Asia-Russia", "https://irusopen.ezvizru.com", "https://irusopenauth.ezvizru.com"),
+    ASIA_Russia(5, "Asia-Russia", "https://irusopen.ezvizru.com",
+            "https://irusopenauth.ezvizru.com", true),
     /**
      * 海外：亚洲
      * （服务亚洲的所有国家，但不包括中国和俄罗斯）
      */
-    ASIA(10, "Asia", "https://isgpopen.ezvizlife.com", "https://isgpopenauth.ezvizlife.com"),
+    ASIA(10, "Asia", "https://isgpopen.ezvizlife.com",
+            "https://isgpopenauth.ezvizlife.com", true),
     /**
      * 海外：北美洲
      */
-    NORTH_AMERICA(15,"North America", "https://iusopen.ezvizlife.com", "https://iusopenauth.ezvizlife.com"),
+    NORTH_AMERICA(15,"North America", "https://iusopen.ezvizlife.com",
+            "https://iusopenauth.ezvizlife.com", true),
     /**
      * 海外：南美洲
      */
-    SOUTH_AMERICA(20, "South America", "https://isaopen.ezvizlife.com", "https://isaopenauth.ezvizlife.com"),
+    SOUTH_AMERICA(20, "South America", "https://isaopen.ezvizlife.com",
+            "https://isaopenauth.ezvizlife.com", true),
     /**
      * 海外：欧洲
      */
-    EUROPE(25, "Europe", "https://ieuopen.ezvizlife.com", "https://ieuopenauth.ezvizlife.com", "5cadedf5478d11e7ae26fa163e8bac01"),
+    EUROPE(25, "Europe", "https://ieuopen.ezvizlife.com",
+            "https://ieuopenauth.ezvizlife.com",
+            "5cadedf5478d11e7ae26fa163e8bac01",
+            true),
 
     /*线上平台的id范围为0到99，测试平台的id范围为100+*/
 
     /**
      * 测试平台:test2
      */
-    TEST2(100, "test2", "https://test2.ys7.com:9000", "https://test2auth.ys7.com:8643", "f24940e782454a0ca7cbf7c2a292a6c7"),
+    TEST2(100, "test2", "https://test2.ys7.com:9000",
+            "https://test2auth.ys7.com:8643",
+            "f24940e782454a0ca7cbf7c2a292a6c7"),
     /**
      * 测试平台:test11
      */
-    TEST11(105, "test11", "https://test11open.ys7.com", "https://test11openauth.ys7.com"),
+    TEST11(105, "test11", "https://test11open.ys7.com",
+            "https://test11openauth.ys7.com"),
     /**
      * 测试平台:test12
      */
-    TEST12(110, "test12", "https://test12open.ys7.com", "https://test12openauth.ys7.com", "680948cc41c44fbaac23d8b47be4028b"),
+    TEST12(110, "test12", "https://test12open.ys7.com",
+            "https://test12openauth.ys7.com",
+            "680948cc41c44fbaac23d8b47be4028b"),
     /**
      * 测试平台:testcn
      */
-    TEST_CN(115, "testcn", "https://testcnopen.ezvizlife.com", "https://testcnopenauth.ezvizlife.com"),
+    TEST_CN(115, "testcn", "https://testcnopen.ezvizlife.com",
+            "https://testcnopenauth.ezvizlife.com", true),
     /**
      * 测试平台:testus
      */
-    TEST_US(120, "testus", "https://testusopen.ezvizlife.com", "https://testusopenauth.ezvizlife.com"),
+    TEST_US(120, "testus", "https://testusopen.ezvizlife.com",
+            "https://testusopenauth.ezvizlife.com", true),
     /**
      * 测试平台:testeu
      */
-    TEST_EU(125, "testeu", "https://testeuopen.ezvizlife.com", "https://testeuopenauth.ezvizlife.com");
+    TEST_EU(125, "testeu", "https://testeuopen.ezvizlife.com",
+            "https://testeuopenauth.ezvizlife.com", true);
 
     public int id;
     public String areaName;
@@ -70,20 +87,28 @@ public enum ServerAreasEnum {
     public String openAuthApiServer;
     // 预置的用于测试h5登录的appKey（该appKey的bundleId已绑定到ezviz.opensdk）
     public String defaultOpenAuthAppKey;
+    // 是否正在海外域名，海外域名需要使用GlobalEZOpenSDK，反之使用EZOpenSDK
+    public boolean usingGlobalSDK;
 
     ServerAreasEnum(int id, String areaName, String openApiServer, String openAuthApiServer){
-        this.id = id;
-        this.areaName = areaName;
-        this.openApiServer = openApiServer;
-        this.openAuthApiServer = openAuthApiServer;
+        this(id, areaName, openApiServer, openAuthApiServer, null, false);
     }
 
     ServerAreasEnum(int id, String areaName, String openApiServer, String openAuthApiServer, String defaultOpenAuthAppKey){
+        this(id, areaName, openApiServer, openAuthApiServer, defaultOpenAuthAppKey, false);
+    }
+
+    ServerAreasEnum(int id, String areaName, String openApiServer, String openAuthApiServer, boolean usingGlobalSDK){
+        this(id, areaName, openApiServer, openAuthApiServer, null, usingGlobalSDK);
+    }
+
+    ServerAreasEnum(int id, String areaName, String openApiServer, String openAuthApiServer, String defaultOpenAuthAppKey, boolean usingGlobalSDK){
         this.id = id;
         this.areaName = areaName;
         this.openApiServer = openApiServer;
         this.openAuthApiServer = openAuthApiServer;
         this.defaultOpenAuthAppKey = defaultOpenAuthAppKey;
+        this.usingGlobalSDK = usingGlobalSDK;
     }
 
     public static List<ServerAreasEnum> getAllServers(){

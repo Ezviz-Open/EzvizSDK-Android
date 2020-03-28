@@ -31,7 +31,7 @@ import com.videogo.ui.cameralist.EZCameraListActivity;
 import com.videogo.ui.util.ActivityUtils;
 import ezviz.ezopensdkcommon.R;
 
-public class LoginSelectActivity extends Activity implements OnClickListener{
+public class LoginSelectActivity extends RootActivity implements OnClickListener{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,20 +60,20 @@ public class LoginSelectActivity extends Activity implements OnClickListener{
         Intent intent = null;
         switch(v.getId()) {
             case R.id.web_login_btn:
-                if (TextUtils.isEmpty(EzvizApplication.mAppKey)){
+                if (TextUtils.isEmpty(EzvizApplication.mInitParams.appKey)){
                     Toast.makeText(this,"Appkey为空",Toast.LENGTH_LONG).show();
                     return;
                 }
                 //if (position++%2==0){
-                //    EZOpenSDK.getInstance().setAccessToken("at.b7auodp5b9w1p1xxc5a1sdswbto3dt11-8z3rac25db-0sk7hca-wvvz6dals");
+                //    getInstanceOfEzvizSDK().setAccessToken("at.b7auodp5b9w1p1xxc5a1sdswbto3dt11-8z3rac25db-0sk7hca-wvvz6dals");
                 //}else{
-                //    EZOpenSDK.getInstance().setAccessToken("at.0r3whcehbliw25ln31jyudve6xlmkze0-4jlc52necs-09ctxls-uggtd6wqd");
+                //    getInstanceOfEzvizSDK().setAccessToken("at.0r3whcehbliw25ln31jyudve6xlmkze0-4jlc52necs-09ctxls-uggtd6wqd");
                 //
                 //}
-                //EZOpenSDK.getInstance().setAccessToken("at.bae1jthhbtalcsbi6i0g7t2z5zuzb8nn-3r8gjto73b-0fhxx20-dnxmptju1");
+                //getInstanceOfEzvizSDK().setAccessToken("at.bae1jthhbtalcsbi6i0g7t2z5zuzb8nn-3r8gjto73b-0fhxx20-dnxmptju1");
 
                 //碧桂园
-               //EZOpenSDK.getInstance().setAccessToken("at.8ew5dyfs80rqvr6s2e0aaewxaf726dh1-9nx0ul6fwj-024fc8e-ddlws86uu");
+               //getInstanceOfEzvizSDK().setAccessToken("at.8ew5dyfs80rqvr6s2e0aaewxaf726dh1-9nx0ul6fwj-024fc8e-ddlws86uu");
 
                 //海外预览慢
                 //EZGlobalSDK.getInstance().setAccessToken("at.4yx0ur2d9ccj6j0c9knk31e4ce1gq7zi-1am89ugnjw-1dsq6xc-tkn9gfap4");

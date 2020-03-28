@@ -69,7 +69,6 @@ import com.videogo.exception.ErrorCode;
 import com.videogo.exception.InnerException;
 import com.videogo.openapi.EZConstants;
 import com.videogo.openapi.EZConstants.EZPlaybackConstants;
-import com.videogo.openapi.EZOpenSDK;
 import com.videogo.openapi.EZOpenSDKListener;
 import com.videogo.openapi.EZPlayer;
 import com.videogo.openapi.bean.EZCameraInfo;
@@ -2424,7 +2423,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             return;
         }
         try {
-            EZOpenSDK.getInstance().openCloudPage(mCameraInfo.getDeviceSerial(), mCameraInfo.getCameraNo());
+            getOpenSDK().openCloudPage(mCameraInfo.getDeviceSerial(), mCameraInfo.getCameraNo());
         } catch (BaseException e) {
             toast(errorInfo);
             e.printStackTrace();

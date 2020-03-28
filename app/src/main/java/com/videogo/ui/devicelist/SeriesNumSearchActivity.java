@@ -32,7 +32,6 @@ import com.videogo.errorlayer.ErrorInfo;
 import com.videogo.exception.BaseException;
 import com.videogo.exception.ErrorCode;
 import com.videogo.exception.ExtraException;
-import com.videogo.openapi.EZOpenSDK;
 import com.videogo.openapi.bean.EZProbeDeviceInfoResult;
 import com.videogo.ui.util.ActivityUtils;
 import com.videogo.util.ConnectionDetector;
@@ -395,7 +394,7 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
         new Thread() {
             public void run() {
 
-                mEZProbeDeviceInfo = EZOpenSDK.getInstance().probeDeviceInfo(serialNo,mDeviceType);
+                mEZProbeDeviceInfo = getOpenSDK().probeDeviceInfo(serialNo,mDeviceType);
                 if (mEZProbeDeviceInfo != null){
                     if (mEZProbeDeviceInfo.getBaseException() == null){
                         // TODO: 2018/6/25 添加设备

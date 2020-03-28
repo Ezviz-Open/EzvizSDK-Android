@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 public class EZCameraListAdapter extends BaseAdapter {
     private static final String TAG = "CameraListAdapter";
@@ -74,6 +74,8 @@ public class EZCameraListAdapter extends BaseAdapter {
         public ImageButton remoteplaybackBtn;
 
         public ImageButton setDeviceBtn;
+
+        public ImageButton videoTalkBtn;
 
         public View itemIconArea;
 
@@ -168,6 +170,7 @@ public class EZCameraListAdapter extends BaseAdapter {
             viewHolder.alarmListBtn = (ImageButton) convertView.findViewById(R.id.tab_alarmlist_btn);            
             viewHolder.remoteplaybackBtn = (ImageButton) convertView.findViewById(R.id.tab_remoteplayback_btn);
             viewHolder.setDeviceBtn = (ImageButton) convertView.findViewById(R.id.tab_setdevice_btn);
+            viewHolder.videoTalkBtn = (ImageButton) convertView.findViewById(R.id.tab_video_talk_btn);
             viewHolder.offlineBgBtn = (ImageView) convertView.findViewById(R.id.offline_bg);
             viewHolder.itemIconArea = convertView.findViewById(R.id.item_icon_area);
             viewHolder.deleteBtn = (ImageButton) convertView.findViewById(R.id.camera_del_btn);
@@ -190,7 +193,10 @@ public class EZCameraListAdapter extends BaseAdapter {
 
             // 设置设备设置的监听响应函数
             viewHolder.setDeviceBtn.setOnClickListener(mOnClickListener);
-            
+
+            // 视频通话的监听响应函数
+            viewHolder.videoTalkBtn.setOnClickListener(mOnClickListener);
+
             viewHolder.deleteBtn.setOnClickListener(mOnClickListener);
             
             viewHolder.devicePicBtn.setOnClickListener(mOnClickListener);
@@ -210,6 +216,7 @@ public class EZCameraListAdapter extends BaseAdapter {
         viewHolder.remoteplaybackBtn.setTag(position);
         viewHolder.alarmListBtn.setTag(position);
         viewHolder.setDeviceBtn.setTag(position);
+        viewHolder.videoTalkBtn.setTag(position);
         viewHolder.deleteBtn.setTag(position);
         viewHolder.devicePicBtn.setTag(position);
         viewHolder.deviceVideoBtn.setTag(position);
@@ -247,6 +254,12 @@ public class EZCameraListAdapter extends BaseAdapter {
                 viewHolder.setDeviceBtn.setVisibility(View.VISIBLE);
             }
         }
+        /*手表设备视频通话功能按钮*/
+        if (deviceInfo != null && "KW1".equalsIgnoreCase(deviceInfo.getCategory())){
+            viewHolder.videoTalkBtn.setVisibility(View.VISIBLE);
+        }else{
+            viewHolder.videoTalkBtn.setVisibility(View.INVISIBLE);
+        }
         return convertView;
     }
 
@@ -281,7 +294,9 @@ public class EZCameraListAdapter extends BaseAdapter {
                     case R.id.tab_setdevice_btn:
                         mListener.onSetDeviceClick(EZCameraListAdapter.this, v, position);
                         break;
-                        
+                    case R.id.tab_video_talk_btn:
+                        mListener.onVideoClickClick(EZCameraListAdapter.this, v, position);
+                        break;
                     case R.id.camera_del_btn: 
                         mListener.onDeleteClick(EZCameraListAdapter.this, v, position);
                         break;
@@ -296,7 +311,7 @@ public class EZCameraListAdapter extends BaseAdapter {
                         
                     case R.id.tab_devicedefence_btn: 
                         mListener.onDeviceDefenceClick(EZCameraListAdapter.this, v, position);
-                        break;                          
+                        break;
                 }
             }
         }
@@ -319,5 +334,7 @@ public class EZCameraListAdapter extends BaseAdapter {
         public void onDeviceVideoClick(BaseAdapter adapter, View view, int position);
         
         public void onDeviceDefenceClick(BaseAdapter adapter, View view, int position);
+
+        public void onVideoClickClick(BaseAdapter adapter, View view, int position);
     }
 }

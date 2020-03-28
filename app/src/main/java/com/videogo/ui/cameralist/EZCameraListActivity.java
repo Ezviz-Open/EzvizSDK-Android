@@ -1,16 +1,16 @@
-/* 
+/*
  * @ProjectName VideoGoJar
  * @Copyright null
- * 
+ *
  * @FileName CameraListActivity.java
  * @Description 这里对文件进行描述
- * 
+ *
  * @author xia xingsuo
  * @data 2015-11-5
- * 
+ *
  * @note 这里写本文件的详细功能描述和注释
  * @note 历史记录
- * 
+ *
  * @warning 这里写本文件的相关警告
  */
 package com.videogo.ui.cameralist;
@@ -39,6 +39,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ezviz.demo.videotalk.WatchVideoTalkActivity;
 import com.ezviz.stream.EZStreamClientManager;
 import com.videogo.RootActivity;
 import com.videogo.constant.Constant;
@@ -47,7 +48,6 @@ import com.videogo.devicemgt.EZDeviceSettingActivity;
 import com.videogo.errorlayer.ErrorInfo;
 import com.videogo.exception.BaseException;
 import com.videogo.exception.ErrorCode;
-import com.videogo.openapi.EZOpenSDK;
 import com.videogo.openapi.bean.EZCameraInfo;
 import com.videogo.openapi.bean.EZDeviceInfo;
 import com.videogo.remoteplayback.list.EZPlayBackListActivity;
@@ -82,7 +82,6 @@ import ezviz.ezopensdk.demo.DemoConfig;
 import ezviz.ezopensdk.demo.ValueKeys;
 
 import static com.ezviz.stream.EZError.EZ_OK;
-import static com.videogo.EzvizApplication.getOpenSDK;
 
 
 public class EZCameraListActivity extends RootActivity implements OnClickListener, SelectCameraDialog.CameraItemClick {
@@ -224,14 +223,13 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
         mAdapter.setOnClickListener(new EZCameraListAdapter.OnClickListener() {
             @Override
             public void onPlayClick(BaseAdapter adapter, View view, int position) {
-
                 mClickType = TAG_CLICK_PLAY;
                 final EZDeviceInfo deviceInfo = mAdapter.getItem(position);
-
                 if (deviceInfo.getCameraNum() <= 0 || deviceInfo.getCameraInfoList() == null || deviceInfo.getCameraInfoList().size() <= 0) {
                     LogUtil.d(TAG, "cameralist is null or cameralist size is 0");
                     return;
                 }
+                /*单通道设备*/
                 if (deviceInfo.getCameraNum() == 1 && deviceInfo.getCameraInfoList() != null && deviceInfo.getCameraInfoList().size() == 1) {
                     LogUtil.d(TAG, "cameralist have one camera");
                     final EZCameraInfo cameraInfo = EZUtils.getCameraInfoFromDevice(deviceInfo, 0);
@@ -250,6 +248,7 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
                     startActivityForResult(intent, REQUEST_CODE);
                     return;
                 }
+                /*多通道设备*/
                 SelectCameraDialog selectCameraDialog = new SelectCameraDialog();
                 selectCameraDialog.setEZDeviceInfo(deviceInfo);
                 selectCameraDialog.setCameraItemClick(EZCameraListActivity.this);
@@ -264,6 +263,7 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
                     LogUtil.d(TAG, "cameralist is null or cameralist size is 0");
                     return;
                 }
+                /*单通道设备*/
                 if (deviceInfo.getCameraNum() == 1 && deviceInfo.getCameraInfoList() != null && deviceInfo.getCameraInfoList().size() == 1) {
                     LogUtil.d(TAG, "cameralist have one camera");
                     EZCameraInfo cameraInfo = EZUtils.getCameraInfoFromDevice(deviceInfo, 0);
@@ -276,6 +276,7 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
                     startActivity(intent);
                     return;
                 }
+                /*多通道设备*/
                 SelectCameraDialog selectCameraDialog = new SelectCameraDialog();
                 selectCameraDialog.setEZDeviceInfo(deviceInfo);
                 selectCameraDialog.setCameraItemClick(EZCameraListActivity.this);
@@ -297,6 +298,16 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
             @Override
             public void onDeleteClick(BaseAdapter adapter, View view, int position) {
                 showDialog(SHOW_DIALOG_DEL_DEVICE);
+            }
+
+            @Override
+            public void onVideoClickClick(BaseAdapter adapter, View view, int position) {
+                LogUtil.d(TAG, "this is a kid watch");
+                mClickType = TAG_CLICK_REMOTE_PLAY_BACK;
+                EZDeviceInfo deviceInfo = mAdapter.getItem(position);
+                Intent intent = new Intent(EZCameraListActivity.this, WatchVideoTalkActivity.class);
+                intent.putExtra(WatchVideoTalkActivity.InIntentKeysAndValues.KEY_DEVICE_SERIAL, deviceInfo.getDeviceSerial());
+                startActivity(intent);
             }
 
             @Override
@@ -628,7 +639,7 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Toast.makeText(getApplicationContext(), getString(R.string.tip_login_out), Toast.LENGTH_LONG).show();
-                EZOpenSDK.getInstance().logout();
+                getOpenSDK().logout();
                 finish();
             }
         });

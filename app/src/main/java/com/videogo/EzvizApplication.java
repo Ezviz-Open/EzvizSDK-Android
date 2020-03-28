@@ -16,6 +16,7 @@
 package com.videogo;
 
 import com.google.gson.Gson;
+import com.videogo.openapi.EZGlobalSDK;
 import com.videogo.openapi.EZOpenSDK;
 import com.videogo.openapi.EzvizAPI;
 
@@ -28,15 +29,15 @@ import ezviz.ezopensdkcommon.common.BaseApplication;
 
 public class EzvizApplication extends BaseApplication {
 
-    public static String mAppKey;
-    public static String mAccessToken;
-    public static String mOpenApiServer;
-    public static String mOpenAuthApiServer;
-
+    public static SdkInitParams mInitParams;
     public static EzvizApplication mEzvizApplication;
 
     public static EZOpenSDK getOpenSDK() {
-        return EZOpenSDK.getInstance();
+        if (EzvizAPI.getInstance().isUsingGlobalSDK()){
+            return EZGlobalSDK.getInstance();
+        }else{
+            return EZOpenSDK.getInstance();
+        }
     }
 
     @Override
@@ -45,7 +46,6 @@ public class EzvizApplication extends BaseApplication {
 
         init();
         initSDK();
-        EzvizAPI.getInstance().setServerUrl(mOpenApiServer, mOpenAuthApiServer);
 
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
@@ -55,6 +55,9 @@ public class EzvizApplication extends BaseApplication {
         });
     }
 
+    /**
+     * 获取持久化保存的参数
+     */
     private void init() {
         SpTool.init(getApplicationContext());
         if (!loadLastSdkInitParams()){
@@ -65,32 +68,25 @@ public class EzvizApplication extends BaseApplication {
     private boolean loadLastSdkInitParams() {
         String sdkInitParamStr = SpTool.obtainValue(ValueKeys.SDK_INIT_PARAMS);
         if (sdkInitParamStr != null){
-            SdkInitParams sdkInitParams = new Gson().fromJson(sdkInitParamStr, SdkInitParams.class);
-            if (sdkInitParams != null && sdkInitParams.appKey != null){
-                mAppKey = sdkInitParams.appKey;
-                mAccessToken = sdkInitParams.accessToken;
-                mOpenApiServer = sdkInitParams.openApiServer;
-                mOpenAuthApiServer = sdkInitParams.openAuthApiServer;
-                return true;
-            }
+            mInitParams = new Gson().fromJson(sdkInitParamStr, SdkInitParams.class);
+            return mInitParams != null && mInitParams.appKey != null;
         }
         return false;
     }
 
     private void LoadDefaultSdkInitParams(){
-        mAppKey = "26810f3acd794862b608b6cfbc32a6b8";
-        mAccessToken = "";
-        mOpenApiServer = "https://open.ys7.com";
-        mOpenAuthApiServer = "https://openauth.ys7.com";
+        mInitParams = SdkInitParams.createBy(null);
+        mInitParams.appKey = "26810f3acd794862b608b6cfbc32a6b8";
+        mInitParams.accessToken = "";
+        mInitParams.openApiServer = "https://open.ys7.com";
+        mInitParams.openAuthApiServer = "https://openauth.ys7.com";
     }
 
+    /**
+     * 初始化SDK
+     */
     private void initSDK() {
-        {
-            SdkInitParams initParams = new SdkInitParams();
-            initParams.appKey = mAppKey;
-            SdkInitTool.initSdk(this, initParams);
-        }
-
+        SdkInitTool.initSdk(this, mInitParams);
     }
 
 }

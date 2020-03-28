@@ -34,7 +34,7 @@ public class ActivityUtils {
     }
 
     public static void goToLoginAgain(Activity activity) {
-        EZOpenSDK.getInstance().openLoginPage();
+        EzvizApplication.getOpenSDK().openLoginPage();
     }
 
     public static void goToMainPage(Activity activity) {

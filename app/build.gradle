@@ -23,11 +23,6 @@ android {
         ndk {
             abiFilters "armeabi-v7a", "arm64-v8a"
         }
-        /*禁止使用java8，如果sdk使用了java8编译，但是应用层使用了java7编译，会导致应用层打包无法通过*/
-        compileOptions {
-            sourceCompatibility JavaVersion.VERSION_1_7
-            targetCompatibility JavaVersion.VERSION_1_7
-        }
     }
     buildTypes {
         debug {
@@ -39,10 +34,21 @@ android {
     }
     productFlavors {
     }
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+    }
 }
 
 dependencies {
-    api 'com.ezviz.sdk:ezviz-sdk:4.9.0.7'
+    /*萤石SDK核心模块，必须*/
+    api 'com.ezviz.sdk:ezviz-sdk:4.10.0'
+    /*视频通话模块，按需使用*/
+    api 'com.ezviz.sdk:videotalk:1.0.0'
     api project(':app-common')
     api fileTree(include: ['*.jar'], dir: 'libs')
+}
+
+repositories {
+    maven { url 'https://dl.bintray.com/open-ezviz/mobile-sdk'}
 }

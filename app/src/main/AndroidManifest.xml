@@ -129,7 +129,11 @@
             android:screenOrientation="portrait" />
         <activity
             android:name="com.videogo.SupportActivity"
-            android:screenOrientation="portrait" /> <!-- receiver -->
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.ezviz.demo.videotalk.WatchVideoTalkActivity"
+            android:screenOrientation="portrait" />
+        <!-- receiver -->
         <receiver android:name="com.videogo.RootActivity$NotificationReceiver" />
     </application>
 

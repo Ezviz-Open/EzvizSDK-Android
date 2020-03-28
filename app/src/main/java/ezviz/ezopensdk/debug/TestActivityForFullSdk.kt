@@ -11,12 +11,13 @@ import android.view.View
 import com.ezviz.sdk.configwifi.finder.DeviceFindCallback
 import com.videogo.RootActivity
 import com.videogo.openapi.EZGlobalSDK
-import com.videogo.openapi.EZOpenSDK
+import com.videogo.openapi.EzvizAPI
 import com.videogo.util.LogUtil
 import com.videogo.wificonfig.APWifiConfig
 import com.videogo.wificonfig.ConfigWifiErrorEnum
 import ezviz.ezopensdk.R
 import kotlinx.android.synthetic.main.activity_test_for_sdk.*
+import kotlin.concurrent.thread
 
 class TestActivityForFullSdk : RootActivity() {
 
@@ -33,9 +34,16 @@ class TestActivityForFullSdk : RootActivity() {
         const val deviceHotspotPwd = configWifiPrefix + deviceVerifyCode
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_test_for_sdk)
+
+        /*以下调试代码不可删除*/
+        tv_sdk_info.text = "以下调试代码不可删除\n" +
+                "isUsingGlobalSDK: " + EzvizAPI.getInstance().isUsingGlobalSDK + "\n" +
+                "以上调试代码不可删除"
+        /*以上调试代码不可删除*/
 
 //        sv_test.holder.addCallback(mSvListener)
 //
@@ -45,12 +53,12 @@ class TestActivityForFullSdk : RootActivity() {
 //        mPlayer.setPlayVerifyCode(deviceVerifyCode)
 //        mPlayer.startRealPlay()
 
-        /** * Enable/Disable SDK logs. */
-        EZGlobalSDK.showSDKLog(true);
-        /** * Supports P2P streaming or not. See the API for details. */
-        EZGlobalSDK.enableP2P(false);
-        /** * Replace the APP_KEY as the one you applied.  */
-        EZGlobalSDK.initLib(application, APP_KEY);
+//        /** * Enable/Disable SDK logs. */
+//        EZGlobalSDK.showSDKLog(true);
+//        /** * Supports P2P streaming or not. See the API for details. */
+//        EZGlobalSDK.enableP2P(false);
+//        /** * Replace the APP_KEY as the one you applied.  */
+//        EZGlobalSDK.initLib(application, APP_KEY);
 
     }
 
@@ -59,7 +67,7 @@ class TestActivityForFullSdk : RootActivity() {
         mPlayer.stopRealPlay()
     }
 
-    private val mPlayer = EZOpenSDK.getInstance().createPlayer(deviceSerial, 1)
+    private val mPlayer = getOpenSDK().createPlayer(deviceSerial, 1)
 
     private val mTvListener = object : TextureView.SurfaceTextureListener{
 
@@ -106,7 +114,14 @@ class TestActivityForFullSdk : RootActivity() {
 
 
     fun onClickTest(view: View) {
-        showToast("无操作")
+//        showToast("无操作")
+        thread {
+//            val devSerial = "C54348757"
+            val devSerial = "C92140427"
+            getOpenSDK().getDeviceList(0, 3)
+            EzvizAPI.getInstance().getDeviceInfoEx(devSerial, 1)
+            getOpenSDK().getDeviceInfo(devSerial)
+        }
     }
 
     fun onClickStop(view: View) {
@@ -123,7 +138,7 @@ class TestActivityForFullSdk : RootActivity() {
 
             override fun OnError(code: Int) {
                 LogUtil.e(TAG, "OnError-$code")
-                EZOpenSDK.getInstance().stopAPConfigWifiWithSsid()
+                getOpenSDK().stopAPConfigWifiWithSsid()
             }
 
             override fun onErrorNew(error: ConfigWifiErrorEnum?) {

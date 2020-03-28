@@ -25,7 +25,6 @@ import com.ezviz.opensdk.auth.EZAuthAPI;
 import com.google.gson.Gson;
 import com.videogo.constant.Config;
 import com.videogo.exception.BaseException;
-import com.videogo.openapi.EZOpenSDK;
 import com.videogo.openapi.EzvizAPI;
 import com.videogo.ui.cameralist.EZCameraListActivity;
 
@@ -36,11 +35,7 @@ import ezviz.ezopensdk.demo.SdkInitTool;
 import ezviz.ezopensdk.demo.ServerAreasEnum;
 import ezviz.ezopensdk.demo.ValueKeys;
 import ezviz.ezopensdkcommon.R;
-import ezviz.ezopensdk.demo.SdkInitParams;
-import ezviz.ezopensdk.demo.SdkInitTool;
-import ezviz.ezopensdk.demo.ServerAreasEnum;
 import ezviz.ezopensdk.demo.SpTool;
-import ezviz.ezopensdk.demo.ValueKeys;
 
 import static com.videogo.constant.Constant.OAUTH_SUCCESS_ACTION;
 
@@ -63,7 +58,7 @@ public class MainActivity extends RootActivity {
             view.post(new Runnable() {
                 @Override
                 public void run() {
-                    if (TextUtils.isEmpty(EzvizApplication.mAppKey)){
+                    if (TextUtils.isEmpty(EzvizApplication.mInitParams.appKey)){
                         Toast.makeText(MainActivity.this,"Appkey为空",Toast.LENGTH_LONG).show();
                         return;
                     }
@@ -92,7 +87,7 @@ public class MainActivity extends RootActivity {
                     jumpToCameraListActivity();
                     finish();
                 }else{
-                    EZOpenSDK.getInstance().openLoginPage();
+                    getOpenSDK().openLoginPage();
                 }
             }
         });
@@ -142,14 +137,10 @@ public class MainActivity extends RootActivity {
             toast("Error occurred! Please try to use demo with appKey & accessToken.");
             return;
         }
-        mSdkInitParams = new SdkInitParams();
-        mSdkInitParams.appKey = mCurrentServerArea.defaultOpenAuthAppKey;
-        mSdkInitParams.serverAreaId = mCurrentServerArea.id;
-        mSdkInitParams.openApiServer = mCurrentServerArea.openApiServer;
-        mSdkInitParams.openAuthApiServer = mCurrentServerArea.openAuthApiServer;
+        mSdkInitParams = SdkInitParams.createBy(mCurrentServerArea);
         SdkInitTool.initSdk(getApplication(), mSdkInitParams);
         registerLoginResultReceiver();
-        EZOpenSDK.getInstance().openLoginPage();
+        getOpenSDK().openLoginPage();
     }
 
     private SdkInitParams mSdkInitParams = null;
@@ -162,7 +153,7 @@ public class MainActivity extends RootActivity {
                     Log.i(TAG, "login success by h5 page");
                     unregisterLoginResultReceiver();
 
-                    mSdkInitParams.accessToken = EZOpenSDK.getInstance().getEZAccessToken().getAccessToken();
+                    mSdkInitParams.accessToken = getOpenSDK().getEZAccessToken().getAccessToken();
                     saveLastSdkInitParams(mSdkInitParams);
 
                     jumpToCameraListActivity();
@@ -188,7 +179,7 @@ public class MainActivity extends RootActivity {
      */
     public void onClickStartExperience(View view) {
         if (checkLoginInfo()){
-            SdkInitParams sdkInitParams = new SdkInitParams();
+            SdkInitParams sdkInitParams = SdkInitParams.createBy(mCurrentServerArea);
             sdkInitParams.appKey = getValidText(mAppKeyET.getText().toString());
             sdkInitParams.accessToken = getValidText(mAccessTokenET.getText().toString());
             SdkInitTool.initSdk(getApplication(), sdkInitParams);
@@ -199,13 +190,10 @@ public class MainActivity extends RootActivity {
                 public void run() {
                     showLoginAnim(true);
                     if (checkAppKeyAndAccessToken()){
-                        // 初始化成功后，保存相关信息
-                        SdkInitParams sdkInitParams = new SdkInitParams();
+                        // 保存相关信息
+                        SdkInitParams sdkInitParams = SdkInitParams.createBy(mCurrentServerArea);
                         sdkInitParams.appKey = getValidText(mAppKeyET.getText().toString());
                         sdkInitParams.accessToken = getValidText(mAccessTokenET.getText().toString());
-                        sdkInitParams.serverAreaId = mCurrentServerArea.id;
-                        sdkInitParams.openApiServer = mCurrentServerArea.openApiServer;
-                        sdkInitParams.openAuthApiServer = mCurrentServerArea.openAuthApiServer;
                         saveLastSdkInitParams(sdkInitParams);
                         // 跳转到主界面
                         jumpToCameraListActivity();

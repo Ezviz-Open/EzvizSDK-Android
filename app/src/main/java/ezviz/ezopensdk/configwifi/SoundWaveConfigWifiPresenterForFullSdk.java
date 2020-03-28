@@ -3,6 +3,7 @@ package ezviz.ezopensdk.configwifi;
 import android.app.Application;
 import android.content.Intent;
 
+import com.videogo.EzvizApplication;
 import com.videogo.openapi.EZConstants;
 import com.videogo.openapi.EZOpenSDK;
 
@@ -25,11 +26,11 @@ public class SoundWaveConfigWifiPresenterForFullSdk extends ConfigWifiExecutingA
         String routerWifiPwd = configParam.getStringExtra(IntentConstants.ROUTER_WIFI_PASSWORD);
         String deviceSerial = configParam.getStringExtra(IntentConstants.DEVICE_SERIAL);
         // 开始配网
-        EZOpenSDK.getInstance().startConfigWifi(app, deviceSerial, routerWifiName, routerWifiPwd, EZConstants.EZWiFiConfigMode.EZWiFiConfigWave, new MixedConfigWifiCallbackDelegate(mCallback));
+        EzvizApplication.getOpenSDK().startConfigWifi(app, deviceSerial, routerWifiName, routerWifiPwd, EZConstants.EZWiFiConfigMode.EZWiFiConfigWave, new MixedConfigWifiCallbackDelegate(mCallback));
     }
 
     @Override
     public void stopConfigWifi() {
-        EZOpenSDK.getInstance().stopConfigWiFi();
+        EzvizApplication.getOpenSDK().stopConfigWiFi();
     }
 }

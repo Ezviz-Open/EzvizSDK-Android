@@ -84,7 +84,7 @@
 		</LinearLayout>
 		
         <LinearLayout
-            android:layout_width="170dp"
+            android:layout_width="200dp"
             android:layout_height="40dp"
             android:gravity="left|center_vertical|start"
             android:orientation="horizontal"
@@ -150,7 +150,27 @@
                     android:background="@null"
                     android:gravity="center"
                     android:src="@drawable/open_cameralist_setup_selector"/>
-            </RelativeLayout>            
+            </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/tab_video_talk_rl"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="3"
+                android:background="@android:color/white"
+                android:gravity="center"
+                android:orientation="vertical" >
+
+                <ImageButton
+                    android:id="@+id/tab_video_talk_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_centerHorizontal="true"
+                    android:background="@null"
+                    android:gravity="center"
+                    android:src="@drawable/play_video"/>
+            </RelativeLayout>
         </LinearLayout>
         <LinearLayout
             android:layout_width="fill_parent"

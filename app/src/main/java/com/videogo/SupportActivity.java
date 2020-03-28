@@ -68,7 +68,7 @@ public class SupportActivity extends RootActivity {
                     EzvizAPI.getInstance().setServerUrl(mApiUrl, mWebUrl);
                 }
                 if (!TextUtils.isEmpty(mAccesstoken)){
-                    EZOpenSDK.getInstance().setAccessToken(mAccesstoken);
+                    getOpenSDK().setAccessToken(mAccesstoken);
                     Intent intent = new Intent(getApplicationContext(),EZCameraListActivity.class);
 
                     if (!TextUtils.isEmpty(mDeviceSerial)){

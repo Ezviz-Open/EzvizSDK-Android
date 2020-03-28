@@ -1,6 +1,6 @@
 /*
  * @ProjectName VideoGo
- * @Copyright HangZhou Hikvision System Technology Co.,Ltd. All Right Reserved
+ * @Copyright null
  *
  * @FileName Utils.java
  * @Description This class is the Utils of other classes.

@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Intent;
 
 import com.ezviz.sdk.configwifi.EZConfigWifiInfoEnum;
+import com.videogo.EzvizApplication;
 import com.videogo.openapi.EZOpenSDK;
 import com.videogo.wificonfig.APWifiConfig;
 
@@ -29,7 +30,7 @@ public class ApConfigWifiPresenterForFullSdk extends ConfigWifiExecutingActivity
         String deviceSerial = configParam.getStringExtra(IntentConstants.DEVICE_SERIAL);
         String deviceVerifyCode = configParam.getStringExtra(IntentConstants.DEVICE_VERIFY_CODE);
         // 开始配网
-        EZOpenSDK.getInstance().startAPConfigWifiWithSsid(routerWifiName, routerWifiPwd, deviceSerial, deviceVerifyCode, new APWifiConfig.APConfigCallback() {
+        EzvizApplication.getOpenSDK().startAPConfigWifiWithSsid(routerWifiName, routerWifiPwd, deviceSerial, deviceVerifyCode, new APWifiConfig.APConfigCallback() {
             @Override
             public void onSuccess() {
                 if (mCallback == null){
@@ -87,6 +88,6 @@ public class ApConfigWifiPresenterForFullSdk extends ConfigWifiExecutingActivity
 
     @Override
     public void stopConfigWifi() {
-        EZOpenSDK.getInstance().stopAPConfigWifiWithSsid();
+        EzvizApplication.getOpenSDK().stopAPConfigWifiWithSsid();
     }
 }
