@@ -27,10 +27,10 @@ android {
 }
 
 dependencies {
-    /*萤石SDK核心模块，必须*/
-    api 'com.ezviz.sdk:ezviz-sdk:' + EZVIZ_SDK_VERSION
+    /*萤石SDK核心模块，必须依赖*/
+    implementation 'com.ezviz.sdk:ezviz-sdk:' + EZVIZ_SDK_VERSION
     /*视频通话模块，按需使用*/
-    api 'com.ezviz.sdk:videotalk:1.0.0'
+    implementation 'com.ezviz.sdk:videotalk:1.0.0'
     api project(':app-common')
     api fileTree(include: ['*.jar'], dir: 'libs')
 }
