@@ -4,15 +4,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    sourceSets {
-        main {
-            jniLibs.srcDirs = ['libs']
-        }
-    }
-    lintOptions {
-        abortOnError false
-    }
-    compileSdkVersion 28
+    compileSdkVersion 29
     defaultConfig {
         applicationId "ezviz.ezopensdk"
         minSdkVersion 16
@@ -32,23 +24,17 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    productFlavors {
-    }
-    compileOptions {
-        sourceCompatibility = 1.8
-        targetCompatibility = 1.8
-    }
 }
 
 dependencies {
     /*萤石SDK核心模块，必须*/
-    api 'com.ezviz.sdk:ezviz-sdk:4.10.0'
+    api 'com.ezviz.sdk:ezviz-sdk:' + EZVIZ_SDK_VERSION
     /*视频通话模块，按需使用*/
     api 'com.ezviz.sdk:videotalk:1.0.0'
     api project(':app-common')
     api fileTree(include: ['*.jar'], dir: 'libs')
 }
 
-repositories {
-    maven { url 'https://dl.bintray.com/open-ezviz/mobile-sdk'}
-}
+//repositories {
+//    maven { url 'https://dl.bintray.com/open-ezviz/mobile-sdk'}
+//}

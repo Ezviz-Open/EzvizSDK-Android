@@ -82,10 +82,25 @@ public class AutoWifiNetConfigActivity extends RootActivity {
             tvSSID.setText(R.string.unknow_ssid);
             showWifiRequiredDialog();
         } else {
-            tvSSID.setText(WiFiUtils.getCurrentWifiSsid(this));
+            updateWifiInfo();
         }
     }
 
+    private void updateWifiInfo(){
+        // 优先使用getCurrentWifiSsid方法获取wifi名
+        String wifiName = WiFiUtils.getCurrentWifiSsid(this);
+        // 如上述方式无效，则使用getWifiSSID方法进行获取
+        if (!isValidWifiSSID(wifiName)){
+            wifiName = BaseUtil.getWifiSSID(this);
+        }
+        if (isValidWifiSSID(wifiName)){
+            tvSSID.setText(wifiName);
+        }
+    }
+
+    private boolean isValidWifiSSID(String wifiName){
+        return !TextUtils.isEmpty(wifiName) && !"<unknown ssid>".equalsIgnoreCase(wifiName);
+    }
 
     private void findViews() {
         btnNext = findViewById(R.id.btnNext);
@@ -96,7 +111,6 @@ public class AutoWifiNetConfigActivity extends RootActivity {
 
     private void initUI() {
         tvTitle.setText(R.string.auto_wifi_cer_config_title2);
-        tvSSID.setText(BaseUtil.getWifiSSID(this));
         String password = "";
         edtPassword.setText(password);
     }

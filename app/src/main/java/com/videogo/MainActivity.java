@@ -25,17 +25,19 @@ import com.ezviz.opensdk.auth.EZAuthAPI;
 import com.google.gson.Gson;
 import com.videogo.constant.Config;
 import com.videogo.exception.BaseException;
+import com.videogo.openapi.EZOpenSDK;
 import com.videogo.openapi.EzvizAPI;
 import com.videogo.ui.cameralist.EZCameraListActivity;
+import com.videogo.util.LogUtil;
 
 import java.util.List;
 
 import ezviz.ezopensdk.demo.SdkInitParams;
 import ezviz.ezopensdk.demo.SdkInitTool;
 import ezviz.ezopensdk.demo.ServerAreasEnum;
+import ezviz.ezopensdk.demo.SpTool;
 import ezviz.ezopensdk.demo.ValueKeys;
 import ezviz.ezopensdkcommon.R;
-import ezviz.ezopensdk.demo.SpTool;
 
 import static com.videogo.constant.Constant.OAUTH_SUCCESS_ACTION;
 
@@ -45,12 +47,14 @@ public class MainActivity extends RootActivity {
     private ServerAreasEnum mCurrentServerArea = null;
     private EditText mAppKeyET = null;
     private EditText mAccessTokenET = null;
+    public static SdkInitParams mInitParams;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        initData();
         initUI();
 
         View view = findViewById(R.id.page_container);
@@ -58,22 +62,15 @@ public class MainActivity extends RootActivity {
             view.post(new Runnable() {
                 @Override
                 public void run() {
-                    if (TextUtils.isEmpty(EzvizApplication.mInitParams.appKey)){
+                    if (TextUtils.isEmpty(mInitParams.appKey)){
                         Toast.makeText(MainActivity.this,"Appkey为空",Toast.LENGTH_LONG).show();
                         return;
                     }
 
-                    if(EzvizAPI.getInstance().isLogin()) {
+                    if(EZOpenSDK.getInstance().isLogin()) {
                         new Thread(new Runnable() {
                             @Override
-                            public void run() {
-                                showLoginAnim(true);
-                                if (checkAppKeyAndAccessToken()){
-                                    jumpToCameraListActivity();
-                                    finish();
-                                }
-                                showLoginAnim(false);
-                            }
+                            public void run() { startCheckLoginValidity(); }
                         }).start();
                     }
                 }
@@ -128,6 +125,42 @@ public class MainActivity extends RootActivity {
         });
     }
 
+    private void initData() {
+        SpTool.init(getApplicationContext());
+        if (!loadLastSdkInitParams()){
+            LoadDefaultSdkInitParams();
+        }
+        mInitParams.accessToken = null;
+        SdkInitTool.initSdk(getApplication(), mInitParams);
+    }
+
+    private boolean loadLastSdkInitParams() {
+        String sdkInitParamStr = SpTool.obtainValue(ValueKeys.SDK_INIT_PARAMS);
+        if (sdkInitParamStr != null){
+            mInitParams = new Gson().fromJson(sdkInitParamStr, SdkInitParams.class);
+            return mInitParams != null && mInitParams.appKey != null;
+        }
+        return false;
+    }
+
+    private void LoadDefaultSdkInitParams(){
+        mInitParams = SdkInitParams.createBy(null);
+        mInitParams.appKey = "26810f3acd794862b608b6cfbc32a6b8";
+        mInitParams.openApiServer = "https://open.ys7.com";
+        mInitParams.openAuthApiServer = "https://openauth.ys7.com";
+    }
+
+    /**
+     * 检查AccessToke是否有效
+     */
+    private void startCheckLoginValidity(){
+        showLoginAnim(true);
+        if (checkAppKeyAndAccessToken()){
+            jumpToCameraListActivity();
+            finish();
+        }
+        showLoginAnim(false);
+    }
 
     /**
      * 通过萤石账号进行体验
@@ -152,10 +185,7 @@ public class MainActivity extends RootActivity {
                 public void onReceive(Context context, Intent intent) {
                     Log.i(TAG, "login success by h5 page");
                     unregisterLoginResultReceiver();
-
-                    mSdkInitParams.accessToken = getOpenSDK().getEZAccessToken().getAccessToken();
                     saveLastSdkInitParams(mSdkInitParams);
-
                     jumpToCameraListActivity();
                     finish();
                 }
@@ -193,7 +223,6 @@ public class MainActivity extends RootActivity {
                         // 保存相关信息
                         SdkInitParams sdkInitParams = SdkInitParams.createBy(mCurrentServerArea);
                         sdkInitParams.appKey = getValidText(mAppKeyET.getText().toString());
-                        sdkInitParams.accessToken = getValidText(mAccessTokenET.getText().toString());
                         saveLastSdkInitParams(sdkInitParams);
                         // 跳转到主界面
                         jumpToCameraListActivity();
@@ -269,6 +298,8 @@ public class MainActivity extends RootActivity {
      * 保存上次sdk初始化的参数
      */
     private void saveLastSdkInitParams(SdkInitParams sdkInitParams) {
+        // 不保存AccessToken
+        sdkInitParams.accessToken = null;
         SpTool.storeValue(ValueKeys.SDK_INIT_PARAMS, sdkInitParams.toString());
     }
 
@@ -279,7 +310,7 @@ public class MainActivity extends RootActivity {
     private boolean checkAppKeyAndAccessToken() {
         boolean isValid = false;
         try {
-            EzvizAPI.getInstance().getUserName();
+            EzvizApplication.getOpenSDK().getDeviceList(0, 1);
             isValid = true;
         } catch (BaseException e) {
             e.printStackTrace();
@@ -331,7 +362,11 @@ public class MainActivity extends RootActivity {
         SdkInitParams sdkInitParams = getLastSdkInitParams();
         if (sdkInitParams != null){
             mAppKeyET.setText(sdkInitParams.appKey);
-            mAccessTokenET.setText(sdkInitParams.accessToken);
+            try{
+                mAccessTokenET.setText(EZOpenSDK.getInstance().getEZAccessToken().getAccessToken());
+            }catch (Exception e){
+                LogUtil.d(TAG, "failed to load AccessToken");
+            }
             for (int position = 0; position < ServerAreasEnum.getAllServers().size(); position++){
                 if (sdkInitParams.serverAreaId == ServerAreasEnum.getAllServers().get(position).id){
                     if (areaServerSp != null){

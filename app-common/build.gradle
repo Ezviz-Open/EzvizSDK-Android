@@ -4,34 +4,23 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion "29.0.2"
-
+    compileSdkVersion 29
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 28
+        //noinspection ExpiredTargetSdkVersion
+        targetSdkVersion 22
         versionCode 1
         versionName "1.0"
     }
-
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    sourceSets {
-        main {
-            jniLibs.srcDirs = ['libs']
-            assets.srcDirs = ['assets']
-        }
-    }
-    lintOptions {
-        abortOnError false
-    }
 }
 
 dependencies {
     // 最终依赖由Application所在的module提供
-    compileOnly 'com.ezviz.sdk:ezviz-sdk:+'
+    compileOnly 'com.ezviz.sdk:ezviz-sdk:' + EZVIZ_SDK_VERSION
 }

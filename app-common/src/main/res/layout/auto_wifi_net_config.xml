@@ -44,7 +44,7 @@
                 android:textColor="@color/common_text"
                 android:textSize="@dimen/title_text_size" />
 
-            <TextView
+            <EditText
                 android:id="@+id/tvSSID"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -52,7 +52,9 @@
                 android:hint="@string/auto_wifi_ssid"
                 android:singleLine="true"
                 android:textColor="@color/common_text"
-                android:textSize="@dimen/title_text_size" />
+                android:textSize="@dimen/title_text_size"
+                android:background="@android:color/transparent"/>
+
         </LinearLayout>
 
         <LinearLayout

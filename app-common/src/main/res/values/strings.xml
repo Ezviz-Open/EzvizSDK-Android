@@ -573,5 +573,6 @@
     <string name="app_common_hint_hotspot_name">such as EZVIZ_C12345678</string>
     <string name="app_common_hint_hotspot_pwd">such as EZVIZ_ABCDEF</string>
     <string name="app_common_deivce_hotspot_info_can_not_empty">Device hotspot name or password can not be empty!</string>
+    <string name="app_common_stop_config_wifi_while_switched_to_background">App switched to background, and configuration has stopped</string>
 
 </resources>

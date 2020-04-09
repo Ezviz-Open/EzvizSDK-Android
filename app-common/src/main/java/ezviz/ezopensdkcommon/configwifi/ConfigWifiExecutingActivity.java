@@ -1,5 +1,6 @@
 package ezviz.ezopensdkcommon.configwifi;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -45,6 +46,13 @@ public class ConfigWifiExecutingActivity extends RootActivity implements ConfigW
                 startConfig();
             }
         });
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        showToast(getString(R.string.app_common_stop_config_wifi_while_switched_to_background));
+        exitPage();
     }
 
     /**
@@ -105,6 +113,7 @@ public class ConfigWifiExecutingActivity extends RootActivity implements ConfigW
         ARouter.getInstance().build(RouteNavigator.ADD_DEVICE_PAGE)
                 .withString(IntentConstants.DEVICE_SERIAL, getIntent().getStringExtra(IntentConstants.DEVICE_SERIAL))
                 .withString(IntentConstants.DEVICE_VERIFY_CODE, getIntent().getStringExtra(IntentConstants.DEVICE_VERIFY_CODE))
+                .withFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK)
                 .navigation(this, new NavCallback() {
                     @Override
                     public void onArrival(Postcard postcard) {
@@ -138,10 +147,18 @@ public class ConfigWifiExecutingActivity extends RootActivity implements ConfigW
                 break;
             }
         }
+        // 用户拒绝连接设备热点则认为配网失败
+        if (code == EZConfigWifiErrorEnum.USER_REFUSED_CONNECTION_REQUEST.code){
+            failedToConfig();
+        }
     }
 
     @Override
     public void onTimeout() {
+        failedToConfig();
+    }
+
+    private void failedToConfig(){
         stopConfig();
         showConfigFailUi();
     }

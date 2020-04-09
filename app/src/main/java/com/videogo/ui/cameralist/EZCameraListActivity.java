@@ -639,7 +639,12 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Toast.makeText(getApplicationContext(), getString(R.string.tip_login_out), Toast.LENGTH_LONG).show();
-                getOpenSDK().logout();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        getOpenSDK().logout();
+                    }
+                }).start();
                 finish();
             }
         });
