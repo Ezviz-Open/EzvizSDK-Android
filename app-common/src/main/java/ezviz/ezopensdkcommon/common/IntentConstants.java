@@ -22,5 +22,6 @@ public class IntentConstants {
     public static final String ROUTER_WIFI_SSID = "wifi_ssid";
     public static final String DEVICE_HOTSPOT_SSID = "device_hotspot_ssid";
     public static final String DEVICE_HOTSPOT_PWD = "device_hotspot_password";
+    public static final String USE_MANUAL_AP_CONFIG = "USE_MANUAL_AP_CONFIG";
 
 }

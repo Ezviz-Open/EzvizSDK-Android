@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".configwifi.ManualConnectDeviceHotspotActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:layout_centerInParent="true">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/please_try_connect_device_hotspot_manually"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="50dp"
+            android:layout_marginBottom="50dp">
+
+            <TextView
+                android:id="@+id/tv_ssid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Device hotspot SSID"
+                android:textSize="16dp"
+                android:textColor="@android:color/holo_red_light"
+                android:textIsSelectable="true"/>
+
+            <TextView
+                android:id="@+id/tv_pwd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Device hotspot password"
+                android:textSize="16dp"
+                android:textColor="@android:color/holo_red_light"
+                android:textIsSelectable="true"/>
+
+        </LinearLayout>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/go_to_connect_wifi"
+            android:layout_marginLeft="50dp"
+            android:layout_marginRight="50dp"
+            android:onClick="onclickGoToWifiSetting"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

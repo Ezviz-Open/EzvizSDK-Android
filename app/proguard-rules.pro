@@ -12,6 +12,14 @@
 -dontwarn com.google.zxing.**
 -keep class com.google.zxing.** { *;}
 
+-keep public class com.alibaba.android.arouter.routes.**{*;}
+-keep public class com.alibaba.android.arouter.facade.**{*;}
+-keep class * implements com.alibaba.android.arouter.facade.template.ISyringe{*;}
+# If you use the byType method to obtain Service, add the following rules to protect the interface:
+-keep interface * implements com.alibaba.android.arouter.facade.template.IProvider
+# If single-type injection is used, that is, no interface is defined to implement IProvider, the following rules need to be added to protect the implementation
+# -keep class * implements com.alibaba.android.arouter.facade.template.IProvider
+
 #*******************************************************************#
 #**********         以上是demo不能混淆的内容            *********#
 #*******************************************************************#
@@ -27,6 +35,12 @@
 -dontwarn com.ezviz.**
 -keep class com.ezviz.** { *;}
 
+-dontwarn com.ez.**
+-keep class com.ez.** { *;}
+
+-dontwarn com.hc.CASClient.**
+-keep class com.hc.CASClient.** { *;}
+
 -dontwarn com.videogo.**
 -keep class com.videogo.** { *;}
 
@@ -39,17 +53,20 @@
 -dontwarn com.hik.streamclient.**
 -keep class com.hik.streamclient.** { *;}
 
--dontwarn com.hik.CASClient.**
--keep class com.hik.CASClient.** { *;}
-
 -dontwarn com.hikvision.sadp.**
 -keep class com.hikvision.sadp.** { *;}
 
 -dontwarn com.hikvision.netsdk.**
 -keep class com.hikvision.netsdk.** { *;}
 
+-dontwarn com.neutral.netsdk.**
+-keep class com.neutral.netsdk.** { *;}
+
 -dontwarn com.hikvision.audio.**
 -keep class com.hikvision.audio.** { *;}
+
+-dontwarn com.mediaplayer.audio.**
+-keep class com.mediaplayer.audio.** { *;}
 
 -dontwarn com.hikvision.wifi.**
 -keep class com.hikvision.wifi.** { *;}

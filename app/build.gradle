@@ -18,8 +18,6 @@ android {
     }
     buildTypes {
         debug {
-            debuggable true
-            jniDebuggable true
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -27,14 +25,23 @@ android {
 }
 
 dependencies {
+
     /*萤石SDK核心模块，必须依赖*/
     implementation 'com.ezviz.sdk:ezviz-sdk:' + EZVIZ_SDK_VERSION
+
     /*视频通话模块，按需使用*/
     implementation 'com.ezviz.sdk:videotalk:1.0.0'
-    api project(':app-common')
-    api fileTree(include: ['*.jar'], dir: 'libs')
+
+    /*码流获取模块，按需使用*/
+    implementation 'com.ezviz.sdk:streamctrl:1.0.0'
+
+    /*其它三方依赖*/
+    implementation project(':app-common')
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+
 }
 
-//repositories {
-//    maven { url 'https://dl.bintray.com/open-ezviz/mobile-sdk'}
-//}
+repositories {
+    /*萤石SDK私有仓库*/
+    maven { url 'https://dl.bintray.com/open-ezviz/mobile-sdk'}
+}

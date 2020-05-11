@@ -1054,7 +1054,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         });
     }
 
-    private class EZStreamDownloadCallbackWithNotify implements EZOpenSDKListener.EZStreamDownloadCallback {
+    private class EZStreamDownloadCallbackWithNotify extends EZOpenSDKListener.EZStreamDownloadCallbackEx {
 
         private int notificationId;
         private String notificationTitle;
@@ -1084,8 +1084,12 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                     break;
             }
             LogUtil.d(TAG, failMsg);
-            toast(failMsg);
             updateNotification(notificationId, failMsg);
+        }
+
+        @Override
+        public void onErrorCode(int code) {
+            showToast("onErrorCode: " + code);
         }
 
         private void updateNotification(int id, String content){
@@ -2205,7 +2209,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         if (mPlaybackPlayer != null) {
             String strRecordFile = DemoConfig.getRecordsFolder() +  "/" + System.currentTimeMillis()+ ".mp4";
             LogUtil.i(TAG, "current record path is " + strRecordFile);
-            mPlaybackPlayer.setStreamDownloadCallback(new EZOpenSDKListener.EZStreamDownloadCallback() {
+            mPlaybackPlayer.setStreamDownloadCallback(new EZOpenSDKListener.EZStreamDownloadCallbackEx() {
                 @Override
                 public void onSuccess(String filepath) {
                     LogUtil.i(TAG, "EZStreamDownloadCallback onSuccess " + filepath);
@@ -2214,6 +2218,11 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                 @Override
                 public void onError(EZOpenSDKListener.EZStreamDownloadError code) {
                     LogUtil.e(TAG, "EZStreamDownloadCallback onError = " + code);
+                }
+
+                @Override
+                public void onErrorCode(int code) {
+                    LogUtil.e(TAG, "EZStreamDownloadCallback onErrorCode = " + code);
                 }
             });
             if (mPlaybackPlayer.startLocalRecordWithFile(strRecordFile)){

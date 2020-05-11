@@ -2,54 +2,55 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="ezviz.ezopensdk">
-
     <!-- 以下是sdk所需权限 -->
-    <!--基础功能所需权限-->
+    <!-- 基础功能所需权限 -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
-    <!--配网所需权限-->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" /> <!-- 配网所需权限 -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
-    <!--对讲所需权限-->
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" /> <!-- 对讲所需权限 -->
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <!--视频通话权限所需-->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" /> <!-- 视频通话权限所需 -->
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <!--以上是sdk所需权限 -->
-
-    <!--以下是demo所需权限 -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" /> <!-- 以上是sdk所需权限 -->
+    <!-- 以下是demo所需权限 -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"
+    <uses-permission
+        android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"
         tools:ignore="ProtectedPermissions" />
-    <uses-permission android:name="android.permission.READ_LOGS"
+    <uses-permission
+        android:name="android.permission.READ_LOGS"
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.FLASHLIGHT" />
     <uses-permission android:name="android.permission.CAMERA" />
+
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
+
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.FLASHLIGHT" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> <!-- App receives push messages."my_app_package.push.sdk.permission.EZVIZ_MESSAGE" -->
     <permission
         android:name="ezviz.ezopensdk.push.sdk.permission.EZVIZ_MESSAGE"
         android:protectionLevel="signature" />
+
     <uses-permission android:name="ezviz.ezopensdk.push.sdk.permission.EZVIZ_MESSAGE" />
+
     <permission
         android:name="ezviz.ezopensdk.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
+
     <uses-permission android:name="ezviz.ezopensdk.permission.C2D_MESSAGE" /> <!-- App receives GCM messages. -->
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" /> <!-- GCM connects to Google Services. -->
     <uses-permission android:name="android.permission.INTERNET" /> <!-- GCM requires a Google account. -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" /> <!-- Keeps the processor from sleeping when a message is received. -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <!--以上是demo所需权限 -->
 
     <application
         android:name="com.videogo.EzvizApplication"
@@ -59,6 +60,19 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name="com.ezviz.demo.streamctrl.RtpStreamPlayActivity"></activity>
+        <activity android:name="com.ezviz.demo.common.MoreFeaturesEntranceActivity" />
+        <activity
+            android:name="com.ezviz.demo.streamctrl.OriginStreamControlActivity"
+            android:label="测试码流">
+
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
+        </activity>
         <activity
             android:name="com.videogo.MainActivity"
             android:configChanges="orientation|keyboardHidden"
@@ -70,10 +84,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".debug.TestActivityForFullSdk"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".add.AddDeviceToAccountActivity"
-            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".debug.TestActivityForFullSdk"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".add.AddDeviceToAccountActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name="com.videogo.main.EzvizWebViewActivity"
             android:configChanges="orientation|keyboardHidden"
@@ -142,8 +158,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name="com.ezviz.demo.videotalk.WatchVideoTalkActivity"
-            android:screenOrientation="portrait" />
-        <!-- receiver -->
+            android:screenOrientation="portrait" /> <!-- receiver -->
         <receiver android:name="com.videogo.RootActivity$NotificationReceiver" />
     </application>
 

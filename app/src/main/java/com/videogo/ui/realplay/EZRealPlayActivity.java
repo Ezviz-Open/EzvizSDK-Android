@@ -1998,13 +1998,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
                             }
                         }
                     }else{
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getApplicationContext(), "抓图失败, 检查是否开启了硬件解码",
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        showToast("抓图失败, 检查是否开启了硬件解码");
                     }
                     super.run();
                 }
@@ -2800,6 +2794,8 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             e.printStackTrace();
         }
         if (mStatus == RealPlayStatus.STATUS_PLAY) {
+            // 停止对讲
+            closeTalkPopupWindow(true, false);
             // 停止播放 Stop play
             stopRealPlay();
             SystemClock.sleep(500);
@@ -3237,7 +3233,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
 
     private void showType() {
         if (Config.LOGGING && mEZPlayer != null) {
-            Utils.showLog(EZRealPlayActivity.this, "getType " + ",time：" + (mStopTime - mStartTime));
+            Utils.showLog(EZRealPlayActivity.this, "cost: " + (mStopTime - mStartTime) + " ms");
         }
     }
 

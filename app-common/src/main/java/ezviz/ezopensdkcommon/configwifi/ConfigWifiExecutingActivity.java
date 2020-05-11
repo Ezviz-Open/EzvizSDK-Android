@@ -1,5 +1,6 @@
 package ezviz.ezopensdkcommon.configwifi;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -26,6 +27,13 @@ public class ConfigWifiExecutingActivity extends RootActivity implements ConfigW
     private View mConfigFailView;
     private TextView mConfigErrorInfoTv;
     private String mAllErrorInfo;
+
+    public static void launch(Context context, Intent intent){
+        Intent newIntent = new Intent(context, ConfigWifiExecutingActivity.class);
+        newIntent.putExtras(intent);
+        newIntent.putExtra(IntentConstants.USE_MANUAL_AP_CONFIG, true);
+        context.startActivity(newIntent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,7 +168,15 @@ public class ConfigWifiExecutingActivity extends RootActivity implements ConfigW
 
     private void failedToConfig(){
         stopConfig();
-        showConfigFailUi();
+        switch (mPresenter.getType()){
+            case ConfigWifiTypeConstants.CONFIG_WIFI_SDK_AP:
+            case ConfigWifiTypeConstants.FULL_SDK_AP:
+                ManualConnectDeviceHotspotActivity.Companion.launch(this, getIntent());
+                break;
+            default:
+                showConfigFailUi();
+                break;
+        }
     }
 
     private void startConfig(){

@@ -39,8 +39,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ezviz.demo.common.MoreFeaturesEntranceActivity;
 import com.ezviz.demo.videotalk.WatchVideoTalkActivity;
-import com.ezviz.stream.EZStreamClientManager;
+import com.ez.stream.EZStreamClientManager;
 import com.videogo.RootActivity;
 import com.videogo.constant.Constant;
 import com.videogo.constant.IntentConsts;
@@ -81,7 +82,7 @@ import ezviz.ezopensdk.debug.TestActivityForFullSdk;
 import ezviz.ezopensdk.demo.DemoConfig;
 import ezviz.ezopensdk.demo.ValueKeys;
 
-import static com.ezviz.stream.EZError.EZ_OK;
+import static com.ez.stream.EZError.EZ_OK;
 
 
 public class EZCameraListActivity extends RootActivity implements OnClickListener, SelectCameraDialog.CameraItemClick {
@@ -159,6 +160,9 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // todo by zw 待处理：排查海外入口通用库日志不打印的问题
+        EZStreamClientManager.create(getApplicationContext()).setLogPrintEnable(true,  false);
 
         if (DemoConfig.isNeedJumpToTestPage){
             startActivity(new Intent(mContext, TestActivityForFullSdk.class));
@@ -426,6 +430,10 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
 
     private int mValidCount = 0;
     private long mLastClickTime = 0;
+
+    public void onClickMoreFeatures(View view) {
+        startActivity(new Intent(this, MoreFeaturesEntranceActivity.class));
+    }
 
     private class GetCamersInfoListTask extends AsyncTask<Void, Void, List<EZDeviceInfo>> {
         private boolean mHeaderOrFooter;

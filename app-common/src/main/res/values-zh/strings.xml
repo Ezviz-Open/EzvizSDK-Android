@@ -577,6 +577,10 @@
     <string name="app_common_hint_hotspot_name">如：EZVIZ_C12345678</string>
     <string name="app_common_hint_hotspot_pwd">如：EZVIZ_ABCDEF</string>
     <string name="app_common_deivce_hotspot_info_can_not_empty">设备热点名称和密码不能为空！</string>
-    <string name="app_common_stop_config_wifi_while_switched_to_background">App切换到后台，配网已经停止</string>
+    <string name="app_common_stop_config_wifi_while_switched_to_background">配网界面关闭，配网已经停止</string>>
+    <string name="please_try_connect_device_hotspot_manually">自动AP配网失败，请到系统设置中手动连接设备热点，连接成功并返回后，demo将开始手动AP配网。</string>
+    <string name="go_to_connect_wifi">去连接wifi</string>
+    <string name="device_hotspot_ssid">设备热点SSID：</string>
+    <string name="device_hotspot_pwd">设备热点密码：</string>
 
 </resources>

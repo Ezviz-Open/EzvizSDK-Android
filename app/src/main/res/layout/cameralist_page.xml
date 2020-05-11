@@ -24,6 +24,20 @@
             android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp" />
 
+        <ImageView
+            android:id="@+id/iv_more"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/more"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_toRightOf="@id/btn_user"
+            android:padding="5dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:onClick="onClickMoreFeatures"/>
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"

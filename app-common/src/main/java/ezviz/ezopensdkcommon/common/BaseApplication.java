@@ -10,9 +10,12 @@ import ezviz.ezopensdkcommon.debug.LogFileUtil;
 
 public class BaseApplication extends Application {
 
+    public static Application mInstance = null;
+
     @Override
     public void onCreate() {
         super.onCreate();
+        mInstance = this;
 
         // 初始化ARouter
         ARouter.openDebug();

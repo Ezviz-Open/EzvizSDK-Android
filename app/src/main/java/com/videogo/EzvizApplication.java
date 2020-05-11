@@ -30,7 +30,7 @@ public class EzvizApplication extends BaseApplication {
     public static EzvizApplication mEzvizApplication;
 
     public static EZOpenSDK getOpenSDK() {
-        if (EzvizAPI.getInstance().isUsingGlobalSDK()){
+        if (EzvizAPI.getInstance() != null && EzvizAPI.getInstance().isUsingGlobalSDK()){
             return EZGlobalSDK.getInstance();
         }else{
             return EZOpenSDK.getInstance();

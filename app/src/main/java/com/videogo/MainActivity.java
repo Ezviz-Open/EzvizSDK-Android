@@ -28,6 +28,7 @@ import com.videogo.exception.BaseException;
 import com.videogo.openapi.EZOpenSDK;
 import com.videogo.openapi.EzvizAPI;
 import com.videogo.ui.cameralist.EZCameraListActivity;
+import com.videogo.util.LocalInfo;
 import com.videogo.util.LogUtil;
 
 import java.util.List;
@@ -63,16 +64,21 @@ public class MainActivity extends RootActivity {
                 @Override
                 public void run() {
                     if (TextUtils.isEmpty(mInitParams.appKey)){
-                        Toast.makeText(MainActivity.this,"Appkey为空",Toast.LENGTH_LONG).show();
+                        showToast("AppKey is empty!");
                         return;
                     }
-
-                    if(EZOpenSDK.getInstance().isLogin()) {
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() { startCheckLoginValidity(); }
-                        }).start();
+                    if (LocalInfo.getInstance().getEZAccesstoken() == null || LocalInfo.getInstance().getEZAccesstoken().getAccessToken() == null){
+                        String tip = "AccessToken is empty!";
+                        LogUtil.i(TAG, tip);
+//                        showToast(tip);
+                        return;
                     }
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            startCheckLoginValidity();
+                        }
+                    }).start();
                 }
             });
         }
