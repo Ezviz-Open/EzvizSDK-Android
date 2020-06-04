@@ -15,26 +15,21 @@
  */
 package com.videogo;
 
-import com.videogo.openapi.EZGlobalSDK;
+import android.support.annotation.NonNull;
+
 import com.videogo.openapi.EZOpenSDK;
-import com.videogo.openapi.EzvizAPI;
 
 import ezviz.ezopensdk.demo.SdkInitParams;
-import ezviz.ezopensdk.demo.SdkInitTool;
 import ezviz.ezopensdkcommon.common.BaseApplication;
 
 
 public class EzvizApplication extends BaseApplication {
 
     public static SdkInitParams mInitParams;
-    public static EzvizApplication mEzvizApplication;
 
-    public static EZOpenSDK getOpenSDK() {
-        if (EzvizAPI.getInstance() != null && EzvizAPI.getInstance().isUsingGlobalSDK()){
-            return EZGlobalSDK.getInstance();
-        }else{
-            return EZOpenSDK.getInstance();
-        }
+    public static EZOpenSDK getOpenSDK(){
+        EZOpenSDK ezOpenSDK = EZOpenSDK.getInstance();
+        return ezOpenSDK;
     }
 
     @Override
@@ -42,8 +37,10 @@ public class EzvizApplication extends BaseApplication {
         super.onCreate();
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
-            public void uncaughtException(Thread thread, Throwable throwable) {
+            public void uncaughtException(@NonNull Thread thread, @NonNull Throwable throwable) {
                 throwable.printStackTrace();
+                // 抓取到异常时，立即重启应用
+                restartApp(EzvizApplication.this);
             }
         });
     }

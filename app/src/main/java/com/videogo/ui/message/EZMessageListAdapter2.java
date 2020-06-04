@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 //import com.videogo.leavemessage.LeaveMessageItem;
 

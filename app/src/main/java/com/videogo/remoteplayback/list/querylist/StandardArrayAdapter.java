@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 public class StandardArrayAdapter extends ArrayAdapter<CloudPartInfoFileEx> {
 

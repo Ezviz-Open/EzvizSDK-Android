@@ -10,7 +10,7 @@ import android.view.View;
 
 import com.videogo.util.Utils;
 
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 public class LoadingView extends View {
 

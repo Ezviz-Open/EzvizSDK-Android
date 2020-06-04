@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 public class QueryCloudRecordFilesAsyncTask extends HikAsyncTask<String, Void, Integer> {
     private final String MINUTE;

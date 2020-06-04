@@ -29,7 +29,7 @@ import android.widget.FrameLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 
 public class PullToRefreshListView extends PullToRefreshAdapterViewBase<ListView> {

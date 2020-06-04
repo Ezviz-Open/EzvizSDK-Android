@@ -28,4 +28,8 @@ public class DemoConfig {
         return DEMO_FOLDER + "/Captures";
     }
 
+    public static String getStreamsFolder(){
+        return DEMO_FOLDER + "/Streams";
+    }
+
 }

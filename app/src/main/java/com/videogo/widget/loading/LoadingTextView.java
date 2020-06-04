@@ -12,7 +12,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 public class LoadingTextView extends FrameLayout {
 

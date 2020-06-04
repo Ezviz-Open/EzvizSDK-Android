@@ -22,7 +22,7 @@ import android.media.SoundPool;
 
 import java.util.HashMap;
 
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 
 public class AudioPlayUtil {

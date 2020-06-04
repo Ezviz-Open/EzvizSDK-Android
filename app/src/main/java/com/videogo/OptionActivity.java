@@ -1,19 +1,24 @@
 package com.videogo;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Toast;
+
 import com.ezviz.opensdk.auth.EZAuthAPI;
 import com.videogo.exception.BaseException;
 import com.videogo.openapi.bean.EZDeviceInfo;
 import com.videogo.ui.LanDevice.LanDeviceActivity;
-import ezviz.ezopensdkcommon.R;
+
 import java.util.ArrayList;
 
-public class OptionActivity extends Activity {
+import ezviz.ezopensdk.R;
+import ezviz.ezopensdkcommon.common.RootActivity;
+
+import static com.videogo.EzvizApplication.getOpenSDK;
+
+public class OptionActivity extends RootActivity {
 
     ArrayList<EZDeviceInfo> mList = new ArrayList<EZDeviceInfo>();
     String url = null;
@@ -31,7 +36,7 @@ public class OptionActivity extends Activity {
                     public void run() {
 
                         try {
-                            mList = (ArrayList<EZDeviceInfo>) EzvizApplication.mEzvizApplication.getOpenSDK().getInstance().getDeviceList(0, 20);
+                            mList = (ArrayList<EZDeviceInfo>) getOpenSDK().getDeviceList(0, 10);
                             if (mList != null) {
                                 showMsg("getDeviceList success size = " + mList.size());
                                 Intent toIntent = new Intent(OptionActivity.this, com.videogo.ui.cameralist.EZCameraListActivity.class);
@@ -46,7 +51,7 @@ public class OptionActivity extends Activity {
 
 //                        // 用于测试设备托管功能
 //                        try {
-//                            mList = (ArrayList<EZDeviceInfo>) EzvizApplication.mEzvizApplication.getOpenSDK().getInstance().getTrustDeviceList(0, 20);
+//                            mList = (ArrayList<EZDeviceInfo>) EzvizApplication.mEzvizApplication.getOpenSDK().getInstance().getTrustDeviceList(0, 10);
 //
 //                            if (mList != null) {
 //                                showMsg("getDeviceList success size = " + mList.size());
@@ -78,8 +83,7 @@ public class OptionActivity extends Activity {
                     @Override
                     public void run() {
                         try {
-                            url = EzvizApplication.mEzvizApplication.getOpenSDK().getInstance()
-                                .captureCamera(mList.get(0).getDeviceSerial(), mList.get(0).getCameraNum());
+                            url = getOpenSDK().captureCamera(mList.get(0).getDeviceSerial(), mList.get(0).getCameraNum());
                             if (TextUtils.isEmpty(url)) {
                                 showMsg("captureCamera fail");
                             } else {

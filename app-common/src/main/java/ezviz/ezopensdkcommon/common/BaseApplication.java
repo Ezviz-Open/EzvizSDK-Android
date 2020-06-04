@@ -3,6 +3,7 @@ package ezviz.ezopensdkcommon.common;
 import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 
@@ -57,6 +58,15 @@ public class BaseApplication extends Application {
      */
     private boolean isMainProcess() {
         return getApplicationContext().getPackageName().equals(getCurrentProcessName());
+    }
+
+    public static void restartApp(Context context){
+        final Intent intent = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
+        if (intent != null){
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            context.startActivity(intent);
+            System.exit(0);
+        }
     }
 
 }

@@ -22,6 +22,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
 }
 
 dependencies {
@@ -38,10 +42,11 @@ dependencies {
     /*其它三方依赖*/
     implementation project(':app-common')
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.squareup.retrofit2:retrofit:2.8.1'
 
 }
 
-repositories {
-    /*萤石SDK私有仓库*/
+/*repositories {
+    *//*萤石SDK私有仓库*//*
     maven { url 'https://dl.bintray.com/open-ezviz/mobile-sdk'}
-}
+}*/

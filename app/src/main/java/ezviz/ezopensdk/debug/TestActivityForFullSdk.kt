@@ -1,14 +1,11 @@
 package ezviz.ezopensdk.debug
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import com.ez.stream.EZStreamClientManager
-import com.ezviz.demo.streamctrl.OriginStreamControlActivity
-import com.videogo.RootActivity
 import com.videogo.openapi.EzvizAPI
 import ezviz.ezopensdk.R
+import ezviz.ezopensdkcommon.common.RootActivity
 import kotlinx.android.synthetic.main.activity_test_for_sdk.*
 
 class TestActivityForFullSdk : RootActivity() {

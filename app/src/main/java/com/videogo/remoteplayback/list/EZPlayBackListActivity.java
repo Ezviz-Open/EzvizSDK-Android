@@ -57,8 +57,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.videogo.EzvizApplication;
-import com.videogo.RootActivity;
+import com.ezviz.demo.common.DataTimeUtil;
 import com.videogo.constant.Constant;
 import com.videogo.constant.IntentConsts;
 import com.videogo.download.DownloadTaskRecordOfCloud;
@@ -79,8 +78,8 @@ import com.videogo.remoteplayback.RemoteFileInfo;
 import com.videogo.remoteplayback.list.bean.ClickedListItem;
 import com.videogo.remoteplayback.list.bean.CloudPartInfoFileEx;
 import com.videogo.remoteplayback.list.querylist.QueryCloudRecordFilesAsyncTask;
-import com.videogo.remoteplayback.list.querylist.QueryPlayBackListTaskCallback;
 import com.videogo.remoteplayback.list.querylist.QueryDeviceRecordFilesAsyncTask;
+import com.videogo.remoteplayback.list.querylist.QueryPlayBackListTaskCallback;
 import com.videogo.remoteplayback.list.querylist.SectionListAdapter;
 import com.videogo.remoteplayback.list.querylist.SectionListAdapter.OnHikItemClickListener;
 import com.videogo.remoteplayback.list.querylist.StandardArrayAdapter;
@@ -92,6 +91,7 @@ import com.videogo.ui.util.AudioPlayUtil;
 import com.videogo.ui.util.DataManager;
 import com.videogo.ui.util.EZUtils;
 import com.videogo.ui.util.VerifyCodeInput;
+import com.videogo.util.DateTimeUtil;
 import com.videogo.util.LocalInfo;
 import com.videogo.util.LogUtil;
 import com.videogo.util.MediaScanner;
@@ -119,6 +119,11 @@ import java.util.TimerTask;
 import ezviz.ezopensdk.R;
 import ezviz.ezopensdk.debug.VideoFileUtil;
 import ezviz.ezopensdk.demo.DemoConfig;
+import ezviz.ezopensdkcommon.common.RootActivity;
+
+import static com.videogo.EzvizApplication.getOpenSDK;
+import static com.videogo.ui.cameralist.EZCameraListActivity.mDownloadTaskRecordListAbstract;
+import static com.videogo.ui.cameralist.EZCameraListActivity.showSimpleNotification;
 
 @SuppressLint({"DefaultLocale", "HandlerLeak", "NewApi"})
 public class EZPlayBackListActivity extends RootActivity implements QueryPlayBackListTaskCallback,
@@ -322,6 +327,20 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
     private EZDeviceRecordFile mDeviceRecordInfo = null;
     private EZCloudRecordFile mCloudRecordInfo = null;
 
+    public static void launch(Context context,EZCameraInfo cameraInfo){
+        Intent intent = new Intent(context, EZPlayBackListActivity.class);
+        intent.putExtra(RemoteListContant.QUERY_DATE_INTENT_KEY, DateTimeUtil.getNow());
+        intent.putExtra(IntentConsts.EXTRA_CAMERA_INFO, cameraInfo);
+        context.startActivity(intent);
+    }
+
+    public static void launch(Context context, String deviceSerial, int cameraNo){
+        EZCameraInfo cameraInfo = new EZCameraInfo();
+        cameraInfo.setDeviceSerial(deviceSerial);
+        cameraInfo.setCameraNo(cameraNo);
+        launch(context, cameraInfo);
+    }
+
     private Handler playBackHandler = new Handler() {
 
         @Override
@@ -454,27 +473,28 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         }
     }
 
+    /**
+     * en: execute some operations when play has finished. such as stop player, update UI
+     * zh: 执行播放完毕的操作：如停止player、更新界面
+     */
     private void handlePlaySegmentOver() {
-        LogUtil.errorLog(TAG, "handlePlaySegmentOver");
+        LogUtil.e(TAG, "handlePlaySegmentOver");
         stopRemoteListPlayer();
         stopRemotePlayBackRecord();
-
         if (mOrientation != Configuration.ORIENTATION_PORTRAIT) {
             setRemoteListSvLayout();
         }
-
         mControlDisplaySec = 0;
         exitBtn.setVisibility(View.GONE);
         progressBar.setVisibility(View.GONE);
         beginTimeTV.setText(endTimeTV.getText());
-
         status = RemoteListContant.STATUS_STOP;
-
-
         loadingPbLayout.setVisibility(View.VISIBLE);
-
         autoLayout.setVisibility(View.GONE);
-        onNextPlayBtnClick();
+        // 播放完毕隐藏进度条
+        progressArea.setVisibility(View.INVISIBLE);
+        // 展示再次播放功能按钮
+        showPlayEventTip(getString(R.string.tip_playback_again));
     }
 
     private void timeBucketUIInit(long beginTime, long endTime) {
@@ -600,7 +620,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
     // 播放失败处理
     private void handlePlayFail(ErrorInfo errorInfo) {
 
-        LogUtil.debugLog(TAG, "handlePlayFail. Playback failed. error info is " + errorInfo.toString());
+        LogUtil.d(TAG, "handlePlayFail. Playback failed. error info is " + errorInfo.toString());
         status = RemoteListContant.STATUS_STOP;
         stopRemoteListPlayer();
 
@@ -611,7 +631,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             // 收到这两个错误码，可以弹出对话框，让用户输入密码后，重新取流预览
             case ErrorCode.ERROR_INNER_VERIFYCODE_NEED:
             case ErrorCode.ERROR_INNER_VERIFYCODE_ERROR: {
-                showTipDialog("");
+                showPlayEventTip("");
                 DataManager.getInstance().setDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial(), null);
                 VerifyCodeInput.VerifyCodeInputDialog(this, this).show();
             }
@@ -628,7 +648,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                 } else {
                     errorInfoText = getErrorTip(R.string.remoteplayback_fail, errorCode);
                 }
-                showTipDialog(errorInfoText);
+                showPlayEventTip(errorInfoText);
                 if (errorCode == ErrorCode.ERROR_CAS_STREAM_RECV_ERROR
                         || errorCode == ErrorCode.ERROR_TRANSF_DEVICE_OFFLINE
                         || errorCode == ErrorCode.ERROR_CAS_PLATFORM_CLIENT_REQUEST_NO_PU_FOUNDED
@@ -641,7 +661,11 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
 
     private void updateCameraInfo() { }
 
-    private void showTipDialog(final String errorTips) {
+    /**
+     * en: show important tip during playing. just like error event, finish event
+     * zh: 展示播放过程中的重要事件提示，如播放出错、播放完成
+     */
+    private void showPlayEventTip(final String tip) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -649,9 +673,8 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                 loadingPbLayout.setVisibility(View.GONE);
                 touchProgressLayout.setVisibility(View.GONE);
                 mControlDisplaySec = 0;
-
                 errorReplay.setVisibility(View.VISIBLE);
-                errorInfoTV.setText(errorTips);
+                errorInfoTV.setText(tip);
                 errorTipsVg.setVisibility(View.VISIBLE);
             }
         });
@@ -667,17 +690,14 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         mControlDisplaySec = 0;
         captureBtn.setEnabled(true);
         videoRecordingBtn.setEnabled(true);
-
         setRemoteListSvLayout();
         mScreenOrientationHelper.enableSensorOrientation();
         loadingImgView.setVisibility(View.GONE);
         loadingPbLayout.setVisibility(View.GONE);
         touchProgressLayout.setVisibility(View.GONE);
         progressBar.setVisibility(View.GONE);
-
         errorTipsVg.setVisibility(View.GONE);
         errorReplay.setVisibility(View.GONE);
-
         downloadBtn.setPadding(Utils.dip2px(this, 5), 0, Utils.dip2px(this, 5), 0);
         if (localInfo.isSoundOpen()) {
             // 打开声音
@@ -688,11 +708,12 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             if (mPlaybackPlayer != null)
                 mPlaybackPlayer.closeSound();
         }
+        progressSeekbar.setVisibility(View.VISIBLE);
     }
 
     // 收到停止回放成功的消息后处理
     private void handleStopPlayback() {
-        LogUtil.debugLog(TAG, "stop playback success");
+        LogUtil.d(TAG, "stop playback success");
     }
 
     private void setRemoteListSvLayout() {
@@ -745,7 +766,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             // 停止播放
             mPlaybackPlayer.stopPlayback();
         } else {
-            mPlaybackPlayer = EzvizApplication.getOpenSDK().createPlayer(mCameraInfo.getDeviceSerial(), mCameraInfo.getCameraNo());
+            mPlaybackPlayer = getOpenSDK().createPlayer(mCameraInfo.getDeviceSerial(), mCameraInfo.getCameraNo());
             mPlaybackPlayer.setPlayVerifyCode(DataManager.getInstance().getDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial()));
         }
     }
@@ -883,7 +904,6 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                     if (mPlaybackPlayer != null) {
                         Calendar seekTime = Calendar.getInstance();
                         seekTime.setTime(new Date(trackTime));
-
                         mPlaybackPlayer.seekPlayback(seekTime);
                     }
                 }
@@ -931,7 +951,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                LogUtil.debugLog(TAG, "onReceive:" + intent.getAction());
+                LogUtil.d(TAG, "onReceive:" + intent.getAction());
             }
         };
         IntentFilter filter = new IntentFilter();
@@ -979,7 +999,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         closePlayBack();
 
         if (mPlaybackPlayer != null) {
-            EzvizApplication.getOpenSDK().releasePlayer(mPlaybackPlayer);
+            getOpenSDK().releasePlayer(mPlaybackPlayer);
         }
         stopQueryTask();
         removeHandler(handler);
@@ -1002,7 +1022,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         }
         final String notificationTitle = "download video from cloud";
         final int notificationId = getUniqueNotificationId();
-        showSimpleNotification(notificationId, notificationTitle, "downloading...click to cancel!", true);
+        showSimpleNotification(mContext, notificationId, notificationTitle, "downloading...click to cancel!", true);
         getTaskManager().submit(new Runnable() {
             @Override
             public void run() {
@@ -1032,7 +1052,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         }
         final String notificationTitle = "download video from sdcard";
         final int notificationId = getUniqueNotificationId();
-        showSimpleNotification(notificationId, notificationTitle, "downloading...click to cancel!", true);
+        showSimpleNotification(mContext, notificationId, notificationTitle, "downloading...click to cancel!", true);
         getTaskManager().submit(new Runnable() {
             @Override
             public void run() {
@@ -1093,7 +1113,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         }
 
         private void updateNotification(int id, String content){
-            showSimpleNotification(id, notificationTitle, content, false);
+            showSimpleNotification(mContext, id, notificationTitle, content, false);
         }
     }
 
@@ -1188,7 +1208,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        LogUtil.debugLog("Picker", "Cancel!");
+                        LogUtil.d("Picker", "Cancel!");
                         if (!isFinishing()) {
                             dialog.dismiss();
                         }
@@ -1281,7 +1301,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         }
     }
 
-    private void initUi() {
+    public void initUi() {
         mContentTabCloudRl = (RelativeLayout) findViewById(R.id.content_tab_cloud_root);
         mContentTabDeviceRl = (RelativeLayout) findViewById(R.id.content_tab_device_root);
         mCheckBtnCloud = (CheckTextButton) findViewById(R.id.pb_search_tab_btn_cloud);
@@ -1377,7 +1397,8 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             }
 
             @Override
-            public void onDoubleClick(MotionEvent e) {
+            public void onDoubleClick(View v, MotionEvent e) {
+                LogUtil.d(TAG, "onDoubleClick:");
             }
 
             @Override
@@ -1386,17 +1407,17 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
 
             @Override
             public void onDrag(int direction, float distance, float rate) {
-                LogUtil.debugLog(TAG, "onDrag:" + direction);
+                LogUtil.d(TAG, "onDrag:" + direction);
             }
 
             @Override
             public void onEnd(int mode) {
-                LogUtil.debugLog(TAG, "onEnd:" + mode);
+                LogUtil.d(TAG, "onEnd:" + mode);
             }
 
             @Override
             public void onZoomChange(float scale, CustomRect oRect, CustomRect curRect) {
-                LogUtil.debugLog(TAG, "onZoomChange:" + scale);
+                LogUtil.d(TAG, "onZoomChange:" + scale);
             }
         };
         surfaceView.setOnTouchListener(mRemotePlayBackTouchListener);
@@ -1482,7 +1503,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
     protected void onStop() {
         super.onStop();
         mScreenOrientationHelper.postOnStop();
-        LogUtil.debugLog(TAG, "onStop():" + notPause + " status:" + status);
+        LogUtil.d(TAG, "onStop():" + notPause + " status:" + status);
 
         if (notPause) {
             closePlayBack();
@@ -1493,7 +1514,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         if (status == RemoteListContant.STATUS_EXIT_PAGE) {
             return;
         }
-        LogUtil.debugLog(TAG, "停止运行.........");
+        LogUtil.d(TAG, "停止运行.........");
         stopPlayTask();
         stopRemoteListPlayer();
 
@@ -1507,7 +1528,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
     @Override
     protected void onResume() {
         super.onResume();
-        LogUtil.debugLog(TAG, "onResume()");
+        LogUtil.d(TAG, "onResume()");
 
         new Handler().postDelayed(new Runnable() {
 
@@ -1754,12 +1775,12 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
     public void queryTaskOver(int type, int queryMode, int queryErrorCode, String detail) {
         mRecordType = type;
         if (type == RemoteListContant.TYPE_CLOUD) {
-            LogUtil.errorLog(TAG, "queryTaskOver: TYPE_CLOUD");
+            LogUtil.e(TAG, "queryTaskOver: TYPE_CLOUD");
         } else if (type == RemoteListContant.TYPE_LOCAL) {
             if (mWaitDlg != null && mWaitDlg.isShowing()) {
                 mWaitDlg.dismiss();
             }
-            LogUtil.errorLog(TAG, "queryTaskOver: TYPE_LOCAL");
+            LogUtil.e(TAG, "queryTaskOver: TYPE_LOCAL");
             queryDeviceRecordFilesAsyncTask = null;
         }
     }
@@ -1884,7 +1905,10 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         loadingPlayBtn.setVisibility(View.GONE);
     }
 
-    // 新的播放UI初始化
+    /**
+     * en: init play UI
+     * zh: 初始化播放界面
+     */
     private void newPlayUIInit() {
         remotePlayBackArea.setVisibility(View.VISIBLE);
         surfaceView.setVisibility(View.INVISIBLE);
@@ -2114,7 +2138,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                 onReplayBtnClick();
                 break;
             case R.id.next_play_btn:
-                onNextPlayBtnClick();
+                // 不需要播放下一个录像片段功能
                 break;
             case R.id.remote_playback_pause_btn:
                 onPlayPauseBtnClick();
@@ -2146,8 +2170,6 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
 
     private void showDelDialog() { }
 
-    private void onNextPlayBtnClick() {}
-
     // 暂停按钮事件处理
     private void onPlayPauseBtnClick() {
         if (notPause) {
@@ -2161,7 +2183,13 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                 if (mPlaybackPlayer != null) {
                     // 停止录像
                     stopRemotePlayBackRecord();
-                    mPlaybackPlayer.pausePlayback();
+                    // 加保护，规避CAS库小概率出现的10S死锁导致的ANR问题
+                    getTaskManager().submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            mPlaybackPlayer.pausePlayback();
+                        }
+                    });
                 }
             }
         } else {
@@ -2171,7 +2199,13 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                 pausePlay();
             } else {
                 if (mPlaybackPlayer != null) {
-                    mPlaybackPlayer.resumePlayback();
+                    // 加保护，规避CAS库小概率出现的10S死锁导致的ANR问题
+                    getTaskManager().submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            mPlaybackPlayer.resumePlayback();
+                        }
+                    });
                 }
                 mScreenOrientationHelper.enableSensorOrientation();
                 status = RemoteListContant.STATUS_PLAYING;
@@ -2183,6 +2217,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
     private void onReplayBtnClick() {
         newPlayInit(true, true);
         timeBucketUIInit(currentClickItemFile.getBeginTime(), currentClickItemFile.getEndTime());
+        startPlayback();
     }
 
     // 开始录像
@@ -2336,7 +2371,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             playTime = seekTime.getTimeInMillis();
         }
         startTime.setTimeInMillis(playTime);
-        LogUtil.infoLog(TAG, "pausePlay:" + startTime);
+        LogUtil.i(TAG, "pausePlay:" + startTime);
         if (currentClickItemFile != null) {
             reConnectPlay(currentClickItemFile.getType(), startTime);
         }
@@ -2395,33 +2430,38 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
 
     @Override
     public void onInputVerifyCode(final String verifyCode) {
-        LogUtil.debugLog(TAG, "verify code is " + verifyCode);
+        LogUtil.d(TAG, "verify code is " + verifyCode);
         DataManager.getInstance().setDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial(), verifyCode);
         if (mPlaybackPlayer != null) {
-
             newPlayUIInit();
+            startPlayback();
+        }
+    }
 
-            if (mDeviceRecordInfo != null) {
-                if (mPlaybackPlayer != null) {
-                    mPlaybackPlayer.setPlayVerifyCode(DataManager.getInstance().getDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial()));
-                }
-
-                startRecordOriginVideo();
-                mPlaybackPlayer.startPlayback(mDeviceRecordInfo.getStartTime(), mDeviceRecordInfo.getStopTime());
-            } else if (mCloudRecordInfo != null) {
-                if (mPlaybackPlayer != null) {
-                    mPlaybackPlayer.setPlayVerifyCode(DataManager.getInstance().getDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial()));
-                }
-
-                startRecordOriginVideo();
-                mPlaybackPlayer.startPlayback(mCloudRecordInfo);
+    /**
+     * en: call EZPlayer.startPlayback to start playback
+     * zh: 调用EZPlayer.startPlayback接口开始回放
+     */
+    private void startPlayback(){
+        if (mDeviceRecordInfo != null) {
+            if (mPlaybackPlayer != null) {
+                mPlaybackPlayer.setPlayVerifyCode(DataManager.getInstance().getDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial()));
             }
 
+            startRecordOriginVideo();
+            mPlaybackPlayer.startPlayback(mDeviceRecordInfo.getStartTime(), mDeviceRecordInfo.getStopTime());
+        } else if (mCloudRecordInfo != null) {
+            if (mPlaybackPlayer != null) {
+                mPlaybackPlayer.setPlayVerifyCode(DataManager.getInstance().getDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial()));
+            }
+            startRecordOriginVideo();
+            mPlaybackPlayer.startPlayback(mCloudRecordInfo);
         }
     }
 
     private void startRecordOriginVideo(){
-        String fileName = LocalInfo.getInstance().getFilePath() + "/origin_video_play_back.ps";
+        String fileName = DemoConfig.getStreamsFolder() + "/origin_video_play_back_"
+                + DataTimeUtil.INSTANCE.getSimpleTimeInfoForTmpFile() + ".ps";
         VideoFileUtil.startRecordOriginVideo(mPlaybackPlayer,fileName);
     }
 

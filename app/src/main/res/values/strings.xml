@@ -564,6 +564,7 @@
     <string name="adding_device_to_your_account">adding device to your account...</string>
     <string name="give_up_adding">Give Up</string>
     <string name="app_add_device_success">Added device to account!</string>
+    <string name="tip_playback_again">Finished to playback, click to playback again!</string>
 
     <!--儿童手表-视频通话-->
     <string name="video_talk_sdk_toast_hang_up">通话已结束</string>

@@ -39,7 +39,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 public class SectionListAdapter implements ListAdapter, OnItemClickListener, PinnedHeaderAdapter, SectionIndexer,
         OnScrollListener {

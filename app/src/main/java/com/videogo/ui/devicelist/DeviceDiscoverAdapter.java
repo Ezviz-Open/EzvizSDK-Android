@@ -28,7 +28,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 public class DeviceDiscoverAdapter extends BaseAdapter {
     private Context mContext = null;

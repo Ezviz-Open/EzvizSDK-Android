@@ -25,7 +25,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
 
 import com.videogo.EzvizApplication;
-import com.videogo.RootActivity;
+import ezviz.ezopensdkcommon.common.RootActivity;
 import com.videogo.alarm.AlarmLogInfoManager;
 import com.videogo.constant.Constant;
 import com.videogo.constant.IntentConsts;
@@ -58,7 +58,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 public class EZMessageActivity2 extends RootActivity implements VerifyCodeInput.VerifyCodeErrorListener{
     private static final String TAG = "EMessageActivity2";
@@ -569,7 +569,7 @@ public class EZMessageActivity2 extends RootActivity implements VerifyCodeInput.
 
                 ErrorInfo errorInfo = (ErrorInfo) e.getObject();
                 mErrorCode = errorInfo.errorCode;
-                LogUtil.debugLog("EM", errorInfo.toString());
+                LogUtil.d("EM", errorInfo.toString());
             }
             
 
@@ -733,7 +733,7 @@ public class EZMessageActivity2 extends RootActivity implements VerifyCodeInput.
 
                     ErrorInfo errorInfo = (ErrorInfo) e.getObject();
                     mErrorCode = errorInfo.errorCode;
-                    LogUtil.debugLog(TAG, errorInfo.toString());
+                    LogUtil.d(TAG, errorInfo.toString());
                 }
 
                 return params[0];
@@ -848,7 +848,7 @@ public class EZMessageActivity2 extends RootActivity implements VerifyCodeInput.
 
                 ErrorInfo errorInfo = (ErrorInfo) e.getObject();
                 mErrorCode = errorInfo.errorCode;
-                LogUtil.debugLog("EM", errorInfo.toString());
+                LogUtil.d("EM", errorInfo.toString());
 
                 return false;
             }
@@ -985,7 +985,7 @@ public class EZMessageActivity2 extends RootActivity implements VerifyCodeInput.
 
                 ErrorInfo errorInfo = (ErrorInfo) e.getObject();
                 mErrorCode = errorInfo.errorCode;
-                LogUtil.debugLog("EM", errorInfo.toString());
+                LogUtil.d("EM", errorInfo.toString());
 
                 return false;
             }

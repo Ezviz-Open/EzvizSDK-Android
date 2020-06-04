@@ -24,7 +24,7 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
 import com.videogo.EzvizApplication;
-import com.videogo.RootActivity;
+import ezviz.ezopensdkcommon.common.RootActivity;
 import com.videogo.constant.IntentConsts;
 import com.videogo.device.PeripheralInfo;
 import com.videogo.errorlayer.ErrorInfo;
@@ -36,7 +36,7 @@ import com.videogo.util.LogUtil;
 import com.videogo.widget.TitleBar;
 import com.videogo.widget.WaitDialog;
 
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 //import com.videogo.restful.exception.VideoGoNetSDKException;
 //import com.videogo.util.ActivityUtils;
@@ -221,7 +221,7 @@ public class ModifyDeviceNameActivity extends RootActivity implements View.OnCli
                 	e.printStackTrace();
 
                     ErrorInfo errorInfo = (ErrorInfo) e.getObject();
-                    LogUtil.debugLog("TAG", errorInfo.toString());
+                    LogUtil.d("TAG", errorInfo.toString());
                 }
 
                 if (errorCode != 0) {

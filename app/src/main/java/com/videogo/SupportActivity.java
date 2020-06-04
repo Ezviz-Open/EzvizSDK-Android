@@ -14,6 +14,9 @@ import com.videogo.widget.TopBar;
 
 import ezviz.ezopensdk.R;
 import ezviz.ezopensdk.demo.ValueKeys;
+import ezviz.ezopensdkcommon.common.RootActivity;
+
+import static com.videogo.EzvizApplication.getOpenSDK;
 
 public class SupportActivity extends RootActivity {
 

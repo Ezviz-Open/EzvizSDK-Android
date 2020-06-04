@@ -24,7 +24,7 @@ public class EZGenerateFilePath {
 		File file = new File(rootPath);
 		if (!file.exists()) {
 			if(!file.mkdir()) {
-			    LogUtil.errorLog(TAG, "file.mkdir fail"); 
+			    LogUtil.e(TAG, "file.mkdir fail");
 			}
 		}
 
@@ -38,7 +38,7 @@ public class EZGenerateFilePath {
 		file = new File(filePath);
 		if (!file.exists()) {
 			if(!file.mkdir()) {
-			    LogUtil.errorLog(TAG, "file.mkdir fail"); 
+			    LogUtil.e(TAG, "file.mkdir fail");
 			}
 		}
 
@@ -51,7 +51,7 @@ public class EZGenerateFilePath {
 		// 文件格式为mnt/sdcard/VideoGo/20120901/20120901141138540_test.jpg
 		filePath += String.format("/%04d%02d%02d%02d%02d%02d%03d_%s_%s", year, month, day, hour, min, sec, milsec, cameraName, deviceSerial);
 
-		LogUtil.debugLog(TAG, "generatFilePath file path:" + filePath);
+		LogUtil.d(TAG, "generatFilePath file path:" + filePath);
 		return filePath;
 	}
 
@@ -105,14 +105,14 @@ public class EZGenerateFilePath {
         File file = new File(dir);
         if (!file.exists()) {
             if (!file.mkdir()) {
-                LogUtil.errorLog(TAG, "mkdir failed");
+                LogUtil.e(TAG, "mkdir failed");
             }
         }
 
         // 缩略图目录
         String thumbnailPath = dir + "/" + filePath.substring(pos + 1);
 
-        LogUtil.debugLog(TAG, "generateThumbnailPath thumbnail path:" + thumbnailPath);
+        LogUtil.d(TAG, "generateThumbnailPath thumbnail path:" + thumbnailPath);
         return thumbnailPath;
     }
 }

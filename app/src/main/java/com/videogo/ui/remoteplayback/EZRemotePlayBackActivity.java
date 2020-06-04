@@ -90,7 +90,6 @@ import com.videogo.widget.CustomTouchListener;
 import com.videogo.widget.TimeBarHorizontalScrollView;
 import com.videogo.widget.TimeBarHorizontalScrollView.TimeScrollBarScrollListener;
 import com.videogo.widget.TitleBar;
-import ezviz.ezopensdkcommon.R;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -98,6 +97,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import ezviz.ezopensdk.R;
 
 //import com.videogo.openapi.bean.resp.CameraInfo;
 
@@ -373,7 +374,8 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
                 onRemotePlayBackSvClick();
             }
             @Override
-            public void onDoubleClick(MotionEvent e) {
+            public void onDoubleClick(View v, MotionEvent e) {
+                LogUtil.d(TAG, "onDoubleClick:");
             }
 
             @Override
@@ -381,22 +383,18 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
             }
             @Override
             public void onDrag(int direction, float distance, float rate) {
-                LogUtil.debugLog(TAG, "onDrag:" + direction);
+                LogUtil.d(TAG, "onDrag:" + direction);
             }
             @Override
             public void onEnd(int mode) {
-                LogUtil.debugLog(TAG, "onEnd:" + mode);
+                LogUtil.d(TAG, "onEnd:" + mode);
             }
             @Override
             public void onZoomChange(float scale, CustomRect oRect, CustomRect curRect) {
-                LogUtil.debugLog(TAG, "onZoomChange:" + scale);
-                if (mStatus == STATUS_PLAY) {
-                    if (scale > 1.0f && scale < 1.1f) {
-                        scale = 1.1f;
-                    }
-                    setPlayScaleUI(scale, oRect, curRect);
-                }
+                LogUtil.d(TAG, "onZoomChange:" + scale);
             }
+
+
         };
         mRemotePlayBackSv.setOnTouchListener(mRemotePlayBackTouchListener);
         mRemotePlayBackLoadingLy = (LinearLayout) findViewById(R.id.remoteplayback_loading_ly);
@@ -575,7 +573,7 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        LogUtil.debugLog("Picker", "Cancel!");
+                        LogUtil.d("Picker", "Cancel!");
                         if (!isFinishing()) {
                             dialog.dismiss();
                         }
@@ -822,7 +820,7 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
      */
     @Override
     public boolean handleMessage(Message msg) {
-        LogUtil.infoLog(TAG, "handleMessage:" + msg.what);
+        LogUtil.i(TAG, "handleMessage:" + msg.what);
         switch (msg.what) {
             case RemotePlayBackMsg.MSG_REMOTEPLAYBACK_PLAY_START:
                 updateLoadingProgress(60);
@@ -1082,7 +1080,7 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
 
     // 搜索文件异常处理
     private void handleSearchCloudFileFail(int errorCode) {
-        LogUtil.debugLog(TAG, "handleSearchFileFail:" + errorCode);
+        LogUtil.d(TAG, "handleSearchFileFail:" + errorCode);
 
         stopRemotePlayBack();
 
@@ -1104,7 +1102,7 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
     }
 
     private void handleConnectionException(int errorCode) {
-        LogUtil.debugLog(TAG, "handleConnectionException:" + errorCode);
+        LogUtil.d(TAG, "handleConnectionException:" + errorCode);
         Calendar startTime = Calendar.getInstance();
         Toast.makeText(this, "network connection exception, will restart playback", Toast.LENGTH_SHORT).show();
 
@@ -1126,7 +1124,7 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
         }
 
         startTime.setTimeInMillis(mPlayTime);
-        LogUtil.debugLog(TAG, "handleConnectionException replay:" + startTime.toString());
+        LogUtil.d(TAG, "handleConnectionException replay:" + startTime.toString());
         stopRemotePlayBack();
         startRemotePlayBack(startTime);
     }
@@ -1271,7 +1269,7 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
             mEZMediaPlayer.setStreamDownloadCallback(new EZOpenSDKListener.EZStreamDownloadCallback() {
                 @Override
                 public void onSuccess(String filepath) {
-                    LogUtil.infoLog(TAG, "EZStreamDownloadCallback onSuccess  "+filepath);
+                    LogUtil.i(TAG, "EZStreamDownloadCallback onSuccess  "+filepath);
 
                 }
 
@@ -1527,13 +1525,13 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
             public void run() {
                 try {
                     mEZCloudFileList = EzvizApplication.getOpenSDK().searchRecordFileFromCloud(mEZAlarmInfo.getDeviceSerial(),mEZAlarmInfo.getCameraNo(), mStartTime, mEndTime);
-                    LogUtil.debugLog(TAG, "searchEZCloudFileList ends: " + mEZCloudFileList);
+                    LogUtil.d(TAG, "searchEZCloudFileList ends: " + mEZCloudFileList);
                     sendMessage(MSG_SEARCH_CLOUD_FILE_SUCCUSS, 0, seletedTime);
                 } catch (BaseException e) {
                     e.printStackTrace();
 
                     ErrorInfo errorInfo = (ErrorInfo) e.getObject();
-                    LogUtil.debugLog(TAG, errorInfo.toString());
+                    LogUtil.d(TAG, errorInfo.toString());
                     sendMessage(MSG_SEARCH_CLOUD_FILE_FAIL, errorInfo.errorCode);
                 }
             }
@@ -1565,30 +1563,30 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
                             EZDeviceRecordFile ezDeviceFile = mEZDeviceFileList.get(i);
                             Calendar tmpStartTime = (ezDeviceFile.getStartTime());
                             Calendar tmpEndTime = (ezDeviceFile.getStopTime());
-                            LogUtil.verboseLog(TAG, "startTime:" + tmpStartTime.getTime() + " endTime:" + tmpEndTime.getTime());
+                            LogUtil.v(TAG, "startTime:" + tmpStartTime.getTime() + " endTime:" + tmpEndTime.getTime());
 
                             if (seletedTime.compareTo(tmpStartTime) >= 0 && seletedTime.compareTo(tmpEndTime) <= 0) {
                                 mAlarmRecordDeviceFile = ezDeviceFile;
                                 mAlarmRecordDeviceFile.setStartTime(mAlarmStartTime);
                                 mAlarmRecordDeviceFile.setStopTime(mAlarmStopTime);
 
-                                LogUtil.debugLog(TAG, "searchEZDeviceFileList success: start, " + mAlarmRecordDeviceFile.getStartTime());
+                                LogUtil.d(TAG, "searchEZDeviceFileList success: start, " + mAlarmRecordDeviceFile.getStartTime());
                                 sendMessage(MSG_SEARCH_CLOUD_FILE_SUCCUSS, 0, seletedTime);
                                 return;
                             }
                         }
-                        LogUtil.debugLog(TAG, "no matching device record file for alarm");
+                        LogUtil.d(TAG, "no matching device record file for alarm");
                     }
 
                     mEZCloudFileList = EzvizApplication.getOpenSDK().searchRecordFileFromCloud(mEZAlarmInfo.getDeviceSerial(),mEZAlarmInfo.getCameraNo(), startTime, endTime);
                     if (mEZCloudFileList != null && mEZCloudFileList.size() > 0) {
                         size = mEZCloudFileList.size();
-                        LogUtil.debugLog(TAG, "searchEZCloudFileList size:" + size);
+                        LogUtil.d(TAG, "searchEZCloudFileList size:" + size);
                         for (int i = 0; i < size; i++) {
                             EZCloudRecordFile ezCloudFile = mEZCloudFileList.get(i);
                             Calendar tmpStartTime = ezCloudFile.getStartTime();
                             Calendar tmpEndTime = ezCloudFile.getStopTime();
-                            LogUtil.verboseLog(TAG, "startTime:" + tmpStartTime.getTime() + " endTime:" + tmpEndTime.getTime());
+                            LogUtil.v(TAG, "startTime:" + tmpStartTime.getTime() + " endTime:" + tmpEndTime.getTime());
 
                             if (seletedTime.compareTo(tmpStartTime) >= 0 && seletedTime.compareTo(tmpEndTime) <= 0) {
                                 mAlarmRecordFile = ezCloudFile;
@@ -1599,12 +1597,12 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
                                 mAlarmRecordFile.setStartTime(tmpStartTime);
                                 mAlarmRecordFile.setStopTime(tmpEndTime);
 
-                                LogUtil.debugLog(TAG, "searchEZCloudFileList success: start, " + mAlarmRecordFile.getStartTime());
+                                LogUtil.d(TAG, "searchEZCloudFileList success: start, " + mAlarmRecordFile.getStartTime());
                                 sendMessage(MSG_SEARCH_CLOUD_FILE_SUCCUSS, 0, seletedTime);
                                 return;
                             }
                         }
-                        LogUtil.debugLog(TAG, "no matching cloud record file for alarm");
+                        LogUtil.d(TAG, "no matching cloud record file for alarm");
                     }
 
                     sendMessage(MSG_SEARCH_CLOUD_FILE_FAIL, -1);
@@ -1612,7 +1610,7 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
                     e.printStackTrace();
 
                     ErrorInfo errorInfo = (ErrorInfo) e.getObject();
-                    LogUtil.debugLog(TAG, "search file list failed. error " + errorInfo.toString());
+                    LogUtil.d(TAG, "search file list failed. error " + errorInfo.toString());
                     sendMessage(MSG_SEARCH_CLOUD_FILE_FAIL, e.getErrorCode());
                 }
             }
@@ -1622,7 +1620,7 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
     private List<EZCloudRecordFile> mEZCloudFileList = null;
 
     private void startRemotePlayBack(final Calendar selectedTime) {
-        LogUtil.debugLog(TAG, "startRemotePlayBack:" + selectedTime);
+        LogUtil.d(TAG, "startRemotePlayBack:" + selectedTime);
 
         if (mStatus == STATUS_START || mStatus == STATUS_PLAY) {
             return;
@@ -1689,7 +1687,7 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
     }
 
     private void stopRemotePlayBack() {
-        LogUtil.debugLog(TAG, "stopRemotePlayBack");
+        LogUtil.d(TAG, "stopRemotePlayBack");
         mStatus = STATUS_STOP;
 
         stopUpdateTimer();
@@ -1703,7 +1701,7 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
     }
 
     private void pauseRemotePlayBack() {
-        LogUtil.debugLog(TAG, "pauseRemotePlayBack");
+        LogUtil.d(TAG, "pauseRemotePlayBack");
         mStatus = STATUS_PAUSE;
 
         if (mEZMediaPlayer != null) {
@@ -1714,7 +1712,7 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
     }
 
     private void resumeRemotePlayBack() {
-        LogUtil.debugLog(TAG, "resumeRemotePlayBack");
+        LogUtil.d(TAG, "resumeRemotePlayBack");
         mStatus = STATUS_PLAY;
 
         if (mEZMediaPlayer != null) {
@@ -2135,7 +2133,7 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
         updateLoadingProgress(0);
 
         Calendar seletedTime = getTimeBarSeekTime();
-        LogUtil.debugLog(TAG, "startRemotePlayBack:" + seletedTime);
+        LogUtil.d(TAG, "startRemotePlayBack:" + seletedTime);
 
         if (mCloudFileList == null) {
             searchCloudFileList(seletedTime);
@@ -2148,7 +2146,7 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
     }
 
     private void handlePlaySuccess(Message msg) {
-        LogUtil.debugLog(TAG, "handlePlaySuccess:" + msg.arg1);
+        LogUtil.d(TAG, "handlePlaySuccess:" + msg.arg1);
         mStatus = STATUS_PLAY;
 
         if (msg.arg1 != 0) {
@@ -2176,65 +2174,12 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
         mRemotePlayBackSv.setLayoutParams(svLp);
 
         mRemotePlayBackTouchListener.setSacaleRect(Constant.MAX_SCALE, 0, 0, realPlaySvlp.width, realPlaySvlp.height);
-        setPlayScaleUI(1, null, null);
-    }
-
-    private void setPlayScaleUI(float scale, CustomRect oRect, CustomRect curRect) {
-        if (scale == 1) {
-            if (mPlayScale == scale) {
-                return;
-            }
-            mRemotePlayBackRatioTv.setVisibility(View.GONE);
-            try {
-                mEZMediaPlayer.setDisplayRegion(false, null, null);
-            } catch (BaseException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        } else {
-            if (mPlayScale == scale) {
-                try {
-                    mEZMediaPlayer.setDisplayRegion(true, oRect, curRect);
-                } catch (BaseException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                return;
-            }
-            RelativeLayout.LayoutParams realPlayRatioTvLp = (RelativeLayout.LayoutParams) mRemotePlayBackRatioTv
-                    .getLayoutParams();
-            if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
-                realPlayRatioTvLp.setMargins(Utils.dip2px(this, 10), Utils.dip2px(this, 10), 0, 0);
-            } else {
-                realPlayRatioTvLp.setMargins(Utils.dip2px(this, 70), Utils.dip2px(this, 20), 0, 0);
-            }
-            mRemotePlayBackRatioTv.setLayoutParams(realPlayRatioTvLp);
-            String sacleStr = String.valueOf(scale);
-            mRemotePlayBackRatioTv.setText(sacleStr.subSequence(0, Math.min(3, sacleStr.length())) + "X");
-            mRemotePlayBackRatioTv.setVisibility(View.VISIBLE);
-
-            mRemotePlayBackControlRl.setVisibility(View.GONE);
-            if (mAlarmStartTime != null) {
-                mRemotePlayBackProgressLy.setVisibility(View.GONE);
-                mRemotePlayBackProgressBar.setVisibility(View.VISIBLE);
-                mLandscapeTitleBar.setVisibility(View.GONE);
-            }
-            mRemotePlayBackFullOperateBar.setVisibility(View.GONE);
-
-            try {
-                mEZMediaPlayer.setDisplayRegion(true, oRect, curRect);
-            } catch (BaseException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-        mPlayScale = scale;
     }
 
     private void handlePlayFail(int errorCode, Object obj) {
         if (obj != null) {
             ErrorInfo errorInfo = (ErrorInfo) obj;
-            LogUtil.debugLog(TAG, "handlePlayFail:" + errorCode);
+            LogUtil.d(TAG, "handlePlayFail:" + errorCode);
         }
 
         stopRemotePlayBack();
@@ -2300,7 +2245,7 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
     }
 
     private void handlePlayFinish() {
-        LogUtil.debugLog(TAG, "handlePlayFinish");
+        LogUtil.d(TAG, "handlePlayFinish");
 
         stopRemotePlayBack();
 
@@ -2429,9 +2374,9 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
 
     @Override
     public void onInputVerifyCode(final String verifyCode) {
-        LogUtil.debugLog(TAG, "verify code is " + verifyCode);
+        LogUtil.d(TAG, "verify code is " + verifyCode);
 
-        LogUtil.debugLog(TAG, "verify code is " + verifyCode);
+        LogUtil.d(TAG, "verify code is " + verifyCode);
         DataManager.getInstance().setDeviceSerialVerifyCode(mEZAlarmInfo.getDeviceSerial(),verifyCode);
         if (mEZMediaPlayer != null) {
             mEZMediaPlayer.setPlayVerifyCode(DataManager.getInstance().getDeviceSerialVerifyCode(mEZAlarmInfo.getDeviceSerial()));

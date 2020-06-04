@@ -1,7 +1,7 @@
 package com.videogo.ui.message;
 
 
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 public enum AlarmType {
     /*

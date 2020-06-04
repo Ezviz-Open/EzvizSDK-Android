@@ -19,7 +19,7 @@ import com.videogo.widget.TitleBar;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 public class EZUpgradeDeviceActivity extends Activity {
     private final static String TAG = "EZUpgradeDeviceActivity";
@@ -165,7 +165,7 @@ public class EZUpgradeDeviceActivity extends Activity {
                     e.printStackTrace();
 
                     ErrorInfo errorInfo = (ErrorInfo) e.getObject();
-                    LogUtil.debugLog(TAG, errorInfo.toString());
+                    LogUtil.d(TAG, errorInfo.toString());
 
                     return;
                 }
@@ -197,7 +197,7 @@ public class EZUpgradeDeviceActivity extends Activity {
                     e.printStackTrace();
 
                     ErrorInfo errorInfo = (ErrorInfo) e.getObject();
-                    LogUtil.debugLog(TAG, errorInfo.toString());
+                    LogUtil.d(TAG, errorInfo.toString());
                 }
             }
         });
@@ -225,7 +225,7 @@ public class EZUpgradeDeviceActivity extends Activity {
                 } catch (BaseException e) {
                     e.printStackTrace();
                     ErrorInfo errorInfo = (ErrorInfo) e.getObject();
-                    LogUtil.debugLog(TAG, errorInfo.toString());
+                    LogUtil.d(TAG, errorInfo.toString());
 
                     runOnUiThread(new Runnable() {
                         @Override

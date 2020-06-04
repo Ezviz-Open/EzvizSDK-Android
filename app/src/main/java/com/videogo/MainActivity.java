@@ -38,8 +38,10 @@ import ezviz.ezopensdk.demo.SdkInitTool;
 import ezviz.ezopensdk.demo.ServerAreasEnum;
 import ezviz.ezopensdk.demo.SpTool;
 import ezviz.ezopensdk.demo.ValueKeys;
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
+import ezviz.ezopensdkcommon.common.RootActivity;
 
+import static com.videogo.EzvizApplication.getOpenSDK;
 import static com.videogo.constant.Constant.OAUTH_SUCCESS_ACTION;
 
 public class MainActivity extends RootActivity {
@@ -116,7 +118,7 @@ public class MainActivity extends RootActivity {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        EzvizApplication.getOpenSDK().logout();
+                        getOpenSDK().logout();
                     }
                 }).start();
 

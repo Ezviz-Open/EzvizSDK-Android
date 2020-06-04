@@ -16,7 +16,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import com.videogo.EzvizApplication;
-import com.videogo.RootActivity;
 import com.videogo.constant.IntentConsts;
 import com.videogo.errorlayer.ErrorInfo;
 import com.videogo.exception.BaseException;
@@ -30,7 +29,8 @@ import com.videogo.util.ConnectionDetector;
 import com.videogo.util.LogUtil;
 import com.videogo.widget.TitleBar;
 import com.videogo.widget.WaitDialog;
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
+import ezviz.ezopensdkcommon.common.RootActivity;
 
 public class EZDeviceSettingActivity extends RootActivity {
     private final String TAG = "EZDeviceSettingActivity";
@@ -248,7 +248,7 @@ public class EZDeviceSettingActivity extends RootActivity {
                 if (!TextUtils.isEmpty(name)){
                     mEZDeviceInfo.setDeviceName(name);
                 }else{
-                    LogUtil.debugLog(TAG,"modify device name is null");
+                    LogUtil.d(TAG,"modify device name is null");
                 }
             }
         }
@@ -548,7 +548,7 @@ public class EZDeviceSettingActivity extends RootActivity {
         	} catch (BaseException e) {;
                 ErrorInfo errorInfo = (ErrorInfo) e.getObject();
                 mErrorCode = errorInfo.errorCode;
-                LogUtil.debugLog(TAG, errorInfo.toString());
+                LogUtil.d(TAG, errorInfo.toString());
         	}
             return false;
         }
@@ -636,7 +636,7 @@ public class EZDeviceSettingActivity extends RootActivity {
 			} catch (BaseException e) {
                 ErrorInfo errorInfo = (ErrorInfo) e.getObject();
                 mErrorCode = errorInfo.errorCode;
-                LogUtil.debugLog(TAG, errorInfo.toString());
+                LogUtil.d(TAG, errorInfo.toString());
 
 				e.printStackTrace();
 			}
@@ -694,9 +694,9 @@ public class EZDeviceSettingActivity extends RootActivity {
             } catch (BaseException e) {
                 ErrorInfo errorInfo = (ErrorInfo) e.getObject();
                 mErrorCode = errorInfo.errorCode;
-                LogUtil.debugLog(TAG, errorInfo.toString());
+                LogUtil.d(TAG, errorInfo.toString());
 
-                LogUtil.errorLog(TAG, "error description: " + e.getMessage());
+                LogUtil.e(TAG, "error description: " + e.getMessage());
             }
             return false;
         }
@@ -761,7 +761,7 @@ public class EZDeviceSettingActivity extends RootActivity {
             } catch (BaseException e) {
                 ErrorInfo errorInfo = (ErrorInfo) e.getObject();
                 mErrorCode = errorInfo.errorCode;
-                LogUtil.debugLog(TAG, errorInfo.toString());
+                LogUtil.d(TAG, errorInfo.toString());
 
                 return false;
             }

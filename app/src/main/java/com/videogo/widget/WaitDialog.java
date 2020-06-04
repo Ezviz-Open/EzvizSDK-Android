@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 
 public class WaitDialog extends Dialog {

@@ -16,7 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 //import com.videogo.util.MD5Util;
 

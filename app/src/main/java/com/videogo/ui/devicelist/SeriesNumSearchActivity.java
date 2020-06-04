@@ -24,8 +24,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.videogo.EzvizApplication;
-import com.videogo.RootActivity;
+
 import com.videogo.constant.Constant;
 import com.videogo.constant.IntentConsts;
 import com.videogo.errorlayer.ErrorInfo;
@@ -40,14 +39,18 @@ import com.videogo.util.LocalValidate;
 import com.videogo.util.LogUtil;
 import com.videogo.widget.TitleBar;
 import com.videogo.widget.WaitDialog;
+
 import ezviz.ezopensdk.R;
 import ezviz.ezopensdk.configwifi.ApConfigWifiPresenterForFullSdk;
 import ezviz.ezopensdk.configwifi.SmartConfigWifiPresenterForFullSdk;
 import ezviz.ezopensdk.configwifi.SoundWaveConfigWifiPresenterForFullSdk;
 import ezviz.ezopensdkcommon.common.IntentConstants;
+import ezviz.ezopensdkcommon.common.RootActivity;
 import ezviz.ezopensdkcommon.configwifi.AutoWifiNetConfigActivity;
 import ezviz.ezopensdkcommon.configwifi.AutoWifiPrepareStepOneActivity;
 import ezviz.ezopensdkcommon.configwifi.ConfigWifiExecutingActivityPresenter;
+
+import static com.videogo.EzvizApplication.getOpenSDK;
 
 public class SeriesNumSearchActivity extends RootActivity implements OnClickListener/*, OnAuthListener*/ {
 
@@ -186,7 +189,7 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
             mDeviceType = mBundle.getString(AutoWifiNetConfigActivity.DEVICE_TYPE);
             mDeviceModel = DeviceModel.getDeviceModel(mDeviceType);
         }
-        LogUtil.debugLog(TAG, "mSerialNoStr = " + mSerialNoStr + ",mVerifyCode = " + mVerifyCode + ",deviceType="
+        LogUtil.d(TAG, "mSerialNoStr = " + mSerialNoStr + ",mVerifyCode = " + mVerifyCode + ",deviceType="
                 + mDeviceModel);
         mLocalInfo = LocalInfo.getInstance();
 
@@ -366,7 +369,7 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        LogUtil.debugLog(TAG, "onDestroy");
+        LogUtil.d(TAG, "onDestroy");
     }
 
 
@@ -379,7 +382,7 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
             mLocalValidate.localValidatSerialNo(serialNo);
         } catch (BaseException e) {
             sendMessage(MSG_LOCAL_VALIDATE_SERIALNO_FAIL, e.getErrorCode());
-            LogUtil.errorLog(TAG, "searchCameraBySN-> local validate serial no fail, errCode:" + e.getErrorCode());
+            LogUtil.e(TAG, "searchCameraBySN-> local validate serial no fail, errCode:" + e.getErrorCode());
             return;
         }
 
@@ -411,7 +414,7 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        LogUtil.infoLog(TAG, "probeDeviceInfo fail :" + mEZProbeDeviceInfo.getBaseException().getErrorCode());
+                                        LogUtil.i(TAG, "probeDeviceInfo fail :" + mEZProbeDeviceInfo.getBaseException().getErrorCode());
                                         sendMessage(MSG_QUERY_CAMERA_FAIL, mEZProbeDeviceInfo.getBaseException().getErrorCode());
                                     }
                                 });
@@ -455,7 +458,7 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
             msg.what = msgCode;
             mMsgHandler.sendMessage(msg);
         } else {
-            LogUtil.errorLog(TAG, "sendMessage-> mMsgHandler object is null");
+            LogUtil.e(TAG, "sendMessage-> mMsgHandler object is null");
         }
     }
 
@@ -466,7 +469,7 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
             msg.arg1 = errorCode;
             mMsgHandler.sendMessage(msg);
         } else {
-            LogUtil.errorLog(TAG, "sendMessage-> mMsgHandler object is null");
+            LogUtil.e(TAG, "sendMessage-> mMsgHandler object is null");
         }
     };
 
@@ -554,12 +557,12 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
                 showToast(R.string.camera_not_online);
                 break;
             case ErrorCode.ERROR_WEB_DEVICE_VALICATECODE_ERROR:
-                LogUtil.debugLog(TAG, "Add camera failure verification code error = " + errCode);
+                LogUtil.d(TAG, "Add camera failure verification code error = " + errCode);
                 mVerifyCode = "";
                 break;
             default:
                 showToast(R.string.add_camera_fail_server_exception, errCode);
-                LogUtil.errorLog(TAG, "handleAddCameraFail->unkown error, errCode:" + errCode);
+                LogUtil.e(TAG, "handleAddCameraFail->unkown error, errCode:" + errCode);
                 //
                 // mVerifyCode = null;
                 break;
@@ -573,7 +576,7 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
                 break;
             default:
                 showToast(R.string.camera_password_error, errCode);
-                LogUtil.errorLog(TAG, "handleLocalValidateCameraPswFail-> unkown error, errCode:" + errCode);
+                LogUtil.e(TAG, "handleLocalValidateCameraPswFail-> unkown error, errCode:" + errCode);
                 break;
         }
         handleCmaeraPswError();
@@ -600,7 +603,7 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
                 break;
             default:
                 showToast(R.string.serial_number_error, errCode);
-                LogUtil.errorLog(TAG, "handleLocalValidateSerialNoFail-> unkown error, errCode:" + errCode);
+                LogUtil.e(TAG, "handleLocalValidateSerialNoFail-> unkown error, errCode:" + errCode);
                 break;
         }
     }
@@ -608,7 +611,7 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
 
     private void handleQueryCameraSuccess() {
         if (mEZProbeDeviceInfo != null) {
-            LogUtil.infoLog(TAG, "handleQueryCameraSuccess, description:" );
+            LogUtil.i(TAG, "handleQueryCameraSuccess, description:" );
             showAddButton();
         }
 
@@ -626,7 +629,7 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
     }
 
     private void showAddButton() {
-    	LogUtil.infoLog(TAG, "enter showAddButton");
+    	LogUtil.i(TAG, "enter showAddButton");
         showCameraList();
         mBtnNext.setVisibility(View.GONE);
         mActivateHint.setVisibility(View.GONE);
@@ -692,7 +695,7 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
                 break;
             default:
                 showErrorPage(R.string.query_camera_fail, errCode);
-                LogUtil.errorLog(TAG, "handleQueryCameraFail-> unkown error, errCode:" + errCode);
+                LogUtil.e(TAG, "handleQueryCameraFail-> unkown error, errCode:" + errCode);
                 break;
         }
     }
@@ -801,17 +804,17 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
             public void run() {
 
                 try {
-                    boolean result = EzvizApplication.getOpenSDK().addDevice(mSerialNoStr, mVerifyCode);
+                    boolean result = getOpenSDK().addDevice(mSerialNoStr, mVerifyCode);
 
                     /***********If necessary, the developer needs to save this code***********/
                     // 添加成功过后
                     sendMessage(MSG_ADD_CAMERA_SUCCESS);
                 } catch (BaseException e) {
                     ErrorInfo errorInfo = (ErrorInfo) e.getObject();
-                    LogUtil.debugLog(TAG, errorInfo.toString());
+                    LogUtil.d(TAG, errorInfo.toString());
 
                     sendMessage(MSG_ADD_CAMERA_FAIL, errorInfo.errorCode);
-                    LogUtil.errorLog(TAG, "add camera fail");
+                    LogUtil.e(TAG, "add camera fail");
                 }
 
             }
@@ -849,7 +852,7 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
     }
 
     private void showCameraList() {
-    	LogUtil.infoLog(TAG, "enter showCameraList");
+    	LogUtil.i(TAG, "enter showCameraList");
         mTitle.setText(R.string.result_txt);
         mActivateHint.setVisibility(View.GONE);
         errorPage.setVisibility(View.GONE);

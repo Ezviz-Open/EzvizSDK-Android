@@ -230,7 +230,7 @@ public class Utils {
 
     public static String getAndroidID(Context context) {
         String androidID = android.provider.Settings.System.getString(context.getContentResolver(), "android_id");
-        LogUtil.debugLog("androidid", androidID);
+        LogUtil.d("androidid", androidID);
         return androidID;
     }
 

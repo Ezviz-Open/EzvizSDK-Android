@@ -24,7 +24,7 @@ import android.widget.TextView;
 
 import com.videogo.widget.TitleBar;
 
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 public class LineConnectgIntroduceActivity extends Activity {
     public static String FROM_PAGE = "from_page";

@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import com.videogo.ui.ddns.EZDDNSListActivity;
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 public class SelectDeviceList extends Activity implements View.OnClickListener {
 

@@ -5,9 +5,9 @@ package com.ezviz.demo.common
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import com.videogo.RootActivity
 import ezviz.ezopensdk.R
 import ezviz.ezopensdk.debug.TestActivityForFullSdk
+import ezviz.ezopensdkcommon.common.RootActivity
 
 class MoreFeaturesEntranceActivity : RootActivity() {
 
@@ -26,6 +26,12 @@ class MoreFeaturesEntranceActivity : RootActivity() {
 
     fun onClickWatchVideoTalk(v: View){
         showToast("暂未启用")
+    }
+
+    fun onClickGetStreamFromHub(view: View) {
+        Intent(this, CollectDeviceInfoActivity::class.java).run {
+            startActivity(this)
+        }
     }
 
 }

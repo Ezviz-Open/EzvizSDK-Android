@@ -70,7 +70,7 @@ import com.videogo.widget.pulltorefresh.PullToRefreshBase;
 import com.videogo.widget.pulltorefresh.PullToRefreshBase.LoadingLayoutCreator;
 import com.videogo.widget.pulltorefresh.PullToRefreshBase.Orientation;
 import com.videogo.widget.pulltorefresh.PullToRefreshListView;
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 import java.util.Date;
 import java.util.List;
 
@@ -210,7 +210,7 @@ public class EZDDNSListActivity extends Activity implements OnClickListener{
             @Override
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
-                LogUtil.debugLog(TAG, "onReceive:" + action);
+                LogUtil.d(TAG, "onReceive:" + action);
                 if (action.equals(Constant.ADD_DEVICE_SUCCESS_ACTION)) {
                     refreshButtonClicked();
                 }
@@ -297,7 +297,7 @@ public class EZDDNSListActivity extends Activity implements OnClickListener{
                 } catch (BaseException e) {
                     ErrorInfo errorInfo = (ErrorInfo) e.getObject();
                     mErrorCode = errorInfo.errorCode;
-                    LogUtil.debugLog(TAG, errorInfo.toString());
+                    LogUtil.d(TAG, errorInfo.toString());
 
                     return null;
                 }

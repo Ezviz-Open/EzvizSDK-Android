@@ -26,8 +26,8 @@
     <uses-permission
         android:name="android.permission.READ_LOGS"
         tools:ignore="ProtectedPermissions" />
-    <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.FLASHLIGHT" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- 以上是sdk所需权限 -->
+    <!-- 以下是demo所需权限 -->
     <uses-permission android:name="android.permission.CAMERA" />
 
     <uses-feature android:name="android.hardware.camera" />
@@ -59,9 +59,11 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name="com.ezviz.demo.streamctrl.RtpStreamPlayActivity"></activity>
+        tools:ignore="GoogleAppIndexingWarning, LockedOrientationActivity">
+        <activity android:name="com.ezviz.demo.common.CollectDeviceInfoActivity"/>
+        <activity android:name="com.ezviz.demo.streamctrl.RtpStreamPlayActivity" />
         <activity android:name="com.ezviz.demo.common.MoreFeaturesEntranceActivity" />
+        <activity android:name=".preview.MultiScreenPreviewActivity" />
         <activity
             android:name="com.ezviz.demo.streamctrl.OriginStreamControlActivity"
             android:label="测试码流">
@@ -159,7 +161,7 @@
         <activity
             android:name="com.ezviz.demo.videotalk.WatchVideoTalkActivity"
             android:screenOrientation="portrait" /> <!-- receiver -->
-        <receiver android:name="com.videogo.RootActivity$NotificationReceiver" />
+        <receiver android:name="com.videogo.ui.cameralist.EZCameraListActivity$NotificationReceiver" />
     </application>
 
 </manifest>

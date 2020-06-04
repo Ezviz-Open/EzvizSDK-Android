@@ -28,7 +28,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.videogo.EzvizApplication;
-import com.videogo.RootActivity;
+import ezviz.ezopensdkcommon.common.RootActivity;
 import com.videogo.constant.Constant;
 import com.videogo.constant.IntentConsts;
 import com.videogo.device.DeviceInfoEx;
@@ -50,6 +50,8 @@ import java.util.TimerTask;
 
 import ezviz.ezopensdk.R;
 import ezviz.ezopensdkcommon.configwifi.AutoWifiNetConfigActivity;
+
+import static com.videogo.EzvizApplication.getOpenSDK;
 
 public class AutoWifiConnectingActivity extends RootActivity implements OnClickListener {
 
@@ -160,13 +162,13 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
                                 LogUtil.i(TAG, "defiveFindHandler: receiver WIFI while isWifiConnected is true");
                                 return;
                             }
-                            LogUtil.debugLog(TAG, "Received WIFI on device connection  " + serialNo);
+                            LogUtil.d(TAG, "Received WIFI on device connection  " + serialNo);
                             isWifiOkBonjourget = true;
                             isWifiConnected = true;
                             t2 = System.currentTimeMillis();
                             changeStatuss(STATUS_REGISTING);
                         } else if (status == EZConstants.EZWifiConfigStatus.DEVICE_PLATFORM_REGISTED) {
-                            LogUtil.debugLog(TAG, "Received PLAT information on device connection " + serialNo);
+                            LogUtil.d(TAG, "Received PLAT information on device connection " + serialNo);
                             if (isPlatConnected) {
                                 LogUtil.i(TAG, "defiveFindHandler: receiver PLAT while isPlatConnected is true");
                                 return;
@@ -245,7 +247,7 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
     // return 0 means success, camera info be saved in mEZProbeDeviceInfo
     // return other value means fail, result is the error code
     private int probeDeviceInfo(String deviceSerial) {
-        mEZProbeDeviceInfo = EzvizApplication.getOpenSDK().probeDeviceInfo(serialNo,deviceType);
+        mEZProbeDeviceInfo = getOpenSDK().probeDeviceInfo(serialNo,deviceType);
             if (mEZProbeDeviceInfo != null) {
                 if (mEZProbeDeviceInfo.getBaseException() != null){
                     return mEZProbeDeviceInfo.getBaseException().getErrorCode();
@@ -289,7 +291,7 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
         // 支持声波或者SmartConfig，均判定为设备支持wifi
         isSupportWifi = getIntent().getBooleanExtra(IntentConsts.EXTRA_SUPPORT_SMART_CONFIG, true)
                 || getIntent().getBooleanExtra(IntentConsts.EXTRA_SUPPORT_SOUND_WAVE, true);
-        LogUtil.debugLog(TAG, "serialNo = "
+        LogUtil.d(TAG, "serialNo = "
             + serialNo
             + ",mVerifyCode = "
             + mVerifyCode
@@ -529,14 +531,14 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
                         isPlatConnected = true;
                         t4 = System.currentTimeMillis();
                         changeStatuss(STATUS_ADDING_CAMERA);
-                        LogUtil.debugLog(TAG,
+                        LogUtil.d(TAG,
                             "start Timeout from the server to obtain the device information is successful");
                     }
                 };
                 final Runnable fail = new Runnable() {
                     public void run() {
                         t4 = System.currentTimeMillis();
-                        LogUtil.debugLog(TAG, "Timeout from the server to get device information failed");
+                        LogUtil.d(TAG, "Timeout from the server to get device information failed");
                         stopWifiConfigOnThread();
                         addCameraFailed(isWifiOkBonjourget ? ERROR_REGIST : ERROR_WIFI_CONNECT, searchErrorCode);
                     }
@@ -590,12 +592,12 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
             @Override
             public void run() {
                 long startTime = System.currentTimeMillis();
-                EzvizApplication.getOpenSDK().stopConfigWiFi();
-                LogUtil.debugLog(TAG,
+                getOpenSDK().stopConfigWiFi();
+                LogUtil.d(TAG,
                     "stopBonjourOnThread .cost time = " + (System.currentTimeMillis() - startTime) + "ms");
             }
         }).start();
-        LogUtil.debugLog(TAG, "stopBonjourOnThread ..................");
+        LogUtil.d(TAG, "stopBonjourOnThread ..................");
     }
 
     @Override
@@ -789,7 +791,7 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
                 LogUtil.i(TAG, "in STATUS_REGISTING: startOvertimeTimer");
                 startOvertimeTimer((MAX_TIME_STEP_TWO_REGIST - 5) * 1000, new Runnable() {
                     public void run() {
-                        EzvizApplication.getOpenSDK().stopConfigWiFi();
+                        getOpenSDK().stopConfigWiFi();
                         final Runnable success = new Runnable() {
                             public void run() {
                                 if (isPlatConnected) {
@@ -802,14 +804,14 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
                                 isPlatConnected = true;
                                 t4 = System.currentTimeMillis();
                                 changeStatuss(STATUS_ADDING_CAMERA);
-                                LogUtil.debugLog(TAG,
+                                LogUtil.d(TAG,
                                     "STATUS_REGISTING Timeout from the server to obtain the device information is successful");
                             }
                         };
                         final Runnable fail = new Runnable() {
                             public void run() {
                                 t4 = System.currentTimeMillis();
-                                LogUtil.debugLog(TAG, "Timeout from the server to get device information failed");
+                                LogUtil.d(TAG, "Timeout from the server to get device information failed");
                                 stopWifiConfigOnThread();
                                 addCameraFailed(ERROR_REGIST, searchErrorCode);
                             }
@@ -868,7 +870,7 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
                     //                                LocalInfo.getInstance().setWifiPassword(mac, wifiPassword);
                 }
 
-                LogUtil.debugLog(TAG, "The server gets the device information successfully");
+                LogUtil.d(TAG, "The server gets the device information successfully");
                 t4 = System.currentTimeMillis();
                 // From the device to switch the wifi interface to the processing
                 addQueryCamera();
@@ -919,7 +921,7 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
         overTimeTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                LogUtil.debugLog(TAG, "startOvertimeTimer");
+                LogUtil.d(TAG, "startOvertimeTimer");
                 runOnUiThread(run);
                 DeviceOnlineStatusMonitor.stop();
             }
@@ -1035,11 +1037,11 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
         //        if (mSearchDevice == null || mSearchDevice.getAvailableChannelCount() <= 0) {
         //            // 将摄像头添加到用户下面
         //            // showToast("该设备已经被添加");
-        //            LogUtil.debugLog(TAG, "该设备已被添加");
+        //            LogUtil.d(TAG, "该设备已被添加");
         ////            addCameraFailed(ERROR_ADD_CAMERA, ErrorCode.ERROR_WEB_SET_EMAIL_REPEAT_ERROR);
         //            return;
         //        }
-        LogUtil.debugLog(TAG, "Add a camera： mVerifyCode = " + mVerifyCode);
+        LogUtil.d(TAG, "Add a camera： mVerifyCode = " + mVerifyCode);
         //mj        
         //boolean stub = mSearchDevice.getReleaseVersion() != null && !mSearchDevice.getReleaseVersion().contains("DEFAULT");
         boolean stub = false;
@@ -1048,7 +1050,7 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
                 // First click if you already have a verification code, then add it directly
                 addQueryCameraAddVerifyCode();
             } else {
-                LogUtil.debugLog(TAG, "Add a camera： showInputCameraVerifyCodeDlg mVerifyCode = " + mVerifyCode);
+                LogUtil.d(TAG, "Add a camera： showInputCameraVerifyCodeDlg mVerifyCode = " + mVerifyCode);
                 showInputCameraVerifyCodeDlg();
             }
         } else {
@@ -1073,7 +1075,7 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
                     // Increase the mobile client operation information record
                     boolean isSuccessfulToAdd = false;
                     try {
-                        EzvizApplication.getOpenSDK().addDevice(serialNo, mVerifyCode);
+                        getOpenSDK().addDevice(serialNo, mVerifyCode);
                         isSuccessfulToAdd = true;
                     } catch (BaseException e) {
                         ErrorInfo errorInfo = e.getErrorInfo();
@@ -1123,7 +1125,7 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
     private void handleAddCameraFail(int errCode) {
         switch (errCode) {
             case 120010:
-                LogUtil.debugLog(TAG, "Add camera failure verification code error = " + errCode);
+                LogUtil.d(TAG, "Add camera failure verification code error = " + errCode);
                 mVerifyCode = "";
                 break;
             default:
@@ -1135,7 +1137,7 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
     public void openCloudFailed(int arg1) {
         // mWaitDlg.dismiss();
         dismissWaitDialog();
-        LogUtil.errorLog(TAG, "Add cloud storage failed, error code：" + arg1);
+        LogUtil.e(TAG, "Add cloud storage failed, error code：" + arg1);
         new AlertDialog.Builder(this).setTitle(R.string.enable_cloud_fause)
             .setMessage(R.string.enable_cloud_fause_retry)
             .setNegativeButton(R.string.retry, new DialogInterface.OnClickListener() {
@@ -1177,7 +1179,7 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
             msg.what = msgCode;
             mMsgHandler.sendMessage(msg);
         } else {
-            LogUtil.errorLog(TAG, "sendMessage-> mMsgHandler object is null");
+            LogUtil.e(TAG, "sendMessage-> mMsgHandler object is null");
         }
     }
 
@@ -1188,7 +1190,7 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
             msg.arg1 = errorCode;
             mMsgHandler.sendMessage(msg);
         } else {
-            LogUtil.errorLog(TAG, "sendMessage-> mMsgHandler object is null");
+            LogUtil.e(TAG, "sendMessage-> mMsgHandler object is null");
         }
     }
 

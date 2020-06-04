@@ -65,8 +65,9 @@ import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ezviz.demo.common.DataTimeUtil;
 import com.videogo.EzvizApplication;
-import com.videogo.RootActivity;
+import ezviz.ezopensdkcommon.common.RootActivity;
 import com.videogo.constant.Config;
 import com.videogo.constant.Constant;
 import com.videogo.constant.IntentConsts;
@@ -93,6 +94,7 @@ import com.videogo.ui.util.DataManager;
 import com.videogo.ui.util.EZUtils;
 import com.videogo.ui.util.VerifyCodeInput;
 import com.videogo.util.ConnectionDetector;
+import com.videogo.util.DateTimeUtil;
 import com.videogo.util.LocalInfo;
 import com.videogo.util.LogUtil;
 import com.videogo.util.MediaScanner;
@@ -290,12 +292,27 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
     private EZDeviceInfo mDeviceInfo = null;
     private EZCameraInfo mCameraInfo = null;
     private String mVerifyCode;
-
     private long mStreamFlow = 0;
-
     private int mRealFlow = 0;
 
-    //    private GoogleApiClient client;
+    // 视频宽高
+    private int mVideoWidth;
+    private int mVideoHeight;
+
+    public static void launch(Context context, EZDeviceInfo deviceInfo, EZCameraInfo cameraInfo){
+        Intent intent = new Intent(context, EZRealPlayActivity.class);
+        intent.putExtra(IntentConsts.EXTRA_CAMERA_INFO, cameraInfo);
+        intent.putExtra(IntentConsts.EXTRA_DEVICE_INFO, deviceInfo);
+        context.startActivity(intent);
+    }
+
+    public static void launch(Context context, String deviceSerial, int cameraNo){
+        EZCameraInfo cameraInfo = new EZCameraInfo();
+        cameraInfo.setDeviceSerial(deviceSerial);
+        cameraInfo.setCameraNo(cameraNo);
+        launch(context, new EZDeviceInfo(), cameraInfo);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -327,7 +344,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         initUI();
         //mRealPlaySv.setVisibility(View.VISIBLE);
 
-        LogUtil.infoLog(TAG, "onResume real play status:" + mStatus);
+        LogUtil.i(TAG, "onResume real play status:" + mStatus);
         if (mCameraInfo != null && mDeviceInfo != null &&  mDeviceInfo.getStatus() != 1) {
             if (mStatus != RealPlayStatus.STATUS_STOP) {
                 stopRealPlay();
@@ -482,7 +499,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             if (mCameraInfo != null) {
                 mCurrentQulityMode = (mCameraInfo.getVideoLevel());
             }
-            LogUtil.debugLog(TAG, "rtspUrl:" + mRtspUrl);
+            LogUtil.d(TAG, "rtspUrl:" + mRtspUrl);
 
             getRealPlaySquareInfo();
         }
@@ -645,12 +662,14 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             }
 
             @Override
-            public void onDoubleClick(MotionEvent e) {
+            public void onDoubleClick(View v, MotionEvent e) {
+                LogUtil.d(TAG, "onDoubleClick:");
+                changeZoomStatus(v, e);
             }
 
             @Override
             public void onZoom(float scale) {
-                LogUtil.debugLog(TAG, "onZoom:" + scale);
+                LogUtil.d(TAG, "onZoom:" + scale);
                 if (mEZPlayer != null && mDeviceInfo != null &&  mDeviceInfo.isSupportZoom()) {
                     startZoom(scale);
                 }
@@ -658,7 +677,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
 
             @Override
             public void onDrag(int direction, float distance, float rate) {
-                LogUtil.debugLog(TAG, "onDrag:" + direction);
+                LogUtil.d(TAG, "onDrag:" + direction);
                 if (mEZPlayer != null) {
                     startDrag(direction, distance, rate);
                 }
@@ -666,7 +685,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
 
             @Override
             public void onEnd(int mode) {
-                LogUtil.debugLog(TAG, "onEnd:" + mode);
+                LogUtil.d(TAG, "onEnd:" + mode);
                 if (mEZPlayer != null) {
                     stopDrag(false);
                 }
@@ -677,18 +696,50 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
 
             @Override
             public void onZoomChange(float scale, CustomRect oRect, CustomRect curRect) {
-                LogUtil.debugLog(TAG, "onZoomChange:" + scale);
-                if (mEZPlayer != null && mDeviceInfo != null && mDeviceInfo.isSupportZoom()) {
-                    //采用云台调焦 Using PTZ focus
-                    return;
-                }
-                if (mStatus == RealPlayStatus.STATUS_PLAY) {
-                    if (scale > 1.0f && scale < 1.1f) {
-                        scale = 1.1f;
-                    }
-                    setPlayScaleUI(scale, oRect, curRect);
-                }
+                LogUtil.d(TAG, "onZoomChange:");
             }
+
+            /**
+             * 未放大情况下，以双击点位置为坐标原点将画面放大2倍
+             * 已放大情况下，取消画面放大效果
+             */
+            @SuppressWarnings("PointlessArithmeticExpression")
+            private void changeZoomStatus(View v, MotionEvent e){
+                if (hasZoomIn){
+                    int invalid = -1;
+                    mEZPlayer.setDisplayRegion(invalid, invalid, invalid, invalid);
+                }else{
+                    // x轴方向
+                    double xOffsetRateOfAnchor = (e.getX() / (double) v.getWidth()) - 0.5;
+                    int left = (int) (mVideoWidth / 4 * 1 + xOffsetRateOfAnchor * mVideoWidth);
+                    int right = (int) (mVideoWidth / 4 * 3 + + xOffsetRateOfAnchor * mVideoWidth);
+                    if (left < 0){ // left超出边界，需要修正
+                        left = 0;
+                        right = mVideoWidth / 2 ;
+                    }
+                    if (right > mVideoWidth){ // right超出边界，需要修正
+                        right = mVideoWidth;
+                        left = mVideoWidth / 2;
+                    }
+                    // y轴方向
+                    double yOffsetRateOfAnchor = (e.getY() / (double) v.getHeight()) - 0.5;
+                    int top = (int) (mVideoHeight / 4 * 1 + yOffsetRateOfAnchor * mVideoHeight);
+                    int bottom = (int) (mVideoHeight / 4 * 3 + + yOffsetRateOfAnchor * mVideoHeight);
+                    if (top < 0){ // top超出边界，需要修正
+                        top = 0;
+                        bottom = mVideoHeight / 2 ;
+                    }
+                    if (bottom > mVideoHeight){ // bottom超出边界，需要修正
+                        bottom = mVideoHeight;
+                        top = mVideoHeight / 2;
+                    }
+                    // 设置坐标
+                    mEZPlayer.setDisplayRegion(left, top, right, bottom);
+                }
+                hasZoomIn = !hasZoomIn;
+            }
+
+            private boolean hasZoomIn;
         };
         mRealPlaySv.setOnTouchListener(mRealPlayTouchListener);
 
@@ -758,14 +809,14 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         boolean preZoomIn = mZoomScale > 1.01 ? true : false;
         boolean zoomIn = scale > 1.01 ? true : false;
         if (mZoomScale != 0 && preZoomIn != zoomIn) {
-            LogUtil.debugLog(TAG, "startZoom stop:" + mZoomScale);
+            LogUtil.d(TAG, "startZoom stop:" + mZoomScale);
             //            mEZOpenSDK.controlPTZ(mZoomScale > 1.01 ? RealPlayStatus.PTZ_ZOOMIN
             //                    : RealPlayStatus.PTZ_ZOOMOUT, RealPlayStatus.PTZ_SPEED_DEFAULT, EZPlayer.PTZ_COMMAND_STOP);
             mZoomScale = 0;
         }
         if (scale != 0 && (mZoomScale == 0 || preZoomIn != zoomIn)) {
             mZoomScale = scale;
-            LogUtil.debugLog(TAG, "startZoom start:" + mZoomScale);
+            LogUtil.d(TAG, "startZoom start:" + mZoomScale);
             //            mEZOpenSDK.controlPTZ(mZoomScale > 1.01 ? RealPlayStatus.PTZ_ZOOMIN
             //                    : RealPlayStatus.PTZ_ZOOMOUT, RealPlayStatus.PTZ_SPEED_DEFAULT, EZPlayer.PTZ_COMMAND_START);
         }
@@ -776,7 +827,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             return;
         }
         if (mZoomScale != 0) {
-            LogUtil.debugLog(TAG, "stopZoom stop:" + mZoomScale);
+            LogUtil.d(TAG, "stopZoom stop:" + mZoomScale);
             //            mEZOpenSDK.controlPTZ(mZoomScale > 1.01 ? RealPlayStatus.PTZ_ZOOMIN
             //                    : RealPlayStatus.PTZ_ZOOMOUT, RealPlayStatus.PTZ_SPEED_DEFAULT, EZPlayer.PTZ_COMMAND_STOP);
             mZoomScale = 0;
@@ -1313,7 +1364,6 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
 
     private void setFullPtzStartUI(boolean startAnim) {
         mIsOnPtz = true;
-        setPlayScaleUI(1, null, null);
         if (mLocalInfo.getPtzPromptCount() < 3) {
             mRealPlayFullPtzPromptIv.setBackgroundResource(R.drawable.ptz_prompt);
             mRealPlayFullPtzPromptIv.setVisibility(View.VISIBLE);
@@ -1430,9 +1480,9 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
     }
 
     private void startVoiceTalk() {
-        LogUtil.debugLog(TAG, "startVoiceTalk");
+        LogUtil.d(TAG, "startVoiceTalk");
         if (mEZPlayer == null) {
-            LogUtil.debugLog(TAG, "EZPlaer is null");
+            LogUtil.d(TAG, "EZPlaer is null");
             return;
         }
         if (mCameraInfo == null) {
@@ -1482,7 +1532,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         if (mCameraInfo == null || mEZPlayer == null) {
             return;
         }
-        LogUtil.debugLog(TAG, "stopVoiceTalk");
+        LogUtil.d(TAG, "stopVoiceTalk");
 
         mEZPlayer.stopVoiceTalk();
         handleVoiceTalkStoped(startAnim);
@@ -1661,7 +1711,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             @Override
             public boolean onKey(View arg0, int arg1, KeyEvent arg2) {
                 if (arg1 == KeyEvent.KEYCODE_BACK) {
-                    LogUtil.infoLog(TAG, "KEYCODE_BACK DOWN");
+                    LogUtil.i(TAG, "KEYCODE_BACK DOWN");
                     closeTalkPopupWindow(true, false);
                 }
                 return false;
@@ -1694,7 +1744,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         //
         // @Override
         // public void onDismiss() {
-        // LogUtil.infoLog(TAG, "KEYCODE_BACK DOWN");
+        // LogUtil.i(TAG, "KEYCODE_BACK DOWN");
         // mTalkPopupWindow = null;
         // closeTalkPopupWindow();
         // }
@@ -1713,7 +1763,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
 
     private void closeTalkPopupWindow(boolean stopTalk, boolean startAnim) {
         if (mTalkPopupWindow != null) {
-            LogUtil.infoLog(TAG, "closeTalkPopupWindow");
+            LogUtil.i(TAG, "closeTalkPopupWindow");
             dismissPopWindow(mTalkPopupWindow);
             mTalkPopupWindow = null;
         }
@@ -1725,7 +1775,6 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
     private void openPtzPopupWindow(View parent) {
         closePtzPopupWindow();
         mIsOnPtz = true;
-        setPlayScaleUI(1, null, null);
 
         LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         ViewGroup layoutView = (ViewGroup) layoutInflater.inflate(R.layout.realplay_ptz_wnd, null, true);
@@ -1756,7 +1805,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
 
             @Override
             public void onDismiss() {
-                LogUtil.infoLog(TAG, "KEYCODE_BACK DOWN");
+                LogUtil.i(TAG, "KEYCODE_BACK DOWN");
                 mPtzPopupWindow = null;
                 mPtzControlLy = null;
                 closePtzPopupWindow();
@@ -1824,7 +1873,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         mQualityPopupWindow.setOnDismissListener(new OnDismissListener() {
             @Override
             public void onDismiss() {
-                LogUtil.infoLog(TAG, "KEYCODE_BACK DOWN");
+                LogUtil.i(TAG, "KEYCODE_BACK DOWN");
                 mQualityPopupWindow = null;
                 closeQualityPopupWindow();
             }
@@ -2060,7 +2109,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
     private void startRealPlay() {
         // 增加手机客户端操作信息记录
         //Increase the mobile client operation information record
-        LogUtil.debugLog(TAG, "startRealPlay");
+        LogUtil.d(TAG, "startRealPlay");
 
         if (mStatus == RealPlayStatus.STATUS_START || mStatus == RealPlayStatus.STATUS_PLAY) {
             return;
@@ -2118,12 +2167,13 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
     }
 
     private void startRecordOriginVideo(){
-        String fileName = LocalInfo.getInstance().getFilePath() + "/origin_video_real_play.ps";
+        String fileName = DemoConfig.getStreamsFolder() + "/origin_video_real_play_"
+                + DataTimeUtil.INSTANCE.getSimpleTimeInfoForTmpFile() + ".ps";
         VideoFileUtil.startRecordOriginVideo(mEZPlayer,fileName);
     }
 
     private void stopRealPlay() {
-        LogUtil.debugLog(TAG, "stopRealPlay");
+        LogUtil.d(TAG, "stopRealPlay");
         mStatus = RealPlayStatus.STATUS_STOP;
 
         stopUpdateTimer();
@@ -2310,7 +2360,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
 
     private void setOrientation(int sensor) {
         if (mForceOrientation != 0) {
-            LogUtil.debugLog(TAG, "setOrientation mForceOrientation:" + mForceOrientation);
+            LogUtil.d(TAG, "setOrientation mForceOrientation:" + mForceOrientation);
             return;
         }
 
@@ -2322,7 +2372,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
 
     public void setForceOrientation(int orientation) {
         if (mForceOrientation == orientation) {
-            LogUtil.debugLog(TAG, "setForceOrientation no change");
+            LogUtil.d(TAG, "setForceOrientation no change");
             return;
         }
         mForceOrientation = orientation;
@@ -2350,15 +2400,15 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         if (this.isFinishing()) {
             return false;
         }
-         LogUtil.infoLog(TAG, "handleMessage:" + msg.what);
+         LogUtil.i(TAG, "handleMessage:" + msg.what);
         switch (msg.what) {
             case MSG_VIDEO_SIZE_CHANGED:
                 LogUtil.d(TAG, "MSG_VIDEO_SIZE_CHANGED");
                 try {
                     String temp = (String) msg.obj;
                     String[] strings = temp.split(":");
-                    int mVideoWidth = Integer.parseInt(strings[0]);
-                    int mVideoHeight = Integer.parseInt(strings[1]);
+                    mVideoWidth = Integer.parseInt(strings[0]);
+                    mVideoHeight = Integer.parseInt(strings[1]);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -2542,7 +2592,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
     }
 
     private void handlePtzControlFail(Message msg) {
-        LogUtil.debugLog(TAG, "handlePtzControlFail:" + msg.arg1);
+        LogUtil.d(TAG, "handlePtzControlFail:" + msg.arg1);
         switch (msg.arg1) {
             case ErrorCode.ERROR_CAS_PTZ_CONTROL_CALLING_PRESET_FAILED:
                 // 正在调用预置点，键控动作无效
@@ -2685,7 +2735,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
     }
 
     private void handleGetCameraInfoSuccess() {
-        LogUtil.infoLog(TAG, "handleGetCameraInfoSuccess");
+        LogUtil.i(TAG, "handleGetCameraInfoSuccess");
 
         updateUI();
 
@@ -2706,7 +2756,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
     }
 
     private void handleVoiceTalkFailed(ErrorInfo errorInfo) {
-        LogUtil.debugLog(TAG, "Talkback failed. " + errorInfo.toString());
+        LogUtil.d(TAG, "Talkback failed. " + errorInfo.toString());
 
         closeTalkPopupWindow(true, false);
 
@@ -2946,7 +2996,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
     private void handlePasswordError(int title_resid, int msg1_resid, int msg2_resid) {
         stopRealPlay();
         setRealPlayStopUI();
-        LogUtil.debugLog(TAG, "startRealPlay");
+        LogUtil.d(TAG, "startRealPlay");
 
         if (mCameraInfo == null || mStatus == RealPlayStatus.STATUS_START || mStatus == RealPlayStatus.STATUS_PLAY) {
             return;
@@ -3024,7 +3074,6 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             mRealPlayPlayRl.setLayoutParams(realPlayPlayRlLp);
         }
         mRealPlayTouchListener.setSacaleRect(Constant.MAX_SCALE, 0, 0, realPlaySvlp.width, realPlaySvlp.height);
-        setPlayScaleUI(1, null, null);
     }
 
     private void handlePlayFail(Object obj) {
@@ -3032,7 +3081,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         if (obj != null) {
             ErrorInfo errorInfo = (ErrorInfo) obj;
             errorCode = errorInfo.errorCode;
-            LogUtil.debugLog(TAG, "handlePlayFail:" + errorInfo.errorCode);
+            LogUtil.d(TAG, "handlePlayFail:" + errorInfo.errorCode);
         }
 
 
@@ -3160,57 +3209,6 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         }
     }
 
-    private void setPlayScaleUI(float scale, CustomRect oRect, CustomRect curRect) {
-        if (scale == 1) {
-            if (mPlayScale == scale) {
-                return;
-            }
-            mRealPlayRatioTv.setVisibility(View.GONE);
-            try {
-                if (mEZPlayer != null) {
-                    mEZPlayer.setDisplayRegion(false, null, null);
-                }
-            } catch (BaseException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        } else {
-            if (mPlayScale == scale) {
-                try {
-                    if (mEZPlayer != null) {
-                        mEZPlayer.setDisplayRegion(true, oRect, curRect);
-                    }
-                } catch (BaseException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                return;
-            }
-            LayoutParams realPlayRatioTvLp = (LayoutParams) mRealPlayRatioTv
-                    .getLayoutParams();
-            if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
-                realPlayRatioTvLp.setMargins(Utils.dip2px(this, 10), Utils.dip2px(this, 10), 0, 0);
-            } else {
-                realPlayRatioTvLp.setMargins(Utils.dip2px(this, 70), Utils.dip2px(this, 20), 0, 0);
-            }
-            mRealPlayRatioTv.setLayoutParams(realPlayRatioTvLp);
-            String sacleStr = String.valueOf(scale);
-            mRealPlayRatioTv.setText(sacleStr.subSequence(0, Math.min(3, sacleStr.length())) + "X");
-            //mj mRealPlayRatioTv.setVisibility(View.VISIBLE);
-            mRealPlayRatioTv.setVisibility(View.GONE);
-            hideControlRlAndFullOperateBar(false);
-            try {
-                if (mEZPlayer != null) {
-                    mEZPlayer.setDisplayRegion(true, oRect, curRect);
-                }
-            } catch (BaseException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-        mPlayScale = scale;
-    }
-
     /*
      * (non-Javadoc)
      * @see android.view.View.OnTouchListener#onTouch(android.view.View, android.view.MotionEvent)
@@ -3219,7 +3217,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
     public boolean onTouch(View v, MotionEvent event) {
         switch (v.getId()) {
             case R.id.realplay_pages_gallery:
-                mRealPlayTouchListener.touch(event);
+                mRealPlayTouchListener.touch(v, event);
                 break;
             case R.id.realplay_full_operate_bar:
                 return true;
@@ -3310,7 +3308,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
 
     @Override
     public void onInputVerifyCode(final String verifyCode) {
-        LogUtil.debugLog(TAG, "verify code is " + verifyCode);
+        LogUtil.d(TAG, "verify code is " + verifyCode);
         DataManager.getInstance().setDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial(), verifyCode);
         if (mEZPlayer != null) {
             startRealPlay();
@@ -3322,7 +3320,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
     private EZOpenSDKListener.EZStandardFlowCallback mLocalRecordCb = new EZOpenSDKListener.EZStandardFlowCallback() {
         @Override
         public void onStandardFlowCallback(int type, byte[] data, int dataLen) {
-            LogUtil.verboseLog(TAG, "standard flow. type is " + type + ". dataLen is " + dataLen + ". data0 is " + data[0]);
+            LogUtil.v(TAG, "standard flow. type is " + type + ". dataLen is " + dataLen + ". data0 is " + data[0]);
 
             if (mOs == null) {
                 File f = new File("/sdcard/videogo.mp4");
@@ -3330,7 +3328,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
                     mOs = new FileOutputStream(f);
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
-                    LogUtil.errorLog(TAG, "new record file failed");
+                    LogUtil.e(TAG, "new record file failed");
 
                     return;
                 }

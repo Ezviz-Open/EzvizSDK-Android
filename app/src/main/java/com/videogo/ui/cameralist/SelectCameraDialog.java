@@ -15,7 +15,7 @@ import android.widget.TextView;
 import com.videogo.openapi.bean.EZCameraInfo;
 import com.videogo.openapi.bean.EZDeviceInfo;
 
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 public class SelectCameraDialog  extends DialogFragment{
 

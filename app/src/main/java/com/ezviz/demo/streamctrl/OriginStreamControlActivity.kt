@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import com.ezviz.demo.common.DataTimeUtil
 import com.ezviz.demo.common.FolderPathManager
 import com.ezviz.sdk.streamctrl.EscDataCallback
 import com.ezviz.sdk.streamctrl.EscMessageCallback
@@ -49,8 +50,7 @@ class OriginStreamControlActivity : RootActivity() {
             setMessageCallback(mMessageCallback)
             startPreview()
             mStatus = StreamCtrlStatusEnum.WAITING
-            val sdf = SimpleDateFormat("yyyyMMdd_HH_mm_ss", Locale.getDefault())
-            mFilePath = "${FolderPathManager.getOriginStreamFolder()}/preview_${sdf.format(Date(System.currentTimeMillis()))}.dat"
+            mFilePath = "${FolderPathManager.getOriginStreamFolder()}/preview_${DataTimeUtil.getSimpleTimeInfoForTmpFile()}.dat"
             LogUtil.i(TAG, "onclickStartPreview: $mFilePath")
             createFile()
             try {

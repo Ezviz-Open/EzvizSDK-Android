@@ -29,7 +29,7 @@ import com.videogo.util.Utils;
 
 import java.util.List;
 
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 public class MenuAdapter extends ArrayAdapter<TitleMenuItem> {
     private Context mContext = null;

@@ -12,7 +12,7 @@ import com.videogo.EzvizApplication;
 import com.videogo.openapi.EZConstants;
 import com.videogo.openapi.EZPlayer;
 import com.videogo.util.LogUtil;
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 public class LanDevicePlayActivity extends Activity implements SurfaceHolder.Callback {
     private static final String TAG = LanDeviceActivateActivity.class.getName();

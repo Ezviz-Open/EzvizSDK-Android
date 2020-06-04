@@ -20,7 +20,7 @@ import com.videogo.constant.IntentConsts;
 import com.videogo.exception.BaseException;
 import com.videogo.openapi.EZHCNetDeviceSDK;
 import com.videogo.util.LogUtil;
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 import java.util.ArrayList;
 
 public class LanDeviceActivity extends Activity {

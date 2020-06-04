@@ -24,9 +24,9 @@ class ManualInputDeviceHotspotInfoActivity : RootActivity() {
         if (TextUtils.isEmpty(deviceHotspotName)){
             deviceHotspotName = mEzvizDeviceHotspotPrefix + intent.getStringExtra(IntentConstants.DEVICE_SERIAL)
         }
-        if (TextUtils.isEmpty(deviceHotspotPwd)){
-            deviceHotspotPwd = mEzvizDeviceHotspotPrefix + intent.getStringExtra(IntentConstants.DEVICE_VERIFY_CODE)
-        }
+//        if (TextUtils.isEmpty(deviceHotspotPwd)){
+//            deviceHotspotPwd = mEzvizDeviceHotspotPrefix + intent.getStringExtra(IntentConstants.DEVICE_VERIFY_CODE)
+//        }
         val jumpIntent = Intent(this, ConfigWifiExecutingActivity::class.java)
         jumpIntent.putExtras(intent)
         jumpIntent.putExtra(IntentConstants.DEVICE_HOTSPOT_SSID, deviceHotspotName)

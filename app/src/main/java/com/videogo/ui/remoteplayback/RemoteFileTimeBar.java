@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 public class RemoteFileTimeBar extends ImageView {
     private static final String TAG = "RemoteFileTimeBar";
@@ -99,12 +99,12 @@ public class RemoteFileTimeBar extends ImageView {
 
         DisplayMetrics dm = context.getResources().getDisplayMetrics();
         mMeasuredHeight = getMeasuredHeight();
-        LogUtil.debugLog(TAG, "init measuredHeight:" + mMeasuredHeight);
+        LogUtil.d(TAG, "init measuredHeight:" + mMeasuredHeight);
         mScreenWidth = dm.widthPixels; // 屏幕宽（像素，如：480px）
         mHalfScreenWidth = mScreenWidth / 2;
         mHourWith = mScreenWidth * 5L / 24L;
         // screenHeight = dm.heightPixels; // 屏幕高（像素，如：800px）
-        LogUtil.debugLog(TAG, "init screenWidth:" + mScreenWidth);
+        LogUtil.d(TAG, "init screenWidth:" + mScreenWidth);
     }
 
     public float getScrollPosByPlayTime(long playTime, int config) {
@@ -265,9 +265,9 @@ public class RemoteFileTimeBar extends ImageView {
             aRect.bottom = bottom;
             long referStartTime = mStartTime.getTimeInMillis();
             long referEndTime = mEndTime.getTimeInMillis();
-            // LogUtil.debugLog(TAG, "refer time(" + referStartTime + ", " + referEndTime + ")");
-            // LogUtil.debugLog(TAG, "real  time(" + startTime + ", " + endTime + ")");
-            // LogUtil.debugLog(TAG, "(" + mLeftX + ", " + mRightX + ")");
+            // LogUtil.d(TAG, "refer time(" + referStartTime + ", " + referEndTime + ")");
+            // LogUtil.d(TAG, "real  time(" + startTime + ", " + endTime + ")");
+            // LogUtil.d(TAG, "(" + mLeftX + ", " + mRightX + ")");
             if (startTime.getTimeInMillis() <= referStartTime) {
                 aRect.left = mLeftX;
             } else {
@@ -284,7 +284,7 @@ public class RemoteFileTimeBar extends ImageView {
                 aRect.right = mLeftX + (int) ((deltaMillis * width / (float) Constant.MILLISSECOND_ONE_DAY));
             }
 
-            // LogUtil.debugLog(TAG, "LR(" + aRect.left + "," + aRect.right + ")");
+            // LogUtil.d(TAG, "LR(" + aRect.left + "," + aRect.right + ")");
 
             fileRect.add(aRect);
 
@@ -317,10 +317,10 @@ public class RemoteFileTimeBar extends ImageView {
             aRect.bottom = bottom;
             long referStartTime = mStartTime.getTimeInMillis();
             long referEndTime = mEndTime.getTimeInMillis();
-            // .LogUtil.debugLog("setStopTime", "refer time(" + referStartTime + ", " + referEndTime
+            // .LogUtil.d("setStopTime", "refer time(" + referStartTime + ", " + referEndTime
             // + ")");
-            // LogUtil.debugLog(TAG, "real  time(" + startTime + ", " + endTime + ")");
-            // LogUtil.debugLog(TAG, "(" + mLeftX + ", " + mRightX + ")");
+            // LogUtil.d(TAG, "real  time(" + startTime + ", " + endTime + ")");
+            // LogUtil.d(TAG, "(" + mLeftX + ", " + mRightX + ")");
             if (startTime <= referStartTime) {
                 aRect.left = mLeftX;
             } else {
@@ -337,7 +337,7 @@ public class RemoteFileTimeBar extends ImageView {
                 aRect.right = mLeftX + (int) ((deltaMillis * width / (float) Constant.MILLISSECOND_ONE_DAY));
             }
 
-            // LogUtil.debugLog(TAG, "LR(" + aRect.left + "," + aRect.right + ")");
+            // LogUtil.d(TAG, "LR(" + aRect.left + "," + aRect.right + ")");
 
             fileRect.add(aRect);
 
@@ -355,7 +355,7 @@ public class RemoteFileTimeBar extends ImageView {
         width = (int) (mScreenWidth * 6);
         height = heightSize;
         mMeasuredHeight = height;
-        LogUtil.debugLog(TAG, "onMeasure measuredHeight:" + mMeasuredHeight);
+        LogUtil.d(TAG, "onMeasure measuredHeight:" + mMeasuredHeight);
         // MUST CALL THIS
         setMeasuredDimension(width, height);
     }

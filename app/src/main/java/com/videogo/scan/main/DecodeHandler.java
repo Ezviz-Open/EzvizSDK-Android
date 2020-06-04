@@ -31,7 +31,7 @@ import com.videogo.util.LogUtil;
 
 import java.util.Map;
 
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 final class DecodeHandler extends Handler {
 
@@ -103,7 +103,7 @@ final class DecodeHandler extends Handler {
     if (rawResult != null) {
       // Don't log the barcode contents for security.
       long end = System.currentTimeMillis();
-      LogUtil.debugLog(TAG, "Found barcode in " + (end - start) + " ms");
+      LogUtil.d(TAG, "Found barcode in " + (end - start) + " ms");
       if (handler != null) {
         Message message = Message.obtain(handler, R.id.decode_succeeded, rawResult);
         Bundle bundle = new Bundle();

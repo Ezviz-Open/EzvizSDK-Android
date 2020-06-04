@@ -22,7 +22,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 import com.videogo.openapi.bean.EZHiddnsDeviceInfo;
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -15,15 +15,20 @@
  */
 package com.videogo.ui.cameralist;
 
+import android.app.Activity;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.util.Log;
@@ -39,13 +44,19 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ezviz.demo.common.CollectDeviceInfoActivity;
 import com.ezviz.demo.common.MoreFeaturesEntranceActivity;
 import com.ezviz.demo.videotalk.WatchVideoTalkActivity;
 import com.ez.stream.EZStreamClientManager;
-import com.videogo.RootActivity;
+
+import ezviz.ezopensdk.preview.MultiScreenPreviewActivity;
+import ezviz.ezopensdkcommon.common.BaseApplication;
+import ezviz.ezopensdkcommon.common.RootActivity;
 import com.videogo.constant.Constant;
 import com.videogo.constant.IntentConsts;
+import com.videogo.constants.ReceiverKeys;
 import com.videogo.devicemgt.EZDeviceSettingActivity;
+import com.videogo.download.DownLoadTaskRecordAbstract;
 import com.videogo.errorlayer.ErrorInfo;
 import com.videogo.exception.BaseException;
 import com.videogo.exception.ErrorCode;
@@ -83,6 +94,7 @@ import ezviz.ezopensdk.demo.DemoConfig;
 import ezviz.ezopensdk.demo.ValueKeys;
 
 import static com.ez.stream.EZError.EZ_OK;
+import static com.videogo.EzvizApplication.getOpenSDK;
 
 
 public class EZCameraListActivity extends RootActivity implements OnClickListener, SelectCameraDialog.CameraItemClick {
@@ -161,9 +173,6 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // todo by zw 待处理：排查海外入口通用库日志不打印的问题
-        EZStreamClientManager.create(getApplicationContext()).setLogPrintEnable(true,  false);
-
         if (DemoConfig.isNeedJumpToTestPage){
             startActivity(new Intent(mContext, TestActivityForFullSdk.class));
         }
@@ -189,6 +198,13 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
             @Override
             public void onClick(View v) {
                 popLogoutDialog();
+            }
+        });
+
+        findViewById(R.id.btn_multi_screen_preview).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MultiScreenPreviewActivity.Companion.launch(v.getContext());
             }
         });
 
@@ -225,10 +241,31 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
         mNoMoreView = getLayoutInflater().inflate(R.layout.no_device_more_footer, null);
         mAdapter = new EZCameraListAdapter(this);
         mAdapter.setOnClickListener(new EZCameraListAdapter.OnClickListener() {
+
+            /**
+             * 根据设备型号判断是否是HUB设备
+             */
+            private boolean isHubDevice(String deviceType){
+                if (TextUtils.isEmpty(deviceType)){
+                    return false;
+                }
+                switch (deviceType){
+                    case "CASTT":
+                    case "CAS_HUB_NEW":
+                        return true;
+                    default:
+                        return deviceType.startsWith("CAS_WG_TEST");
+                }
+            }
+
             @Override
             public void onPlayClick(BaseAdapter adapter, View view, int position) {
                 mClickType = TAG_CLICK_PLAY;
                 final EZDeviceInfo deviceInfo = mAdapter.getItem(position);
+                if (isHubDevice(deviceInfo.getDeviceType())){
+                    jumpToDeviceInfoInputPage();
+                    return;
+                }
                 if (deviceInfo.getCameraNum() <= 0 || deviceInfo.getCameraInfoList() == null || deviceInfo.getCameraInfoList().size() <= 0) {
                     LogUtil.d(TAG, "cameralist is null or cameralist size is 0");
                     return;
@@ -263,6 +300,10 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
             public void onRemotePlayBackClick(BaseAdapter adapter, View view, int position) {
                 mClickType = TAG_CLICK_REMOTE_PLAY_BACK;
                 EZDeviceInfo deviceInfo = mAdapter.getItem(position);
+                if (isHubDevice(deviceInfo.getDeviceType())){
+                    jumpToDeviceInfoInputPage();
+                    return;
+                }
                 if (deviceInfo.getCameraNum() <= 0 || deviceInfo.getCameraInfoList() == null || deviceInfo.getCameraInfoList().size() <= 0) {
                     LogUtil.d(TAG, "cameralist is null or cameralist size is 0");
                     return;
@@ -285,6 +326,13 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
                 selectCameraDialog.setEZDeviceInfo(deviceInfo);
                 selectCameraDialog.setCameraItemClick(EZCameraListActivity.this);
                 selectCameraDialog.show(getFragmentManager(), "RemotePlayBackClick");
+            }
+
+            /**
+             * 如果是HUB设备，则需要手动输入相应HUB设备和子设备序列号组合后的序列号才能进行取流操作
+             */
+            private void jumpToDeviceInfoInputPage(){
+                startActivity(new Intent(mContext, CollectDeviceInfoActivity.class));
             }
 
             @Override
@@ -371,7 +419,7 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
             @Override
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
-                LogUtil.debugLog(TAG, "onReceive:" + action);
+                LogUtil.d(TAG, "onReceive:" + action);
                 if (action.equals(Constant.ADD_DEVICE_SUCCESS_ACTION)) {
                     refreshButtonClicked();
                 }
@@ -481,13 +529,13 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
                 if (mLoadType == LOAD_MY_DEVICE) {
 
                     if (mHeaderOrFooter) {
-                        result = getOpenSDK().getDeviceList(0, 20);
+                        result = getOpenSDK().getDeviceList(0, 10);
                     } else {
                         result = getOpenSDK().getDeviceList((mAdapter.getCount() / 20)+(mAdapter.getCount() % 20>0?1:0), 20);
                     }
                 } else if (mLoadType == LOAD_SHARE_DEVICE) {
                     if (mHeaderOrFooter) {
-                        result = getOpenSDK().getSharedDeviceList(0, 20);
+                        result = getOpenSDK().getSharedDeviceList(0, 10);
                     } else {
                         result = getOpenSDK().getSharedDeviceList((mAdapter.getCount() / 20)+(mAdapter.getCount() % 20>0?1:0), 20);
                     }
@@ -497,7 +545,7 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
             } catch (BaseException e) {
                 ErrorInfo errorInfo = (ErrorInfo) e.getObject();
                 mErrorCode = errorInfo.errorCode;
-                LogUtil.debugLog(TAG, errorInfo.toString());
+                LogUtil.d(TAG, errorInfo.toString());
 
                 return null;
             }
@@ -576,6 +624,8 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
         if (mReceiver != null) {
             unregisterReceiver(mReceiver);
         }
+
+        stopAllDownloadTasks();
     }
 
     @Override
@@ -718,4 +768,66 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
             mLastPressTimeMs = System.currentTimeMillis();
         }
     }
+
+    public static ArrayList<DownLoadTaskRecordAbstract> mDownloadTaskRecordListAbstract = new ArrayList<>();
+
+    /**
+     * 展示下载通知
+     * @param context
+     * @param notificationId
+     * @param title
+     * @param content
+     * @param clickToCancel
+     */
+    public static void showSimpleNotification(Context context, int notificationId, String title, String content, boolean clickToCancel){
+        LogUtil.d(TAG, "show notification " + notificationId);
+        Intent intent = new Intent(BaseApplication.mInstance, NotificationReceiver.class)
+                .putExtra(ReceiverKeys.NOTIFICATION_ID, notificationId);
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(mContext)
+                .setContentTitle(title)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(content))
+                .setWhen(System.currentTimeMillis())
+                .setSmallIcon(ezviz.ezopensdkcommon.R.mipmap.videogo_icon)
+                .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), ezviz.ezopensdkcommon.R.mipmap.videogo_icon))
+                .setPriority(NotificationCompat.PRIORITY_MAX);
+        // 点击发送通知到NotificationReceiver
+        if (clickToCancel) {
+            notificationBuilder.setContentIntent(PendingIntent.getBroadcast(mContext, notificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT));
+        }
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+        if (notificationManager != null) {
+            notificationManager.notify(notificationId, notificationBuilder.build());
+        }
+    }
+
+    public static class NotificationReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int notificationId = intent.getIntExtra(ReceiverKeys.NOTIFICATION_ID, -1);
+            LogUtil.d(TAG, "onClick, notificationId is " + notificationId);
+            DownLoadTaskRecordAbstract downLoadTaskRecord = null;
+            for (DownLoadTaskRecordAbstract downLoadTaskRecordAbstract : mDownloadTaskRecordListAbstract){
+                if (downLoadTaskRecordAbstract.getNotificationId() == notificationId){
+                    LogUtil.d(TAG, "stopped download task which related to notificationId " + notificationId);
+                    downLoadTaskRecord = downLoadTaskRecordAbstract;
+                    downLoadTaskRecord.stopDownloader();
+                }
+            }
+            if (downLoadTaskRecord != null){
+                mDownloadTaskRecordListAbstract.remove(downLoadTaskRecord);
+            }
+            NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+            if (notificationManager != null){
+                notificationManager.cancel(notificationId);
+                RootActivity.toastMsg("canceled to downloaded!");
+            }
+        }
+    }
+
+    private static void stopAllDownloadTasks(){
+        for (DownLoadTaskRecordAbstract downloadRecord: mDownloadTaskRecordListAbstract){
+            downloadRecord.stopDownloader();
+        }
+    }
+
 }

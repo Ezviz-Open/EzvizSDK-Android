@@ -2,7 +2,7 @@ package com.videogo.ui.devicelist;
 
 import android.text.TextUtils;
 
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 public enum DeviceModel {
 

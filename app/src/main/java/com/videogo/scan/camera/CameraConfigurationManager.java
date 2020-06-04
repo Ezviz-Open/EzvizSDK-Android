@@ -56,23 +56,23 @@ final class CameraConfigurationManager {
         // We're landscape-only, and have apparently seen issues with display thinking it's portrait
         // when waking from sleep. If it's not landscape, assume it's mistaken and reverse them:
         if (width < height) {
-            LogUtil.debugLog(TAG, "Display reports portrait orientation; assuming this is incorrect");
+            LogUtil.d(TAG, "Display reports portrait orientation; assuming this is incorrect");
             int temp = width;
             width = height;
             height = temp;
         }
 
         screenResolution = new Point(width, height);
-        LogUtil.debugLog(TAG, "Screen resolution: " + screenResolution);
+        LogUtil.d(TAG, "Screen resolution: " + screenResolution);
         cameraResolution = findBestPreviewSizeValue(parameters, screenResolution, false);
-        LogUtil.debugLog(TAG, "Camera resolution: " + cameraResolution);
+        LogUtil.d(TAG, "Camera resolution: " + cameraResolution);
     }
 
     void setDesiredCameraParameters(Camera camera) {
         Camera.Parameters parameters = camera.getParameters();
 
         if (parameters == null) {
-            LogUtil.warnLog(TAG, "Device error: no camera parameters are available. Proceeding without configuration.");
+            LogUtil.w(TAG, "Device error: no camera parameters are available. Proceeding without configuration.");
             return;
         }
 
@@ -144,7 +144,7 @@ final class CameraConfigurationManager {
     }
 
     private static String findSettableValue(Collection<String> supportedValues, String... desiredValues) {
-        LogUtil.debugLog(TAG, "Supported values: " + supportedValues);
+        LogUtil.d(TAG, "Supported values: " + supportedValues);
         String result = null;
         if (supportedValues != null) {
             for (String desiredValue : desiredValues) {
@@ -154,7 +154,7 @@ final class CameraConfigurationManager {
                 }
             }
         }
-        LogUtil.debugLog(TAG, "Settable value: " + result);
+        LogUtil.d(TAG, "Settable value: " + result);
         return result;
     }
 

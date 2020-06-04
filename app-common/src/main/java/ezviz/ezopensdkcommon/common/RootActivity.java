@@ -3,11 +3,17 @@ package ezviz.ezopensdkcommon.common;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -332,5 +338,24 @@ public class RootActivity extends Activity {
     }
 
     protected void initUi(){}
+
+    private static TaskManager mTaskManager = null;
+    protected synchronized static TaskManager getTaskManager(){
+        if (mTaskManager == null){
+            mTaskManager = new TaskManager();
+        }
+        return mTaskManager;
+    }
+
+    public static void exitApp(){
+        for (Activity activity: mActivityList){
+            if (!activity.isFinishing()){
+                activity.finish();
+            }
+        }
+        System.exit(0);
+    }
+
+    protected void initPresenter(){}
 
 }

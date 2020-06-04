@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 public final class ViewfinderView extends View {
 

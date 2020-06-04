@@ -11,7 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 
 public class GroupLayout extends LinearLayout {

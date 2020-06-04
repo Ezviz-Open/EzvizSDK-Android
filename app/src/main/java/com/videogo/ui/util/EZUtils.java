@@ -30,7 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 public class EZUtils {
 

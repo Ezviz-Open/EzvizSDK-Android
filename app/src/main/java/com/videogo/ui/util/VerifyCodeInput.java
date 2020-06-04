@@ -18,7 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.videogo.constant.Constant;
 import com.videogo.util.Utils;
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 public class VerifyCodeInput {
 

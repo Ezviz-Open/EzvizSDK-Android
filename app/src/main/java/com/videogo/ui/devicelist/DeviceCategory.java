@@ -1,7 +1,7 @@
 package com.videogo.ui.devicelist;
 
 
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 public enum DeviceCategory {
 

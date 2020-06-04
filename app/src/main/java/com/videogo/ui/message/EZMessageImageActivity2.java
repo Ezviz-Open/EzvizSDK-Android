@@ -19,7 +19,7 @@ import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 
-import com.videogo.RootActivity;
+import ezviz.ezopensdkcommon.common.RootActivity;
 import com.videogo.alarm.AlarmLogInfoManager;
 import com.videogo.constant.IntentConsts;
 import com.videogo.openapi.bean.EZAlarmInfo;
@@ -32,7 +32,7 @@ import com.videogo.util.LogUtil;
 import com.videogo.util.Utils;
 import com.videogo.widget.TitleBar;
 
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 public class EZMessageImageActivity2 extends RootActivity implements VerifyCodeInput.VerifyCodeErrorListener{
 
@@ -105,7 +105,7 @@ public class EZMessageImageActivity2 extends RootActivity implements VerifyCodeI
 
         mEZAlarmInfo = getIntent().getParcelableExtra(IntentConsts.EXTRA_ALARM_INFO);
         if (mEZAlarmInfo == null){
-            LogUtil.debugLog("EZMessageImageActivity2","mEZAlarmInfo is null");
+            LogUtil.d("EZMessageImageActivity2","mEZAlarmInfo is null");
             finish();
             return;
         }

@@ -42,7 +42,7 @@ public class VideoFileUtil {
             public void onData(int dataType, byte[] data, int len) {
                 if (mFos != null){
                     try {
-                        Log.v(TAG, "write origin video to file...");
+//                        Log.v(TAG, "write origin video to file...");
                         if (data != null){
                             mFos.write(data, 0, len);
                         }

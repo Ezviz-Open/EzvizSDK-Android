@@ -46,7 +46,7 @@ import android.widget.Toast;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Result;
-import com.videogo.RootActivity;
+import ezviz.ezopensdkcommon.common.RootActivity;
 import com.videogo.exception.BaseException;
 import com.videogo.exception.ExtraException;
 import com.videogo.scan.camera.CameraManager;
@@ -65,7 +65,7 @@ import java.net.URLDecoder;
 import java.util.Collection;
 import java.util.regex.Pattern;
 
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 import ezviz.ezopensdkcommon.configwifi.AutoWifiNetConfigActivity;
 
 //import com.videogo.device.DetectorType;
@@ -464,10 +464,10 @@ public final class CaptureActivity extends RootActivity implements SurfaceHolder
         playBeepSoundAndVibrate();
 
         if (resultString == null) {
-            LogUtil.errorLog(TAG, "handleDecode-> resultString is null");
+            LogUtil.e(TAG, "handleDecode-> resultString is null");
             return;
         }
-        LogUtil.errorLog(TAG, "resultString = " + resultString);
+        LogUtil.e(TAG, "resultString = " + resultString);
 
         // mA1DeviceSeries不为空 表示 从a1界面进来扫描
         if (!TextUtils.isEmpty(mA1DeviceSeries)) {
@@ -544,7 +544,7 @@ public final class CaptureActivity extends RootActivity implements SurfaceHolder
             mSerialNoStr = "";
             mSerialVeryCodeStr = "";
             deviceType = "";
-            LogUtil.errorLog(TAG, resultString);
+            LogUtil.e(TAG, resultString);
             // CS-F1-1WPFR
             // CS-A1-1WPFR
             // CS-C1-1FPFR
@@ -615,7 +615,7 @@ public final class CaptureActivity extends RootActivity implements SurfaceHolder
             if (mSerialNoStr == null) {
                 mSerialNoStr = stringOrigin;
             }
-            LogUtil.debugLog(TAG, "mSerialNoStr = " + mSerialNoStr + ",mSerialVeryCodeStr = " + mSerialVeryCodeStr
+            LogUtil.d(TAG, "mSerialNoStr = " + mSerialNoStr + ",mSerialVeryCodeStr = " + mSerialVeryCodeStr
                     + ",deviceType = " + deviceType);
             // 判断是不是9位
             isValidate();
@@ -706,10 +706,10 @@ public final class CaptureActivity extends RootActivity implements SurfaceHolder
         mLocalValidate = new LocalValidate();
         try {
             mLocalValidate.localValidatSerialNo(mSerialNoStr);
-            LogUtil.infoLog(TAG, mSerialNoStr);
+            LogUtil.i(TAG, mSerialNoStr);
         } catch (BaseException e) {
             handleLocalValidateSerialNoFail(e.getErrorCode());
-            LogUtil.errorLog(TAG, "searchCameraBySN-> local validate serial no fail, errCode:" + e.getErrorCode());
+            LogUtil.e(TAG, "searchCameraBySN-> local validate serial no fail, errCode:" + e.getErrorCode());
             return;
         }
 
@@ -722,7 +722,7 @@ public final class CaptureActivity extends RootActivity implements SurfaceHolder
         bundle.putString("SerialNo", mSerialNoStr);
         bundle.putString("very_code", mSerialVeryCodeStr);
         bundle.putString(AutoWifiNetConfigActivity.DEVICE_TYPE, deviceType);
-        LogUtil.debugLog(TAG, "very_code:" + mSerialVeryCodeStr);
+        LogUtil.d(TAG, "very_code:" + mSerialVeryCodeStr);
         Intent intent = new Intent(CaptureActivity.this, SeriesNumSearchActivity.class);
         intent.putExtras(bundle);
         CaptureActivity.this.startActivity(intent);
@@ -741,7 +741,7 @@ public final class CaptureActivity extends RootActivity implements SurfaceHolder
                 break;
             default:
                 showToast(R.string.serial_number_error, errCode);
-                LogUtil.errorLog(TAG, "handleLocalValidateSerialNoFail-> unkown error, errCode:" + errCode);
+                LogUtil.e(TAG, "handleLocalValidateSerialNoFail-> unkown error, errCode:" + errCode);
                 break;
         }
         reScan();
@@ -771,12 +771,12 @@ public final class CaptureActivity extends RootActivity implements SurfaceHolder
             }
             decodeOrStoreSavedBitmap(null, null);
         } catch (IOException ioe) {
-            LogUtil.warnLog(TAG, ioe);
+            LogUtil.w(TAG, ioe);
             displayFrameworkBugMessageAndExit();
         } catch (RuntimeException e) {
             // Barcode Scanner has seen crashes in the wild of this variety:
             // java.?lang.?RuntimeException: Fail to connect to camera service
-            LogUtil.warnLog(TAG, "Unexpected error initializing camera", e);
+            LogUtil.w(TAG, "Unexpected error initializing camera", e);
             displayFrameworkBugMessageAndExit();
         }
     }

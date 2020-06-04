@@ -14,4 +14,6 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "com.alibaba:arouter-api:$arrouter_api_version"
     kapt "com.alibaba:arouter-compiler:$arouter_compiler_version"
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
+    implementation 'com.android.support:cardview-v7:28.0.0'
 }

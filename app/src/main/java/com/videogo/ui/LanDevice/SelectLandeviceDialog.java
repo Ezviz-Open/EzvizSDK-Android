@@ -11,7 +11,7 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import com.ezviz.hcnetsdk.EZLoginDeviceInfo;
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 import java.util.ArrayList;
 
 public class SelectLandeviceDialog extends DialogFragment{

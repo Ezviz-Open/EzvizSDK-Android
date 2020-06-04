@@ -14,7 +14,7 @@ import android.widget.TextView;
 import com.videogo.widget.pulltorefresh.LoadingLayout;
 import com.videogo.widget.pulltorefresh.PullToRefreshBase.Orientation;
 
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 public class PullToRefreshFooter extends LoadingLayout {
 

@@ -12,7 +12,7 @@ import com.videogo.openapi.EZHCNetDeviceSDK;
 import com.videogo.constant.IntentConsts;
 import com.videogo.util.Utils;
 
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 public class LanDeviceActivateActivity extends Activity implements View.OnClickListener {
     private static final String TAG = LanDeviceActivateActivity.class.getName();

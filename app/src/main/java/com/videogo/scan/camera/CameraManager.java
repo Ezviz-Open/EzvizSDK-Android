@@ -140,7 +140,7 @@ public final class CameraManager {
                 camera.autoFocus(autoFocusCallback);
             } catch (RuntimeException re) {
                 // Have heard RuntimeException reported in Android 4.0.x+; continue?
-                LogUtil.warnLog(TAG, "Unexpected exception while focusing", re);
+                LogUtil.w(TAG, "Unexpected exception while focusing", re);
             }
         }
     }
@@ -166,7 +166,7 @@ public final class CameraManager {
         // int leftOffset = (screenResolution.x - width) / 2;
         // int topOffset = (screenResolution.y - height) / 2;
         // framingRect = new Rect(leftOffset, topOffset, leftOffset + width, topOffset + height);
-        // LogUtil.debugLog(TAG, "Calculated framing rect: " + framingRect);
+        // LogUtil.d(TAG, "Calculated framing rect: " + framingRect);
         // }
         // return framingRect;
 
@@ -182,7 +182,7 @@ public final class CameraManager {
             int leftOffset = (screenResolution.y - width) / 2;
             int topOffset = (screenResolution.x - height) / 2;
             framingRect = new Rect(leftOffset, topOffset, leftOffset + width, topOffset + height);
-            LogUtil.debugLog(TAG, "Calculated framing rect: " + framingRect);
+            LogUtil.d(TAG, "Calculated framing rect: " + framingRect);
         }
         return framingRect;
     }
@@ -217,7 +217,7 @@ public final class CameraManager {
             int leftOffset = (screenResolution.x - width) / 2;
             int topOffset = (screenResolution.y - height) / 2;
             framingRect = new Rect(leftOffset, topOffset, leftOffset + width, topOffset + height);
-            LogUtil.debugLog(TAG, "Calculated manual framing rect: " + framingRect);
+            LogUtil.d(TAG, "Calculated manual framing rect: " + framingRect);
             framingRectInPreview = null;
         } else {
             requestedFramingRectWidth = width;

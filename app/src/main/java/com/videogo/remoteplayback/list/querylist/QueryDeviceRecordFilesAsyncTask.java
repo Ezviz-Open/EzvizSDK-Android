@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 public class QueryDeviceRecordFilesAsyncTask extends HikAsyncTask<String, Void, Integer> {
 
@@ -130,7 +130,7 @@ public class QueryDeviceRecordFilesAsyncTask extends HikAsyncTask<String, Void, 
 			e.printStackTrace();
 
             ErrorInfo errorInfo = e.getObject();
-            LogUtil.debugLog("search file list failed. error ", errorInfo.toString());
+            LogUtil.d("search file list failed. error ", errorInfo.toString());
 		}
 
 		convertCalendarFiles = new ArrayList<>();
@@ -191,10 +191,10 @@ public class QueryDeviceRecordFilesAsyncTask extends HikAsyncTask<String, Void, 
 
     private CloudPartInfoFile getCloudPartInfoFile(CloudPartInfoFile cloudPartInfoFile, Date beginDate, Date endDate) {
         Calendar beginCalender = Utils.convert14Calender(cloudPartInfoFile.getStartTime());
-        if (beginCalender.getTimeInMillis() < beginDate.getTime()) {
-            beginCalender = Calendar.getInstance();
-            beginCalender.setTime(beginDate);
-        }
+//        if (beginCalender.getTimeInMillis() < beginDate.getTime()) {
+//            beginCalender = Calendar.getInstance();
+//            beginCalender.setTime(beginDate);
+//        }
         Calendar endCalender = Utils.convert14Calender(cloudPartInfoFile.getEndTime());
         if (endCalender.getTimeInMillis() > endDate.getTime()) {
             endCalender = Calendar.getInstance();

@@ -568,5 +568,6 @@
     <string name="adding_device_to_your_account">正在添加设备到账号...</string>
     <string name="give_up_adding">放弃</string>
     <string name="app_add_device_success">已添加设备到账号！</string>
+    <string name="tip_playback_again">回放完成，点击再次回放！</string>
 
 </resources>

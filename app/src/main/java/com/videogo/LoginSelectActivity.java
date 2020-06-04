@@ -29,7 +29,9 @@ import android.widget.Toast;
 import com.videogo.ui.LanDevice.LanDeviceActivity;
 import com.videogo.ui.cameralist.EZCameraListActivity;
 import com.videogo.ui.util.ActivityUtils;
-import ezviz.ezopensdkcommon.R;
+
+import ezviz.ezopensdk.R;
+import ezviz.ezopensdkcommon.common.RootActivity;
 
 public class LoginSelectActivity extends RootActivity implements OnClickListener{
 

@@ -12,7 +12,7 @@ import com.ezviz.hcnetsdk.EZSADPDeviceInfo;
 
 import java.util.List;
 
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 
 public class LandeviceAdapter extends BaseAdapter {

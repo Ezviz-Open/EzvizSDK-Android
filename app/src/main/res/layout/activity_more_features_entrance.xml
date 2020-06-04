@@ -45,6 +45,14 @@
             android:paddingBottom="10dp"
             android:onClick="onClickWatchVideoTalk"/>
 
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="HUB设备取流"
+            android:layout_marginTop="10dp"
+            android:paddingBottom="10dp"
+            android:onClick="onClickGetStreamFromHub"/>
+
     </LinearLayout>
 
 </RelativeLayout>

@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
-import com.videogo.RootActivity;
+import ezviz.ezopensdkcommon.common.RootActivity;
 import com.videogo.exception.BaseException;
 import com.videogo.exception.ErrorCode;
 import com.videogo.ui.util.ActivityUtils;
@@ -12,6 +12,8 @@ import com.videogo.ui.util.ActivityUtils;
 import ezviz.ezopensdk.R;
 import ezviz.ezopensdkcommon.common.IntentConstants;
 import ezviz.ezopensdkcommon.common.RouteNavigator;
+
+import static com.videogo.EzvizApplication.getOpenSDK;
 
 @Route(path = RouteNavigator.ADD_DEVICE_PAGE)
 public class AddDeviceToAccountActivity extends RootActivity {
@@ -38,7 +40,7 @@ public class AddDeviceToAccountActivity extends RootActivity {
         finishAdd(false);
     }
 
-    private void initUi() {
+    public void initUi() {
         mAddUi = findViewById(R.id.app_progress_bar_add_device);
         mFailUi = findViewById(R.id.app_vg_failed_to_add_device);
     }

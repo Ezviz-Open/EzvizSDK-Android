@@ -35,7 +35,7 @@ import android.widget.LinearLayout;
 
 import com.videogo.util.LogUtil;
 
-import ezviz.ezopensdkcommon.R;
+import ezviz.ezopensdk.R;
 
 public abstract class PullToRefreshBase<T extends View> extends LinearLayout implements IPullToRefresh<T> {
 
@@ -142,7 +142,7 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
     @Override
     public void addView(View child, int index, ViewGroup.LayoutParams params) {
         if (DEBUG) {
-            LogUtil.debugLog(LOG_TAG, "addView: " + child.getClass().getSimpleName());
+            LogUtil.d(LOG_TAG, "addView: " + child.getClass().getSimpleName());
         }
 
         final T refreshableView = getRefreshableView();
@@ -403,7 +403,7 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
                 throw new RuntimeException("can't set this mode before set footerlayout");
 
             if (DEBUG) {
-                LogUtil.debugLog(LOG_TAG, "Setting mode to: " + mode);
+                LogUtil.d(LOG_TAG, "Setting mode to: " + mode);
             }
             mMode = mode;
             updateUIForMode();
@@ -458,7 +458,7 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
 
         mState = state;
         if (DEBUG) {
-            LogUtil.debugLog(LOG_TAG, "State: " + mState.name());
+            LogUtil.d(LOG_TAG, "State: " + mState.name());
         }
 
         switch (mState) {
@@ -711,7 +711,7 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
     @Override
     protected final void onSizeChanged(int w, int h, int oldw, int oldh) {
         if (DEBUG) {
-            LogUtil.debugLog(LOG_TAG, String.format("onSizeChanged. W: %d, H: %d", w, h));
+            LogUtil.d(LOG_TAG, String.format("onSizeChanged. W: %d, H: %d", w, h));
         }
 
         super.onSizeChanged(w, h, oldw, oldh);
@@ -778,7 +778,7 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
         }
 
         if (DEBUG) {
-            LogUtil.debugLog(LOG_TAG,
+            LogUtil.d(LOG_TAG,
                     String.format("Setting Padding. L: %d, T: %d, R: %d, B: %d", pLeft, pTop, pRight, pBottom));
         }
         setPadding(pLeft, pTop, pRight, pBottom);
@@ -807,7 +807,7 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
 
     protected final void setHeaderScroll(int value) {
         if (DEBUG) {
-            LogUtil.debugLog(LOG_TAG, "setHeaderScroll: " + value);
+            LogUtil.d(LOG_TAG, "setHeaderScroll: " + value);
         }
 
         // Clamp value to with pull scroll range
