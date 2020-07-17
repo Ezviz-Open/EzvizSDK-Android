@@ -46,13 +46,19 @@
         <RelativeLayout
             android:id="@+id/vg_play_window"
             android:layout_width="match_parent"
-            android:layout_height="300dp">
+            android:layout_height="300dp"
+            android:background="@color/black">
 
-            <SurfaceView
+<!--            <SurfaceView-->
+<!--                android:id="@+id/remote_playback_wnd_sv"-->
+<!--                android:layout_width="600dp"-->
+<!--                android:layout_height="300dp"-->
+<!--                android:background="@android:color/transparent" />-->
+
+            <TextureView
                 android:id="@+id/remote_playback_wnd_sv"
                 android:layout_width="600dp"
-                android:layout_height="300dp"
-                android:background="@android:color/transparent" />
+                android:layout_height="300dp" />
 
             <LinearLayout
                 android:id="@+id/vg_error_tips"
@@ -293,10 +299,10 @@
 
                 <ImageButton
                     android:id="@+id/remote_playback_pause_btn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
                     android:background="@drawable/ez_remote_list_pause_btn_selector"
-                    android:visibility="visible" />
+                    android:visibility="visible"/>
 
                 <ImageButton
                     android:id="@+id/remote_playback_sound_btn"
@@ -365,7 +371,8 @@
                     android:text="1x"
                     android:textColor="@color/white"
                     android:background="@drawable/translucent"
-                    android:onClick="onClickChangePlaybackSpeed"/>
+                    android:onClick="onClickChangePlaybackSpeed"
+                    android:enabled="false"/>
 
             </LinearLayout>
 

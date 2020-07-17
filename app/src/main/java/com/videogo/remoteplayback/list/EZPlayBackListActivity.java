@@ -15,6 +15,7 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.graphics.SurfaceTexture;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
@@ -27,9 +28,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
-import android.view.SurfaceHolder;
-import android.view.SurfaceHolder.Callback;
-import android.view.SurfaceView;
+import android.view.TextureView;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
@@ -69,6 +68,7 @@ import com.videogo.exception.InnerException;
 import com.videogo.openapi.EZConstants;
 import com.videogo.openapi.EZConstants.EZPlaybackConstants;
 import com.videogo.openapi.EZOpenSDKListener;
+import com.videogo.openapi.EZPlaybackStreamParam;
 import com.videogo.openapi.EZPlayer;
 import com.videogo.openapi.bean.EZCameraInfo;
 import com.videogo.openapi.bean.EZCloudRecordFile;
@@ -122,12 +122,13 @@ import ezviz.ezopensdk.demo.DemoConfig;
 import ezviz.ezopensdkcommon.common.RootActivity;
 
 import static com.videogo.EzvizApplication.getOpenSDK;
+import static com.videogo.openapi.EZConstants.EZPlaybackConstants.MSG_REMOTE_PLAYBACK_RATE_LOWER;
 import static com.videogo.ui.cameralist.EZCameraListActivity.mDownloadTaskRecordListAbstract;
 import static com.videogo.ui.cameralist.EZCameraListActivity.showSimpleNotification;
 
 @SuppressLint({"DefaultLocale", "HandlerLeak", "NewApi"})
 public class EZPlayBackListActivity extends RootActivity implements QueryPlayBackListTaskCallback,
-        OnHikItemClickListener, Callback, OnClickListener, OnTouchListener,
+        OnHikItemClickListener, /*Callback*/ TextureView.SurfaceTextureListener, OnClickListener, OnTouchListener,
         ArrayAdapterChangeListener, VerifyCodeInput.VerifyCodeInputListener {
 
 
@@ -175,7 +176,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
     private RelativeLayout remotePlayBackArea;
     // 关闭播放区域按钮
     private ImageButton exitBtn;
-    private SurfaceView surfaceView = null;
+    private TextureView mTextureView = null;
     private CustomTouchListener mRemotePlayBackTouchListener = null;
     // 播放比例
     private float mPlayScale = 1;
@@ -381,12 +382,33 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                 case RemoteListContant.MSG_REMOTELIST_STREAM_TIMEOUT:
                     handleStreamTimeOut();
                     break;
+                case MSG_REMOTE_PLAYBACK_RATE_LOWER:
+                    Log.d(TAG, "MSG_REMOTE_PLAYBACK_RATE_LOWER");
+                    updatePlaybackRateUi();
+                    break;
                 default:
                     break;
             }
         }
 
     };
+
+    private void updatePlaybackRateUi() {
+        String currentPlaybackRate = "1x";
+        if (mPlaybackRateBtn != null){
+            currentPlaybackRate = mPlaybackRateBtn.getText().toString();
+        }
+        String changedPlaybackRate;
+        // 4倍速以上则直接降速到4倍速
+        // 4倍速及其以下则直接降速到1倍速
+        if (Integer.parseInt(currentPlaybackRate.replace("x", "")) > 4){
+            changedPlaybackRate = "4x";
+        }else{
+            changedPlaybackRate = "1x";
+        }
+        showToast("changed to lower playback rate: " + changedPlaybackRate);
+        mPlaybackRateBtn.setText(changedPlaybackRate);
+    }
 
     // 处理播放取流超时
     private void handleStreamTimeOut() { }
@@ -495,6 +517,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         progressArea.setVisibility(View.INVISIBLE);
         // 展示再次播放功能按钮
         showPlayEventTip(getString(R.string.tip_playback_again));
+        mPlaybackRateBtn.setEnabled(false);
     }
 
     private void timeBucketUIInit(long beginTime, long endTime) {
@@ -709,6 +732,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                 mPlaybackPlayer.closeSound();
         }
         progressSeekbar.setVisibility(View.VISIBLE);
+        mPlaybackRateBtn.setEnabled(true);
     }
 
     // 收到停止回放成功的消息后处理
@@ -1375,8 +1399,8 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         remotePlayBackArea = (RelativeLayout) findViewById(R.id.remote_playback_area);
         endTimeTV = (TextView) findViewById(R.id.end_time_tv);
         exitBtn = (ImageButton) findViewById(R.id.exit_btn);
-        surfaceView = (SurfaceView) findViewById(R.id.remote_playback_wnd_sv);
-        surfaceView.getHolder().addCallback(this);
+        mTextureView = findViewById(R.id.remote_playback_wnd_sv);
+        mTextureView.setSurfaceTextureListener(this);
         mRemotePlayBackRatioTv = (TextView) findViewById(R.id.remoteplayback_ratio_tv);
         mRemotePlayBackTouchListener = new CustomTouchListener() {
 
@@ -1420,7 +1444,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                 LogUtil.d(TAG, "onZoomChange:" + scale);
             }
         };
-        surfaceView.setOnTouchListener(mRemotePlayBackTouchListener);
+        mTextureView.setOnTouchListener(mRemotePlayBackTouchListener);
 
         setRemoteListSvLayout();
 
@@ -1521,8 +1545,8 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         onActivityStopUI();
         stopUpdateTimer();
         status = RemoteListContant.STATUS_EXIT_PAGE;
-        if (surfaceView != null)
-            surfaceView.setVisibility(View.GONE);
+        if (mTextureView != null)
+            mTextureView.setVisibility(View.GONE);
     }
 
     @Override
@@ -1535,7 +1559,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             @Override
             public void run() {
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(surfaceView.getWindowToken(), 0);
+                imm.hideSoftInputFromWindow(mTextureView.getWindowToken(), 0);
             }
         }, 200);
 
@@ -1550,7 +1574,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
 
         // 判断是否处理暂停状态
         if (notPause || status == RemoteListContant.STATUS_DECRYPT) {
-            surfaceView.setVisibility(View.VISIBLE);
+            mTextureView.setVisibility(View.VISIBLE);
             onActivityResume();
             startUpdateTimer();
             isDateSelected = false;
@@ -1839,10 +1863,11 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                 mPinnedHeaderListViewForLocal.smoothScrollToPositionFromTop(playClickItem.getPosition(), 100, 500);
             }
             mPlaybackPlayer.setHandler(playBackHandler);
-            mPlaybackPlayer.setSurfaceHold(surfaceView.getHolder());
+
+            mPlaybackPlayer.setSurfaceEx(mTextureView.getSurfaceTexture());
 
             startRecordOriginVideo();
-            mPlaybackPlayer.startPlayback(mDeviceRecordInfo);
+            mPlaybackPlayer.startPlaybackV2(EZPlaybackStreamParam.createBy(mDeviceRecordInfo));
         } else {
             downloadBtn.setVisibility(View.VISIBLE);
             sectionAdapter.setSelection(cloudFile.getPosition());
@@ -1862,10 +1887,11 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                 mCloudRecordInfo = new EZCloudRecordFile(); mDeviceRecordInfo = null;
                 convertCloudPartInfoFile2EZCloudRecordFile(mCloudRecordInfo, cloudFile);
                 mPlaybackPlayer.setHandler(playBackHandler);
-                mPlaybackPlayer.setSurfaceHold(surfaceView.getHolder());
+
+                mPlaybackPlayer.setSurfaceEx(mTextureView.getSurfaceTexture());
 
                 startRecordOriginVideo();
-                mPlaybackPlayer.startPlayback(mCloudRecordInfo);
+                mPlaybackPlayer.startPlaybackV2(EZPlaybackStreamParam.createBy(mCloudRecordInfo));
             }
         }
         showDownLoad();
@@ -1911,8 +1937,8 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
      */
     private void newPlayUIInit() {
         remotePlayBackArea.setVisibility(View.VISIBLE);
-        surfaceView.setVisibility(View.INVISIBLE);
-        surfaceView.setVisibility(View.VISIBLE);
+        mTextureView.setVisibility(View.INVISIBLE);
+        mTextureView.setVisibility(View.VISIBLE);
         loadingImgView.setVisibility(View.VISIBLE);
         loadingPbLayout.setVisibility(View.VISIBLE);
         touchProgressLayout.setVisibility(View.GONE);
@@ -2034,7 +2060,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         loadingPlayBtn.setVisibility(View.VISIBLE);
     }
 
-    @Override
+/*    @Override
     public void surfaceCreated(SurfaceHolder holder) {
         if (mPlaybackPlayer != null) {
             mPlaybackPlayer.setSurfaceHold(holder);
@@ -2051,6 +2077,32 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         if (mPlaybackPlayer != null) {
             mPlaybackPlayer.setSurfaceHold(null);
         }
+    }*/
+
+
+    @Override
+    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+        if (mPlaybackPlayer != null) {
+            mPlaybackPlayer.setSurfaceEx(surface);
+        }
+    }
+
+    @Override
+    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+
+    }
+
+    @Override
+    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+        if (mPlaybackPlayer != null) {
+            mPlaybackPlayer.setSurfaceEx(null);
+        }
+        return false;
+    }
+
+    @Override
+    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+
     }
 
     @Override
@@ -2172,6 +2224,10 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
 
     // 暂停按钮事件处理
     private void onPlayPauseBtnClick() {
+        if (mPlaybackPlayer == null){
+            showToast(getString(R.string.please_operate_after_select_any_record));
+            return;
+        }
         if (notPause) {
             // 暂停播放
             notPause = false;
@@ -2449,13 +2505,13 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             }
 
             startRecordOriginVideo();
-            mPlaybackPlayer.startPlayback(mDeviceRecordInfo.getStartTime(), mDeviceRecordInfo.getStopTime());
+            mPlaybackPlayer.startPlaybackV2(EZPlaybackStreamParam.createBy(mCloudRecordInfo));
         } else if (mCloudRecordInfo != null) {
             if (mPlaybackPlayer != null) {
                 mPlaybackPlayer.setPlayVerifyCode(DataManager.getInstance().getDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial()));
             }
             startRecordOriginVideo();
-            mPlaybackPlayer.startPlayback(mCloudRecordInfo);
+            mPlaybackPlayer.startPlaybackV2(EZPlaybackStreamParam.createBy(mCloudRecordInfo));
         }
     }
 
@@ -2531,16 +2587,21 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                 String rate = targetRateWithX.replaceAll("x", "");
                 rate = rate.replace("X", "");
                 int rateInt = Integer.parseInt(rate);
+                EZConstants.EZPlaybackRate targetRateEnum = null;
+                // 寻找对应的枚举值
                 for (EZConstants.EZPlaybackRate rateEnum: EZConstants.EZPlaybackRate.values()){
                     if (rateInt == rateEnum.speed){
-                        if (mPlaybackPlayer.setPlaybackRate(rateEnum)){
-                            if (popupWindow != null && popupWindow.getContentView() != null && popupWindow.getContentView().getTag() instanceof  Button){
-                                ((Button) popupWindow.getContentView().getTag()).setText(targetRateWithX);
-                            }
-                        }else{
-                            toast("failed to change to " + targetRateWithX);
-                        }
+                        targetRateEnum = rateEnum;
+                        break;
                     }
+                }
+                // 切换到指定倍速
+                if (mPlaybackPlayer.setPlaybackRate(targetRateEnum/*, 2*/)){
+                    if (popupWindow != null && popupWindow.getContentView() != null && popupWindow.getContentView().getTag() instanceof  Button){
+                        ((Button) popupWindow.getContentView().getTag()).setText(targetRateWithX);
+                    }
+                }else{
+                    toast("failed to change to " + targetRateWithX);
                 }
             }
         }

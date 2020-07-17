@@ -570,4 +570,6 @@
     <string name="app_add_device_success">已添加设备到账号！</string>
     <string name="tip_playback_again">回放完成，点击再次回放！</string>
 
+    <string name="please_operate_after_select_any_record">请在选择任意录像后操作！</string>
+
 </resources>

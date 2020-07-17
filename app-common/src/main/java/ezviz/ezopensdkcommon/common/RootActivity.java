@@ -115,6 +115,7 @@ public class RootActivity extends Activity {
     }
 
     protected void showToast(final CharSequence text) {
+        LogUtil.d(TAG, text.toString());
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
