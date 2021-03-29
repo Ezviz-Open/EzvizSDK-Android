@@ -5,6 +5,7 @@ package com.ezviz.demo.common
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import com.ezviz.demo.videotalk.MultiTestActivity
 import ezviz.ezopensdk.R
 import ezviz.ezopensdk.debug.TestActivityForFullSdk
 import ezviz.ezopensdkcommon.common.RootActivity
@@ -26,6 +27,12 @@ class MoreFeaturesEntranceActivity : RootActivity() {
 
     fun onClickWatchVideoTalk(v: View){
         showToast("暂未启用")
+    }
+
+    fun onClickMultiVideoTalk(v: View) {
+        Intent(this, MultiTestActivity::class.java).run {
+            startActivity(this)
+        }
     }
 
     fun onClickGetStreamFromHub(view: View) {

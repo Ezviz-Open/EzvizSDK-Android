@@ -16,6 +16,8 @@ class ManualInputDeviceHotspotInfoActivity : RootActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_manual_input_device_hotspot_info)
+
+//        app_common_device_hotspot_name.setText("")
     }
 
     fun onClickNext(view: View){

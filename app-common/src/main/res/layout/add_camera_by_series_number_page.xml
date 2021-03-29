@@ -97,14 +97,13 @@
             android:layout_height="50dp"
             android:layout_below="@id/verifycodeEditTextContainer"
             android:layout_marginLeft="15dp"
+            android:layout_marginTop="39dp"
             android:layout_marginRight="15dp"
-            android:layout_marginTop="40dp"
             android:background="@drawable/login_btn_selector"
             android:onClick="onClick"
             android:scaleType="fitCenter"
             android:text="@string/next_button_txt"
-            android:textColor="@color/white"
-            />
+            android:textColor="@color/white" />
 
         <TextView
             android:layout_width="match_parent"
@@ -280,10 +279,10 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_below="@+id/title_bar"
+        android:layout_marginTop="297dp"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:visibility="visible"
-        >
+        android:visibility="visible">
 
         <!-- android:background="@drawable/input_shade" -->
 
@@ -292,8 +291,7 @@
             android:layout_width="150dp"
             android:layout_height="165dp"
             android:layout_marginTop="35dp"
-            android:background="@anim/device_search_bg"
-            />
+            android:background="@anim/device_search_bg" />
 
         <TextView
             android:id="@+id/querying_camera_tv"
@@ -305,8 +303,7 @@
             android:paddingRight="10dp"
             android:text="@string/querying_camera_text"
             android:textColor="@color/gray_text"
-            android:textSize="@dimen/loading_text_size"
-            />
+            android:textSize="@dimen/loading_text_size" />
     </LinearLayout>
 
 </RelativeLayout>

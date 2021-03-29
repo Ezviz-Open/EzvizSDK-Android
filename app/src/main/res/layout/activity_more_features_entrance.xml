@@ -48,6 +48,14 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="多方音视频通话"
+            android:layout_marginTop="10dp"
+            android:paddingBottom="10dp"
+            android:onClick="onClickMultiVideoTalk"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="HUB设备取流"
             android:layout_marginTop="10dp"
             android:paddingBottom="10dp"

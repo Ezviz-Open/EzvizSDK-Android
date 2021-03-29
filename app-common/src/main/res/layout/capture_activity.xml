@@ -20,7 +20,7 @@
         <com.videogo.scan.main.ViewfinderView
             android:id="@+id/viewfinder_view"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_height="match_parent"
             android:background="@color/transparent" />
 
         <TextView
@@ -50,6 +50,6 @@
     <com.videogo.widget.TitleBar
         android:id="@+id/title_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="23dp" />
 
 </FrameLayout>

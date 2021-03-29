@@ -48,7 +48,7 @@
                 android:id="@+id/et_device_serial"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="C54348757"
+                android:text="D09137336"
                 android:gravity="center_horizontal"/>
             
         </LinearLayout>

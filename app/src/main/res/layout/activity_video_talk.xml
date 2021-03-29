@@ -103,6 +103,36 @@
                 android:onClick="onClickLeaveRoom"/>
 
         </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_marginTop="16dp"
+            android:background="#ddd"
+            android:layout_gravity="center_horizontal"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_gravity="center_horizontal"
+            android:text="安全帽测试"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/btn_hat_video_caller"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="音视频呼叫" />
+
+            <Button
+                android:id="@+id/btn_hat_audio_caller"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="纯音频呼叫" />
+        </LinearLayout>
 
     </LinearLayout>
 

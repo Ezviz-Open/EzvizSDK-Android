@@ -2,6 +2,7 @@ package com.ezviz.demo.videotalk
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Intent
 import android.graphics.SurfaceTexture
 import android.os.Build
 import android.os.Bundle
@@ -89,6 +90,30 @@ class WatchVideoTalkActivity : Activity(){
      */
     private fun initListeners() {
         mPlayerView!!.surfaceTextureListener = mSurfaceTextureListener
+        btn_hat_video_caller.setOnClickListener {
+            Intent(this@WatchVideoTalkActivity, SafetyHatTalkActivity::class.java).run {
+                // 加入通话房间的角色是呼叫方
+                putExtra(InIntentKeysAndValues.KEY_ROLE, InIntentKeysAndValues.VALUE_CALLER)
+                putExtra(InIntentKeysAndValues.KEY_DEVICE_SERIAL, mWatchSerial)
+                putExtra(InIntentKeysAndValues.KEY_SELF_ID, mSelfId)
+                putExtra(InIntentKeysAndValues.KEY_SERVER, mServerDomain)
+                putExtra(InIntentKeysAndValues.KEY_SERVER_PORT, mServerPort)
+                putExtra(InIntentKeysAndValues.KEY_USE_AUDIO, false)
+                startActivity(this)
+            }
+        }
+        btn_hat_audio_caller.setOnClickListener {
+            Intent(this@WatchVideoTalkActivity, SafetyHatTalkActivity::class.java).run {
+                // 加入通话房间的角色是呼叫方
+                putExtra(InIntentKeysAndValues.KEY_ROLE, InIntentKeysAndValues.VALUE_CALLER)
+                putExtra(InIntentKeysAndValues.KEY_DEVICE_SERIAL, mWatchSerial)
+                putExtra(InIntentKeysAndValues.KEY_SELF_ID, mSelfId)
+                putExtra(InIntentKeysAndValues.KEY_SERVER, mServerDomain)
+                putExtra(InIntentKeysAndValues.KEY_SERVER_PORT, mServerPort)
+                putExtra(InIntentKeysAndValues.KEY_USE_AUDIO, true)
+                startActivity(this)
+            }
+        }
     }
 
     fun dip2px(dipValue: Float): Int {
@@ -140,6 +165,7 @@ class WatchVideoTalkActivity : Activity(){
         param.serverPort = mServerPort
         param.selfClientType = EvcParamValueEnum.EvcClientType.ANDROID_PHONE
         param.otherClientType = EvcParamValueEnum.EvcClientType.CHILD_WATCH
+        param.streamType = EvcParamValueEnum.EvcStreamType.VIDEO_TALK
         param.otherId = mWatchSerial
         param.selfId = mSelfId
         mEzvizVideoCall?.startVideoTalk(param)
@@ -252,12 +278,21 @@ class WatchVideoTalkActivity : Activity(){
             }
         }
 
+        override fun onJoinRoom(roomId: Int, clientId: Int, username: String) {
+//            TODO("Not yet implemented")
+        }
+
+        override fun onQuitRoom(roomId: Int, clientId: Int) {
+//            debug("create room, roomId $roomId clientId: $clientId")
+        }
+
         override fun onRoomCreated(roomId: Int) {
             showToast("onRoomCreated: $roomId")
         }
 
-        override fun onCallEstablished(width: Int, height: Int) {
+        override fun onCallEstablished(width: Int, height: Int, clientId: Int) {
             runOnUiThread {
+                mEzvizVideoCall?.setDisplay(Surface(mPlayerView?.surfaceTexture), clientId)
                 if (InIntentKeysAndValues.VALUE_CALLER == mRole) {
                     mCurrentTalkState = TalkStateEnum.CALLER_TALKING
                 }
@@ -318,6 +353,9 @@ class WatchVideoTalkActivity : Activity(){
         const val KEY_SERVER = "server"
         const val KEY_SERVER_PORT = "server_port"
         const val KEY_SELF_ID = "caller_id"
+        const val KEY_USE_AUDIO = "key_use_audio"
+        const val KEY_ENABLE_VIDEO = "key_enable_video"
+        const val KEY_ENABLE_AUDIO = "key_enable_audio"
     }
 
     override fun onBackPressed() {
@@ -367,9 +405,16 @@ class WatchVideoTalkActivity : Activity(){
     }
 
     private val mSurfaceTextureListener = object : TextureView.SurfaceTextureListener{
-
+        var mLastSurface: SurfaceTexture? = null
         override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture?, width: Int, height: Int) {
-            // do nothing
+            LogUtil.d(TAG, "onSurfaceTextureAvailable")
+            mEzvizVideoCall?.setDisplay(Surface(surface!!))
+            if (mLastSurface == null){
+                mEzvizVideoCall?.setDisplay(Surface(surface))
+                mLastSurface = surface;
+            }else{
+                mEzvizVideoCall?.refreshWindow()
+            }
         }
 
         override fun onSurfaceTextureUpdated(surface: SurfaceTexture?) {

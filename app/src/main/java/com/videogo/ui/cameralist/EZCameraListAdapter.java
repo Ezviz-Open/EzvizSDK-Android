@@ -255,11 +255,12 @@ public class EZCameraListAdapter extends BaseAdapter {
             }
         }
         /*手表设备视频通话功能按钮*/
-        if (deviceInfo != null && "KW1".equalsIgnoreCase(deviceInfo.getCategory())){
-            viewHolder.videoTalkBtn.setVisibility(View.VISIBLE);
-        }else{
-            viewHolder.videoTalkBtn.setVisibility(View.INVISIBLE);
-        }
+        viewHolder.videoTalkBtn.setVisibility(View.VISIBLE);
+//        if (deviceInfo != null && ("KW1".equalsIgnoreCase(deviceInfo.getCategory()) || "DS-3LHL10".equalsIgnoreCase(deviceInfo.getCategory()))){
+//            viewHolder.videoTalkBtn.setVisibility(View.VISIBLE);
+//        }else{
+//            viewHolder.videoTalkBtn.setVisibility(View.INVISIBLE);
+//        }
         return convertView;
     }
 

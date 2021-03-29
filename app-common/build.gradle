@@ -5,22 +5,39 @@ apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 29
+    buildToolsVersion "29.0.3"
+
     defaultConfig {
-        minSdkVersion 15
+        minSdkVersion 21
         //noinspection ExpiredTargetSdkVersion
-        targetSdkVersion 22
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
     }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+            assets.srcDirs = ['assets']
+        }
+    }
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {
-    // 最终依赖由Application所在的module提供
-    compileOnly 'com.ezviz.sdk:ezviz-sdk:' + EZVIZ_SDK_VERSION
+    compileOnly fileTree(dir: COMMON_LIB_PATH, include: ['*.jar'])
+    implementation files('..\\ezviz-sdk\\libs\\configwifi.jar')
+    if (BUILD_TYPE == "for_config_wifi"){
+        compileOnly project(path: ':configwifi')
+    }else{
+        compileOnly project(path: ':ezviz-sdk')
+    }
 }

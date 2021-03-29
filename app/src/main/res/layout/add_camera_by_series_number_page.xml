@@ -120,6 +120,18 @@
             android:textSize="@dimen/device_set_text_size"
             android:visibility="gone"
             />
+
+        <TextView
+            android:id="@+id/querying_camera_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:gravity="center"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:text="@string/querying_camera_text"
+            android:textColor="@color/gray_text"
+            android:textSize="@dimen/loading_text_size" />
     </RelativeLayout>
 
     <LinearLayout
@@ -295,18 +307,6 @@
             android:background="@anim/device_search_bg"
             />
 
-        <TextView
-            android:id="@+id/querying_camera_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:gravity="center"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:text="@string/querying_camera_text"
-            android:textColor="@color/gray_text"
-            android:textSize="@dimen/loading_text_size"
-            />
     </LinearLayout>
 
 </RelativeLayout>

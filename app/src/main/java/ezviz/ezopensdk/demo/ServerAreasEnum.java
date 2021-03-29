@@ -65,6 +65,12 @@ public enum ServerAreasEnum {
     TEST12(110, "test12", "https://test12open.ys7.com",
             "https://test12openauth.ys7.com",
             "680948cc41c44fbaac23d8b47be4028b"),
+
+    TEST14(112, "test14", "https://test14open.ys7.com",
+            "https://test14openauth.ys7.com"),
+
+    TEST15(113, "test15", "https://test15open.ys7.com",
+            "https://test15openauth.ys7.com"),
     /**
      * 测试平台:testcn
      */
@@ -78,8 +84,15 @@ public enum ServerAreasEnum {
     /**
      * 测试平台:testeu
      */
-    TEST_EU(125, "testeu", "https://testeuopen.ezvizlife.com",
-            "https://testeuopenauth.ezvizlife.com", true);
+//    TEST_EU(125, "testeu", "https://testeuopen.ezvizlife.com",
+//            "https://testeuopenauth.ezvizlife.com", true),
+
+    TEST_EU(125, "testeu", "https://ys-open.wens.com.cn",
+            "https://test2auth.ys7.com:8643", true);
+
+
+//    TEST_NEW(130,"testnew", "https://ys-open.wens.com.cn",
+//            "https://test2auth.ys7.com:8643", true);
 
     public int id;
     public String areaName;

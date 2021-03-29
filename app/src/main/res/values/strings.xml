@@ -566,7 +566,7 @@
     <string name="app_add_device_success">Added device to account!</string>
     <string name="tip_playback_again">Finished to playback, click to playback again!</string>
     <string name="please_operate_after_select_any_record">Please operate after select any record!</string>
-
+<!--    <String name="device_no_support_talkback">the device does not support talkback</String>-->
     <!--儿童手表-视频通话-->
     <string name="video_talk_sdk_toast_hang_up">通话已结束</string>
     <string name="video_talk_sdk_toast_nobody">对方无应答</string>
@@ -582,6 +582,7 @@
     <string name="video_talk_signal_weak">网络信号弱</string>
     <string name="main_tab_second_tab">智能</string>
     <string name="goto_ad_close_page">可前往关闭广告</string>
+    <string name="device_no_support_talkback">该设备不支持对讲</string>
     <!--儿童手表-视频通话-->
 
 </resources>

@@ -159,8 +159,17 @@
             android:name="com.videogo.SupportActivity"
             android:screenOrientation="portrait" />
         <activity
+            android:name="com.ezviz.demo.videotalk.SafetyHatTalkActivity"
+            android:screenOrientation="portrait" /> <!-- receiver -->
+        <activity
             android:name="com.ezviz.demo.videotalk.WatchVideoTalkActivity"
             android:screenOrientation="portrait" /> <!-- receiver -->
+        <activity
+            android:name="com.ezviz.demo.videotalk.MultiTestActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.ezviz.demo.videotalk.MultiVideoTalkActivity"
+            android:screenOrientation="portrait" />
         <receiver android:name="com.videogo.ui.cameralist.EZCameraListActivity$NotificationReceiver" />
     </application>
 

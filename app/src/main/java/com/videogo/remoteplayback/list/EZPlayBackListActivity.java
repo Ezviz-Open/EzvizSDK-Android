@@ -401,7 +401,8 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         String changedPlaybackRate;
         // 4倍速以上则直接降速到4倍速
         // 4倍速及其以下则直接降速到1倍速
-        if (Integer.parseInt(currentPlaybackRate.replace("x", "")) > 4){
+        String rate = currentPlaybackRate.replaceAll("(?i)x", "").trim();
+        if (Integer.parseInt(rate) > 4){
             changedPlaybackRate = "4x";
         }else{
             changedPlaybackRate = "1x";
@@ -2505,7 +2506,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             }
 
             startRecordOriginVideo();
-            mPlaybackPlayer.startPlaybackV2(EZPlaybackStreamParam.createBy(mCloudRecordInfo));
+            mPlaybackPlayer.startPlaybackV2(EZPlaybackStreamParam.createBy(mDeviceRecordInfo));
         } else if (mCloudRecordInfo != null) {
             if (mPlaybackPlayer != null) {
                 mPlaybackPlayer.setPlayVerifyCode(DataManager.getInstance().getDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial()));
@@ -2584,8 +2585,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             }
             if (v instanceof Button){
                 String targetRateWithX = (String) ((Button) v).getText();
-                String rate = targetRateWithX.replaceAll("x", "");
-                rate = rate.replace("X", "");
+                String rate = targetRateWithX.replaceAll("(?i)x", "");
                 int rateInt = Integer.parseInt(rate);
                 EZConstants.EZPlaybackRate targetRateEnum = null;
                 // 寻找对应的枚举值

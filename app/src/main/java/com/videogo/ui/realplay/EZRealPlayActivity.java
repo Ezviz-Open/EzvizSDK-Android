@@ -16,7 +16,9 @@
 package com.videogo.ui.realplay;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.Application;
+import android.bluetooth.BluetoothClass;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -35,6 +37,7 @@ import android.os.Message;
 import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -71,6 +74,7 @@ import ezviz.ezopensdkcommon.common.RootActivity;
 import com.videogo.constant.Config;
 import com.videogo.constant.Constant;
 import com.videogo.constant.IntentConsts;
+import com.videogo.device.DeviceInfoEx;
 import com.videogo.errorlayer.ErrorInfo;
 import com.videogo.exception.BaseException;
 import com.videogo.exception.ErrorCode;
@@ -1334,7 +1338,8 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             case R.id.realplay_talk_btn:
             case R.id.realplay_talk_btn2:
             case R.id.realplay_full_talk_btn:
-                startVoiceTalk();
+                //startVoiceTalk();
+                selectTalkbackItems();
                 break;
 
             case R.id.realplay_quality_btn:
@@ -1479,7 +1484,12 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         }
     }
 
-    private void startVoiceTalk() {
+//    private void createTalkDialog(){
+//        selectTalkbackItems();
+//    }
+
+    private void startVoiceTalk(boolean isDeviceTalkBack) {
+
         LogUtil.d(TAG, "startVoiceTalk");
         if (mEZPlayer == null) {
             LogUtil.d(TAG, "EZPlaer is null");
@@ -1525,7 +1535,63 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         if (mEZPlayer != null) {
             mEZPlayer.closeSound();
         }
-        mEZPlayer.startVoiceTalk();
+
+        //boolean isDeviceTalkBack = false;
+        mEZPlayer.startVoiceTalk(isDeviceTalkBack);
+        //mEZPlayer.startVoiceTalk();
+    }
+
+    private void startVoiceTalk() {
+
+        LogUtil.d(TAG, "startVoiceTalk");
+        if (mEZPlayer == null) {
+            LogUtil.d(TAG, "EZPlaer is null");
+            return;
+        }
+        if (mCameraInfo == null) {
+            return;
+        }
+        mIsOnTalk = true;
+
+        updateOrientation();
+
+        Utils.showToast(this, R.string.start_voice_talk);
+        mRealPlayTalkBtn.setEnabled(false);
+        mRealPlayFullTalkBtn.setEnabled(false);
+        mRealPlayFullTalkAnimBtn.setEnabled(false);
+        if (mOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mRealPlayFullAnimBtn.setBackgroundResource(R.drawable.speech_1);
+            mRealPlayFullTalkBtn.getLocationInWindow(mStartXy);
+            mEndXy[0] = Utils.dip2px(this, 20);
+            mEndXy[1] = mStartXy[1];
+            startFullBtnAnim(mRealPlayFullAnimBtn, mStartXy, mEndXy, new AnimationListener() {
+
+                @Override
+                public void onAnimationStart(Animation animation) {
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    Utils.showToast(EZRealPlayActivity.this, R.string.realplay_full_talk_start_tip);
+                    mRealPlayFullTalkAnimBtn.setVisibility(View.VISIBLE);
+                    mRealPlayFullAnimBtn.setVisibility(View.GONE);
+                    onRealPlaySvClick();
+                    //                    mFullscreenFullButton.setVisibility(View.VISIBLE);
+                }
+            });
+        }
+
+        if (mEZPlayer != null) {
+            mEZPlayer.closeSound();
+        }
+
+        //boolean isDeviceTalkBack = true;
+        mEZPlayer.startVoiceTalk(true);
+        //mEZPlayer.startVoiceTalk();
     }
 
     private void stopVoiceTalk(boolean startAnim) {
@@ -1536,6 +1602,46 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
 
         mEZPlayer.stopVoiceTalk();
         handleVoiceTalkStoped(startAnim);
+    }
+
+    private void selectTalkbackItems(){
+        View view = LayoutInflater.from(this).inflate(R.layout.select_talkback_items,null,false);
+        final AlertDialog dialog = new AlertDialog.Builder(this).setView(view).create();
+
+        Button nvr_talkback = view.findViewById(R.id.select_nvr_talkback);
+        Button ipc_talkback = view.findViewById(R.id.select_ipc_talkback);
+        final boolean[] isDeviceTalkBack = {false};
+        dialog.show();
+        //dialog.getWindow().setLayout(800, 350);
+        nvr_talkback.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startVoiceTalk();
+                dialog.dismiss();
+            }
+        });
+
+        ipc_talkback.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startVoiceTalk(false);
+                dialog.dismiss();
+
+//                if(new DeviceInfoEx().getSupportChannelTalk()==1){
+//                    ErrorInfo errorInfo = new ErrorInfo();
+//                    errorInfo.errorCode = ErrorCode.ERROR_CHANNEL_NO_SUPPORT_TALKBACK;
+//                    Message message = Message.obtain();
+//                    message.what = EZConstants.EZRealPlayConstants.MSG_REALPLAY_VOICETALK_FAIL;
+//                    message.arg1 = errorInfo.errorCode;
+//                    message.obj = errorInfo;
+//                    mHandler.sendMessage(message);
+//
+//                }else{
+//                    startVoiceTalk(false);
+//                    dialog.dismiss();
+//                }
+            }
+        });
     }
 
     private OnClickListener mOnPopWndClickListener = new OnClickListener() {
@@ -2284,7 +2390,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
 
             mRealPlayCaptureBtn.setEnabled(false);
             mRealPlayRecordBtn.setEnabled(false);
-            if (mDeviceInfo.getStatus() == 1 && (mEZPlayer == null)) {
+            if (mDeviceInfo.getStatus() == 1 && (mEZPlayer != null)) {
                 mRealPlayQualityBtn.setEnabled(true);
             } else {
                 mRealPlayQualityBtn.setEnabled(false);
@@ -2397,6 +2503,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
     @SuppressLint("NewApi")
     @Override
     public boolean handleMessage(Message msg) {
+
         if (this.isFinishing()) {
             return false;
         }
@@ -2781,6 +2888,9 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             case ErrorCode.ERROR_CAS_AUDIO_SEND_ERROR:
                 Utils.showToast(EZRealPlayActivity.this, R.string.realplay_play_talkback_network_exception, errorInfo.errorCode);
                 break;
+            case ErrorCode.ERROR_CHANNEL_NO_SUPPORT_TALKBACK:
+                Utils.showToast(EZRealPlayActivity.this, R.string.device_no_support_talkback, errorInfo.errorCode );
+                break;
             default:
                 Utils.showToast(EZRealPlayActivity.this, R.string.realplay_play_talkback_fail, errorInfo.errorCode);
                 break;
@@ -2843,7 +2953,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (mStatus == RealPlayStatus.STATUS_PLAY) {
+//        if (mStatus == RealPlayStatus.STATUS_PLAY) {
             // 停止对讲
             closeTalkPopupWindow(true, false);
             // 停止播放 Stop play
@@ -2851,7 +2961,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             SystemClock.sleep(500);
             // 开始播放 start play
             startRealPlay();
-        }
+//        }
     }
 
     private void handleSetVedioModeFail(int errorCode) {
