@@ -398,8 +398,8 @@ public class MainActivity extends RootActivity {
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             mCurrentServerArea = ServerAreasEnum.getAllServers().get(position);
             // http://canal.hikvision.com.cn/browse/BUGOL-11702
-            mAppKeyET.setText("bdb0cbd3e34b44a2b4a99beee1d25853");
-            mAccessTokenET.setText("ar.cm5dsvhn5e25ow0m2ltr9nojdlmvxgfm-8s1uzp98n5-0r34osk-pi9d3q4gh");
+            mAppKeyET.setText("f0bd090eeec24a96bdcec64f22aee1df");
+            mAccessTokenET.setText("at.9xbeie9n56thtzzqcwyzeugra57n4afe-26k1uffvyw-16vra1s-udqb96gta");
 //            mAppKeyET.setText("775e87b465a54fcc82915611bfc36eb6");
 //            mAccessTokenET.setText("at.1hwlg8akaimfa1lkds92zt5b9zc5j435-2rtp3qpy6r-0ekyeex-hdxzbfoem");
 
