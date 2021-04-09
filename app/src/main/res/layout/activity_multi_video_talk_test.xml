@@ -144,13 +144,12 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:layout_marginTop="20dp">
-
         <Button
             android:id="@+id/create_room_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="onClickCreateRoom"
-            android:text="创建房间" />
+            android:text="创建房间"
+            android:onClick="onClickCreateRoom"/>
 
         <Button
             android:id="@+id/join_room_btn"

@@ -1,4 +1,4 @@
-﻿apply plugin: 'com.android.application'
+apply plugin: 'com.android.application'
 apply from: "../app-common/build_common.gradle"
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
@@ -60,26 +60,27 @@ android {
 
 dependencies {
     /*萤石SDK核心模块，必须*/
- //   api project(path: ':ezviz-sdk')
-//    api 'com.ezviz.sdk:ezviz-sdk:4.10.0'
+//    api project(path: ':ezviz-sdk')
+    api 'com.ezviz.sdk:ezviz-sdk:4.16.1'
 
     /*视频通话模块，按需使用*/
 //    api project(path: ':videotalk')
-//    api 'com.ezviz.sdk:videotalk:1.0.0'
+    api 'com.ezviz.sdk:videotalk:1.2.0'
 
     /*视频通话模块，按需使用*/
 //    api project(path: ':streamctrl')
-//    api 'com.ezviz.sdk:videotalk:1.0.0'
+    api 'com.ezviz.sdk:streamctrl:1.2.0'
 
     /*萤石核心模块的三方依赖*/
 //    implementation 'javax.jmdns:jmdns:3.4.1'
-//    implementation 'com.google.code.gson:gson:2.8.0'
+    implementation 'com.google.code.gson:gson:2.8.0'
+    api 'com.squareup.okhttp3:okhttp:3.12.1'
 
     /*demo的依赖项*/
-//    api project(path: ':app-common')
-//    implementation fileTree(include: ['*.jar'], dir: 'libs')
-//    implementation 'com.android.support:appcompat-v7:28.0.0'
-//    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    api project(path: ':app-common')
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
 }
 
 //repositories {
