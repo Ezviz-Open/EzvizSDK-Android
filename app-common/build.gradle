@@ -5,12 +5,11 @@ apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 29
-    buildToolsVersion "29.0.3"
 
     defaultConfig {
-        minSdkVersion 21
+        minSdkVersion 16
         //noinspection ExpiredTargetSdkVersion
-        targetSdkVersion 29
+        targetSdkVersion 22
         versionCode 1
         versionName "1.0"
     }
@@ -33,12 +32,12 @@ android {
 }
 
 dependencies {
-//    compileOnly fileTree(dir: COMMON_LIB_PATH, include: ['*.jar'])
-    api 'com.ezviz.sdk:ezviz-sdk:4.16.1'
-//    implementation files('..\\ezviz-sdk\\libs\\configwifi.jar')
-//    if (BUILD_TYPE == "for_config_wifi"){
-//        compileOnly project(path: ':configwifi')
-//    }else{
-//        compileOnly project(path: ':ezviz-sdk')
-//    }
+    compileOnly fileTree(dir: COMMON_LIB_PATH, include: ['*.jar'])
+    implementation files('..\\ezviz-sdk\\libs\\configwifi.jar')
+    if (BUILD_TYPE == "for_config_wifi"){
+        compileOnly project(path: ':configwifi')
+    }else{
+        compileOnly project(path: ':ezviz-sdk')
+    }
+    //api 'com.ezviz.sdk:ezviz-sdk:4.16.1'
 }
