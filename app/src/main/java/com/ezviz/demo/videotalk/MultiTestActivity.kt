@@ -107,6 +107,7 @@ class MultiTestActivity : Activity() {
             putExtra("is_call_device", is_call_device_cb.isChecked)
             putExtra("enable_video", enable_video_cb.isChecked)
             putExtra("enable_audio", enable_audio_cb.isChecked)
+            putExtra("enable_audio", enable_audio_cb.isChecked)
             startActivity(this)
         }
     }

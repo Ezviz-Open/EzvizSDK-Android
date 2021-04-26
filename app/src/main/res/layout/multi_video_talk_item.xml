@@ -39,8 +39,8 @@
     </LinearLayout>
     <FrameLayout
         android:id="@+id/camera_layout"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:background="@android:color/black">
 
         <TextureView

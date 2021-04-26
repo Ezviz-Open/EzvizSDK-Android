@@ -81,6 +81,8 @@ public enum ServerAreasEnum {
      */
     TEST_US(120, "testus", "https://testusopen.ezvizlife.com",
             "https://testusopenauth.ezvizlife.com", true),
+    IOT_US(120, "iotUs", "https://openapius.eziot.com",
+            "https://openapiusauth.eziot.com", false),
     /**
      * 测试平台:testeu
      */
@@ -88,7 +90,7 @@ public enum ServerAreasEnum {
 //            "https://testeuopenauth.ezvizlife.com", true),
 
     TEST_EU(125, "testeu", "https://ys-open.wens.com.cn",
-            "https://test2auth.ys7.com:8643", true);
+            "https://test2auth.ys7.com:8643", false);
 
 
 //    TEST_NEW(130,"testnew", "https://ys-open.wens.com.cn",

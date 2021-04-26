@@ -47,9 +47,9 @@ class VideoTalkView(context: Context, val mEZMeetingCall: EZMeetingCall) {
         val width = wm.defaultDisplay.width
 //        val height = wm.defaultDisplay.height
         val lp = cameraLayout.layoutParams
-        lp.width = width / 2
-        lp.height = width / 2
-        cameraLayout.layoutParams = lp
+//        lp.width = width / 2
+//        lp.height = width / 2
+//        cameraLayout.layoutParams = lp
         checkVideo.setOnCheckedChangeListener { _, isChecked ->
             cameraView.visibility = if (isChecked) View.VISIBLE else View.GONE
         }

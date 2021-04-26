@@ -24,8 +24,8 @@
         <EditText
             android:id="@+id/room_id"
             android:layout_width="150dp"
-            android:inputType="number"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:inputType="number" />
     </LinearLayout>
 
     <LinearLayout

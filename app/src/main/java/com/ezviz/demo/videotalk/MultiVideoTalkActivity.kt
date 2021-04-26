@@ -2,7 +2,6 @@ package com.ezviz.demo.videotalk
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -10,17 +9,16 @@ import android.support.v7.app.AlertDialog
 import android.text.TextUtils
 import android.view.View
 import android.widget.CompoundButton
+import android.widget.EditText
 import android.widget.Toast
 import com.ezviz.demo.videotalk.widget.VideoTalkView
 import com.ezviz.sdk.videotalk.*
-import com.ezviz.sdk.videotalk.EvcParamValueEnum.EvcOperationEnum
 import com.ezviz.sdk.videotalk.sdk.EZMeetingCall
+import com.videogo.exception.BaseException
+import com.videogo.openapi.EZOpenSDK
 import ezviz.ezopensdk.R
 import ezviz.ezopensdkcommon.common.LogUtil
-import ezviz.ezopensdkcommon.common.Utils
 import kotlinx.android.synthetic.main.activity_multi_video_talk.*
-import kotlinx.android.synthetic.main.activity_multi_video_talk_test.*
-import org.json.JSONObject
 import java.util.*
 import kotlin.concurrent.thread
 
@@ -37,6 +35,7 @@ class MultiVideoTalkActivity : Activity() {
 
         /*对应手表联系人ID*/
         private const val ERROR = -1
+        var param: EvcParam = EvcParam();
     }
 
     @SuppressLint("ObsoleteSdkInt")
@@ -58,16 +57,16 @@ class MultiVideoTalkActivity : Activity() {
          * enableMic 进入会议时是否开启麦克风
          * EZMeetingCall.CallBack 会议通话回调
          */
-        EZMeetingCall(camera_view_my, mSelfId?:"", check_video_my.isChecked, check_mic_my.isChecked, mMettingCallback).run {
+        EZMeetingCall(camera_view_my, mSelfId?:"", check_video_my.isChecked, check_mic_my.isChecked, mMettingCallback, param).run {
             mEZMeetingCall = this
             this.setLogPrintEnable(true)
         }
 
         Handler().postDelayed({
             if (mIsCall) {
-                createMeeting()
+                createMeeting(mCustomId)
             } else {
-                joinMeeting()
+                joinMeeting(mCustomId)
             }
         }, 1000)
     }
@@ -89,6 +88,8 @@ class MultiVideoTalkActivity : Activity() {
         check_video_my.isChecked = intent.getBooleanExtra("enable_video", false)
         check_mic_my.isChecked = intent.getBooleanExtra("enable_audio", true)
 
+        mCustomId = System.currentTimeMillis().toString()
+
         if (!mIsCall) {
             room_id_text.text = mInputtedRoomID.toString()
         }
@@ -98,6 +99,141 @@ class MultiVideoTalkActivity : Activity() {
     @Suppress("UNUSED_PARAMETER")
     fun onClickLeaveRoom(view: View) {
         finish()
+    }
+
+    fun onClickCreateProject(view : View){
+        val ezAccessToken = EZOpenSDK.getInstance().ezAccessToken;
+        projectName = findViewById(R.id.project_name)
+        projectId = findViewById(R.id.project_id)
+        val projectNameText: String = projectName?.text.toString()
+        val projectIdText: String = projectId?.text.toString()
+        if(TextUtils.isEmpty(projectNameText)){
+            Toast.makeText(this, "请输入projectName", Toast.LENGTH_LONG).show()
+            return;
+        }
+        if(TextUtils.isEmpty(projectIdText)){
+            Toast.makeText(this, "请输入projectId", Toast.LENGTH_LONG).show()
+            return;
+        }
+
+        val regex: Regex = "^[a-z0-9A-Z]+$".toRegex()
+        //str.matches(regex);
+        if(!projectIdText.matches(regex)){
+            Toast.makeText(this, "projectId只能为英文字符或数字", Toast.LENGTH_LONG).show()
+            return
+        }
+        //val response :String? = null
+        thread {
+            try {
+                val response = mEZMeetingCall?.createProject(ezAccessToken.accessToken,projectIdText,projectNameText)
+
+                runOnUiThread {
+                    Toast.makeText(this, response, Toast.LENGTH_LONG).show()
+                }
+            } catch (e : BaseException){
+                e.printStackTrace()
+            }
+
+        }
+
+
+    }
+
+    fun onClickStartRecord(view : View){
+        val ezAccessToken = EZOpenSDK.getInstance().ezAccessToken;
+        fileId = findViewById(R.id.file_id)
+        projectId = findViewById(R.id.project_id)
+        val fileIdText: String = fileId?.text.toString()
+        val projectIdText: String = projectId?.text.toString()
+
+        if(TextUtils.isEmpty(fileIdText)){
+            Toast.makeText(this, "请输入fileId", Toast.LENGTH_LONG).show();
+            return
+        }
+        if(TextUtils.isEmpty(projectIdText)){
+            Toast.makeText(this, "请输入projectId", Toast.LENGTH_LONG).show();
+            return
+        }
+
+        val regex: Regex = "^[a-z0-9A-Z]+$".toRegex()
+        //str.matches(regex);
+        if(!fileIdText.matches(regex) || !projectIdText.matches(regex)){
+            Toast.makeText(this, "fileId或projectId只能为英文字符或数字", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        if(!isCreateUser!!){ //如果不是房间创建者
+            Toast.makeText(this, "非管理员无权限", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        //var fileId:
+        thread {
+            try {
+                //val time = System.currentTimeMillis()
+                val response: String? = mEZMeetingCall?.startConRecord(ezAccessToken.accessToken, mRoomId!!, mClient!!, projectIdText, fileIdText, mCustomId)
+                //mEZMeetingCall?.startConRecord(ezAccessToken.accessToken, mRoomId!!, mClient!!.toString(),"123","test5")
+                runOnUiThread {
+                    Toast.makeText(this, response, Toast.LENGTH_LONG).show()
+                }
+            } catch (e : BaseException){
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun onClickStopRecord(view : View){
+        val ezAccessToken = EZOpenSDK.getInstance().ezAccessToken;
+
+        thread {
+            try {
+                val response: String? = mEZMeetingCall?.stopConRecord(ezAccessToken.accessToken,mRoomId!!, mCustomId)
+                runOnUiThread {
+                    Toast.makeText(this, response, Toast.LENGTH_LONG).show()
+                }
+            } catch (e : BaseException){
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun onClickSearchRecord(view : View){
+        val ezAccessToken = EZOpenSDK.getInstance().ezAccessToken;
+
+        fileId = findViewById(R.id.file_id)
+        projectId = findViewById(R.id.project_id)
+        val fileIdText: String = fileId?.text.toString()
+        val projectIdText: String = projectId?.text.toString()
+        if(TextUtils.isEmpty(fileIdText)){
+            Toast.makeText(this, "请输入fileId", Toast.LENGTH_LONG).show();
+            return;
+        }
+        if(TextUtils.isEmpty(projectIdText)){
+            Toast.makeText(this, "请输入projectId", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        val regex: Regex = "^[a-z0-9A-Z]+$".toRegex()
+        //str.matches(regex);
+        if(!fileIdText.matches(regex) || !projectIdText.matches(regex)){
+            Toast.makeText(this, "fileId或projectId只能为英文字符或数字", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        thread {
+            try {
+                val response: String? = mEZMeetingCall?.searchConRecord(ezAccessToken.accessToken, projectIdText, fileIdText)
+                runOnUiThread {
+                    //val alertDialog1: AlertDialog?  = AlertDialog.Builder(this).setMessage(response).create()
+                    //alertDialog1?.show()
+                    //val json:JSONObject = JSONObject(response)
+                    val urls: EditText? = findViewById(R.id.url)
+                    urls?.setText(response)
+                }
+            } catch (e : BaseException){
+                e.printStackTrace()
+            }
+        }
     }
 
 
@@ -116,18 +252,20 @@ class MultiVideoTalkActivity : Activity() {
         }
     }
 
-    private fun createMeeting() {
+    private fun createMeeting(customId: String?) {
         if (mIsCallDevice) {
-            mEZMeetingCall?.createMeetingWithDevice(mDeviceSerial?:"", mChannelId, mPassword)
+            mEZMeetingCall?.createMeetingWithDevice(mDeviceSerial?:"", mChannelId, mPassword, customId)
         } else {
-            mEZMeetingCall?.createMeeting(mPassword)
+            mEZMeetingCall?.createMeeting(mPassword, customId)
         }
+        isCreateUser = true
     }
 
-    private fun joinMeeting() {
+    private fun joinMeeting(customId:String?) {
         if (isValidRoomId()) {
-            mEZMeetingCall?.joinMeeting(mInputtedRoomID, mPassword)
+            mEZMeetingCall?.joinMeeting(mInputtedRoomID, mPassword, customId)
         }
+        isCreateUser = false
     }
 
 
@@ -143,7 +281,8 @@ class MultiVideoTalkActivity : Activity() {
 
     override fun onRestart() {
         super.onRestart()
-        mEZMeetingCall?.enableCamera(true)
+        mEZMeetingCall?.enableCamera(mEZMeetingCall?.enableCamera == true)
+        mEZMeetingCall?.enableMic(mEZMeetingCall?.enableMic == true)
     }
 
     /**
@@ -234,8 +373,10 @@ class MultiVideoTalkActivity : Activity() {
                 }
             } else if (code == 10152) {
                 isLackOfRecordAudioPermission = true
+                showToast("没有麦克风权限")
             } else if (code == 20153) {
                 isLackOfCameraPermission = true
+                showToast("没有相机权限")
             } else if (code == 50007 || code == 50005) {
                 showToast("网络断开，退出房间")
                 finish()
@@ -245,15 +386,27 @@ class MultiVideoTalkActivity : Activity() {
             }
         }
 
-        override fun onRoomCreated(roomId: Int) {
+        override fun onRoomCreated(roomId: Int,clientId: Int, customId: String) {
             showToast("onRoomCreated: $roomId")
             runOnUiThread {
+                mRoomId = roomId
                 room_id_text.text = roomId.toString()
+                mCustomId  = customId
+
             }
         }
 
-        override fun onJoinRoom(roomId: Int, clientId: Int, username: String) {
+        override fun onJoinRoom(roomId: Int, clientId: Int, username: String, customId: String) {
             runOnUiThread {
+                //mClient = clientId
+                //mClient+=clientId.toString();
+                if(TextUtils.isEmpty(mClient)){
+                    mClient = mClient.plus(clientId.toString())
+                }else{
+                    mClient = mClient.plus(",$clientId")
+                }
+                mRoomId = roomId
+                mCustomId = customId
                 joinRoom(clientId, username)
             }
         }
@@ -405,5 +558,21 @@ class MultiVideoTalkActivity : Activity() {
      * 加入的房间号
      */
     private var mInputtedRoomID = ERROR
+
+    private var mRoomId : Int? = null
+
+    //private var mClient : Int? = null
+    private var mClient: String = ""
+
+    private var fileId: EditText? = null
+    private var projectId: EditText? = null
+    private var projectName: EditText? = null
+
+    private var isCreateUser: Boolean? = null
+
+    /**
+     * 开启会议和关闭会议传入的字段
+     */
+    private var mCustomId: String? = null
 
 }
