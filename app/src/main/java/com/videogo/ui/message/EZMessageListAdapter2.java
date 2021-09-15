@@ -324,13 +324,9 @@ public class EZMessageListAdapter2 extends BaseAdapter implements View.OnClickLi
                 //boolean detector_ipc_link = relAlarm.getEnumAlarmType() == AlarmType.DETECTOR_IPC_LINK;
                 boolean detector_ipc_link = false;
                 boolean alarm_has_camera = true;
-                if (detector_ipc_link) {
+                if (detector_ipc_link || alarm_has_camera) {
                     if (!mDataSetChanged) {
-                        EZUtils.loadImage(mContext, viewHolder.image, alarmLogInfo.getAlarmPicUrl(),mDeviceSerial,mMyVerifyCodeErrorListener);
-                    }
-                } else if (alarm_has_camera) {
-                    if (!mDataSetChanged) {
-                        EZUtils.loadImage(mContext, viewHolder.image, alarmLogInfo.getAlarmPicUrl(), mDeviceSerial,mMyVerifyCodeErrorListener);
+                        EZUtils.loadImage(mContext, viewHolder.image, alarmLogInfo, mMyVerifyCodeErrorListener);
                     }
                 } else {
                     viewHolder.image.setBackgroundResource(R.drawable.message_a1_bg);

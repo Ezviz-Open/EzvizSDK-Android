@@ -38,6 +38,7 @@ import com.ezviz.sdk.videotalk.EvcParam;
 import com.ezviz.sdk.videotalk.EvcParamValueEnum;
 import com.ezviz.sdk.videotalk.EzvizVideoCall;
 import com.ezviz.sdk.videotalk.EzvizVoiceCall;
+import com.ezviz.videotalk.JNAApi;
 import com.ezviz.videotalk.debug.DebugUtils;
 import com.videogo.exception.BaseSdkRuntimeException;
 
@@ -203,9 +204,9 @@ public class SafetyHatTalkActivity extends Activity {
             onPermissionsGranted();
         }
 
-        if (BuildConfig.DEBUG) {
-            DebugUtils.startSaveLogToFile(getApplicationContext());
-        }
+//        if (BuildConfig.DEBUG) {
+//            DebugUtils.startSaveLogToFile(getApplicationContext());
+//        }
     }
 
     private void initData() {
@@ -629,9 +630,20 @@ public class SafetyHatTalkActivity extends Activity {
         }
 
         @Override
-        public void onJoinRoom(int roomId, int clientId, String username) {
+        public void onJoinRoom(JNAApi.BavJoinInfo joinInfo) {
 
         }
+
+        @Override
+        public void onClientUpdated(JNAApi.BavJoinInfo bavJoinInfo){
+
+        }
+
+        @Override
+        public void onClientStat(int clientId, int volume){
+
+        }
+
 
         @Override
         public void onQuitRoom(int roomId, int clientId) {

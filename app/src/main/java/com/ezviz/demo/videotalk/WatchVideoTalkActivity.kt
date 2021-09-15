@@ -13,6 +13,7 @@ import android.view.View
 import android.widget.Toast
 import com.ezviz.sdk.videotalk.*
 import com.ezviz.sdk.videotalk.EvcParamValueEnum.EvcOperationEnum
+import com.ezviz.videotalk.JNAApi
 import ezviz.ezopensdk.R
 import ezviz.ezopensdkcommon.common.LogUtil
 import kotlinx.android.synthetic.main.activity_video_talk.*
@@ -278,7 +279,19 @@ class WatchVideoTalkActivity : Activity(){
             }
         }
 
-        override fun onJoinRoom(roomId: Int, clientId: Int, username: String) {
+//        override fun onJoinRoom(roomId: Int, clientId: Int, username: String) {
+////            TODO("Not yet implemented")
+//        }
+
+        override fun onJoinRoom(joinInfo: JNAApi.BavJoinInfo) {
+//            TODO("Not yet implemented")
+        }
+
+        override fun onClientStat(clientId: Int, volume: Int) {
+//            TODO("Not yet implemented")
+        }
+
+        override fun onClientUpdated(bavJoinInfo: JNAApi.BavJoinInfo?) {
 //            TODO("Not yet implemented")
         }
 

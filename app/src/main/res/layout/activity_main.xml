@@ -122,6 +122,46 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="18dp"
+                android:text="@string/string_apiurl"/>
+
+            <EditText
+                android:id="@+id/et_api_url"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="10dp"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18dp"
+                android:text="@string/string_authurl"/>
+
+            <EditText
+                android:id="@+id/et_auth_server"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="10dp"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18dp"
                 android:text="@string/app_key"/>
 
             <EditText

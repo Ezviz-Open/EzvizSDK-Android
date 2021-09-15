@@ -52,6 +52,7 @@ import com.ez.stream.EZStreamClientManager;
 import ezviz.ezopensdk.preview.MultiScreenPreviewActivity;
 import ezviz.ezopensdkcommon.common.BaseApplication;
 import ezviz.ezopensdkcommon.common.RootActivity;
+
 import com.videogo.constant.Constant;
 import com.videogo.constant.IntentConsts;
 import com.videogo.constants.ReceiverKeys;
@@ -130,7 +131,7 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
     private final static int LOAD_SHARE_DEVICE = 1;
     private int mLoadType = LOAD_MY_DEVICE;
 
-    private String mSingleDeviceSerial="";
+    private String mSingleDeviceSerial = "";
 
     @Override
     public void onCameraItemClick(EZDeviceInfo deviceInfo, int camera_index) {
@@ -143,9 +144,9 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
                     return;
                 }
                 int ret = EZStreamClientManager.create(getApplication().getApplicationContext()).clearTokens();
-                if (EZ_OK == ret){
+                if (EZ_OK == ret) {
                     Log.i(TAG, "clearTokens: ok");
-                }else{
+                } else {
                     Log.e(TAG, "clearTokens: faile");
                 }
                 intent = new Intent(EZCameraListActivity.this, EZRealPlayActivity.class);
@@ -173,7 +174,7 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (DemoConfig.isNeedJumpToTestPage){
+        if (DemoConfig.isNeedJumpToTestPage) {
             startActivity(new Intent(mContext, TestActivityForFullSdk.class));
         }
 
@@ -181,8 +182,8 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
 
         // 只展示单个设备
         mSingleDeviceSerial = getIntent().getStringExtra(ValueKeys.DEVICE_SERIAL.name());
-        if (!TextUtils.isEmpty(mSingleDeviceSerial)){
-            Log.e(TAG, "only show the device which serial is " + mSingleDeviceSerial );
+        if (!TextUtils.isEmpty(mSingleDeviceSerial)) {
+            Log.e(TAG, "only show the device which serial is " + mSingleDeviceSerial);
         }
 
         initData();
@@ -245,11 +246,11 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
             /**
              * 根据设备型号判断是否是HUB设备
              */
-            private boolean isHubDevice(String deviceType){
-                if (TextUtils.isEmpty(deviceType)){
+            private boolean isHubDevice(String deviceType) {
+                if (TextUtils.isEmpty(deviceType)) {
                     return false;
                 }
-                switch (deviceType){
+                switch (deviceType) {
                     case "CASTT":
                     case "CAS_HUB_NEW":
                         return true;
@@ -262,7 +263,7 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
             public void onPlayClick(BaseAdapter adapter, View view, int position) {
                 mClickType = TAG_CLICK_PLAY;
                 final EZDeviceInfo deviceInfo = mAdapter.getItem(position);
-                if (isHubDevice(deviceInfo.getDeviceType())){
+                if (isHubDevice(deviceInfo.getDeviceType())) {
                     jumpToDeviceInfoInputPage();
                     return;
                 }
@@ -278,9 +279,9 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
                         return;
                     }
                     int ret = EZStreamClientManager.create(getApplication().getApplicationContext()).clearTokens();
-                    if (EZ_OK == ret){
+                    if (EZ_OK == ret) {
                         Log.i(TAG, "clearTokens: ok");
-                    }else{
+                    } else {
                         Log.e(TAG, "clearTokens: fail");
                     }
                     Intent intent = new Intent(EZCameraListActivity.this, EZRealPlayActivity.class);
@@ -300,7 +301,7 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
             public void onRemotePlayBackClick(BaseAdapter adapter, View view, int position) {
                 mClickType = TAG_CLICK_REMOTE_PLAY_BACK;
                 EZDeviceInfo deviceInfo = mAdapter.getItem(position);
-                if (isHubDevice(deviceInfo.getDeviceType())){
+                if (isHubDevice(deviceInfo.getDeviceType())) {
                     jumpToDeviceInfoInputPage();
                     return;
                 }
@@ -331,7 +332,7 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
             /**
              * 如果是HUB设备，则需要手动输入相应HUB设备和子设备序列号组合后的序列号才能进行取流操作
              */
-            private void jumpToDeviceInfoInputPage(){
+            private void jumpToDeviceInfoInputPage() {
                 startActivity(new Intent(mContext, CollectDeviceInfoActivity.class));
             }
 
@@ -341,8 +342,8 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
                 EZDeviceInfo deviceInfo = mAdapter.getItem(position);
                 Intent intent = new Intent(EZCameraListActivity.this, EZDeviceSettingActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putParcelable(IntentConsts.EXTRA_DEVICE_INFO,deviceInfo);
-                intent.putExtra("Bundle",bundle);
+                bundle.putParcelable(IntentConsts.EXTRA_DEVICE_INFO, deviceInfo);
+                intent.putExtra("Bundle", bundle);
                 startActivity(intent);
                 bIsFromSetting = true;
             }
@@ -431,6 +432,7 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
     }
 
     int count = 100;
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -462,13 +464,13 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
      */
     public void onClickTryOpenTestPage(View view) {
         long currentTime = System.currentTimeMillis();
-        if (currentTime - mLastClickTime < 1000){
+        if (currentTime - mLastClickTime < 1000) {
             mValidCount++;
-        }else{
+        } else {
             mValidCount = 0;
         }
         // 短时间内连续点击至少5次，则打开测试页面
-        if (mValidCount >= 5){
+        if (mValidCount >= 5) {
             startActivity(new Intent(mContext, TestActivityForFullSdk.class));
             showToast("test!!!");
             mValidCount = 0;
@@ -514,7 +516,7 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
             }
             try {
                 List<EZDeviceInfo> result = null;
-                if (!TextUtils.isEmpty(mSingleDeviceSerial)){
+                if (!TextUtils.isEmpty(mSingleDeviceSerial)) {
                     EZDeviceInfo deviceInfo = getOpenSDK().getDeviceInfo(mSingleDeviceSerial);
                     result = new ArrayList<EZDeviceInfo>();
                     result.add(deviceInfo);
@@ -531,13 +533,13 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
                     if (mHeaderOrFooter) {
                         result = getOpenSDK().getDeviceList(0, 10);
                     } else {
-                        result = getOpenSDK().getDeviceList((mAdapter.getCount() / 20)+(mAdapter.getCount() % 20>0?1:0), 20);
+                        result = getOpenSDK().getDeviceList((mAdapter.getCount() / 20) + (mAdapter.getCount() % 20 > 0 ? 1 : 0), 20);
                     }
                 } else if (mLoadType == LOAD_SHARE_DEVICE) {
                     if (mHeaderOrFooter) {
                         result = getOpenSDK().getSharedDeviceList(0, 10);
                     } else {
-                        result = getOpenSDK().getSharedDeviceList((mAdapter.getCount() / 20)+(mAdapter.getCount() % 20>0?1:0), 20);
+                        result = getOpenSDK().getSharedDeviceList((mAdapter.getCount() / 20) + (mAdapter.getCount() % 20 > 0 ? 1 : 0), 20);
                     }
                 }
                 return result;
@@ -572,7 +574,7 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
                     mNoCameraTipLy.setVisibility(View.VISIBLE);
                     mGetCameraFailTipLy.setVisibility(View.GONE);
                     mListView.getRefreshableView().removeFooterView(mNoMoreView);
-                } else if (result.size() < 10) {
+                } else if (result.size() < 20) {
                     mListView.setFooterRefreshEnabled(false);
                     mListView.getRefreshableView().addFooterView(mNoMoreView);
                 } else if (mHeaderOrFooter) {
@@ -718,23 +720,23 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
-        if (resultCode == RESULT_CODE){
-            if (requestCode == REQUEST_CODE){
+        if (resultCode == RESULT_CODE) {
+            if (requestCode == REQUEST_CODE) {
                 String deviceSerial = intent.getStringExtra(IntentConsts.EXTRA_DEVICE_ID);
-                int cameraNo = intent.getIntExtra(IntentConsts.EXTRA_CAMERA_NO,-1);
-                int videoLevel = intent.getIntExtra("video_level",-1);
-                if (TextUtils.isEmpty(deviceSerial)){
+                int cameraNo = intent.getIntExtra(IntentConsts.EXTRA_CAMERA_NO, -1);
+                int videoLevel = intent.getIntExtra("video_level", -1);
+                if (TextUtils.isEmpty(deviceSerial)) {
                     return;
                 }
-                if (videoLevel == -1 || cameraNo == -1){
+                if (videoLevel == -1 || cameraNo == -1) {
                     return;
                 }
-                if (mAdapter.getDeviceInfoList() != null){
-                    for (EZDeviceInfo deviceInfo:mAdapter.getDeviceInfoList()){
-                        if (deviceInfo.getDeviceSerial().equals(deviceSerial)){
-                            if (deviceInfo.getCameraInfoList() != null){
-                                for (EZCameraInfo cameraInfo:deviceInfo.getCameraInfoList()){
-                                    if (cameraInfo.getCameraNo() == cameraNo){
+                if (mAdapter.getDeviceInfoList() != null) {
+                    for (EZDeviceInfo deviceInfo : mAdapter.getDeviceInfoList()) {
+                        if (deviceInfo.getDeviceSerial().equals(deviceSerial)) {
+                            if (deviceInfo.getCameraInfoList() != null) {
+                                for (EZCameraInfo cameraInfo : deviceInfo.getCameraInfoList()) {
+                                    if (cameraInfo.getCameraNo() == cameraNo) {
                                         cameraInfo.setVideoLevel(videoLevel);
                                         mAdapter.notifyDataSetChanged();
                                     }
@@ -753,17 +755,18 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
     }
 
     private long mLastPressTimeMs = 0;
-    private void checkExit(){
+
+    private void checkExit() {
         boolean isExist = false;
-        if (mLastPressTimeMs > 0){
-            if (System.currentTimeMillis() - mLastPressTimeMs < 2 * 1000){
+        if (mLastPressTimeMs > 0) {
+            if (System.currentTimeMillis() - mLastPressTimeMs < 2 * 1000) {
                 isExist = true;
             }
         }
-        if (isExist){
+        if (isExist) {
             Toast.makeText(getApplicationContext(), getApplicationContext().getString(R.string.app_closed), Toast.LENGTH_LONG).show();
             exitApp();
-        }else{
+        } else {
             Toast.makeText(getApplicationContext(), getApplicationContext().getString(R.string.press_again_to_exit), Toast.LENGTH_SHORT).show();
             mLastPressTimeMs = System.currentTimeMillis();
         }
@@ -773,13 +776,14 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
 
     /**
      * 展示下载通知
+     *
      * @param context
      * @param notificationId
      * @param title
      * @param content
      * @param clickToCancel
      */
-    public static void showSimpleNotification(Context context, int notificationId, String title, String content, boolean clickToCancel){
+    public static void showSimpleNotification(Context context, int notificationId, String title, String content, boolean clickToCancel) {
         LogUtil.d(TAG, "show notification " + notificationId);
         Intent intent = new Intent(BaseApplication.mInstance, NotificationReceiver.class)
                 .putExtra(ReceiverKeys.NOTIFICATION_ID, notificationId);
@@ -806,26 +810,26 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
             int notificationId = intent.getIntExtra(ReceiverKeys.NOTIFICATION_ID, -1);
             LogUtil.d(TAG, "onClick, notificationId is " + notificationId);
             DownLoadTaskRecordAbstract downLoadTaskRecord = null;
-            for (DownLoadTaskRecordAbstract downLoadTaskRecordAbstract : mDownloadTaskRecordListAbstract){
-                if (downLoadTaskRecordAbstract.getNotificationId() == notificationId){
+            for (DownLoadTaskRecordAbstract downLoadTaskRecordAbstract : mDownloadTaskRecordListAbstract) {
+                if (downLoadTaskRecordAbstract.getNotificationId() == notificationId) {
                     LogUtil.d(TAG, "stopped download task which related to notificationId " + notificationId);
                     downLoadTaskRecord = downLoadTaskRecordAbstract;
                     downLoadTaskRecord.stopDownloader();
                 }
             }
-            if (downLoadTaskRecord != null){
+            if (downLoadTaskRecord != null) {
                 mDownloadTaskRecordListAbstract.remove(downLoadTaskRecord);
             }
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
-            if (notificationManager != null){
+            if (notificationManager != null) {
                 notificationManager.cancel(notificationId);
                 RootActivity.toastMsg("canceled to downloaded!");
             }
         }
     }
 
-    private static void stopAllDownloadTasks(){
-        for (DownLoadTaskRecordAbstract downloadRecord: mDownloadTaskRecordListAbstract){
+    private static void stopAllDownloadTasks() {
+        for (DownLoadTaskRecordAbstract downloadRecord : mDownloadTaskRecordListAbstract) {
             downloadRecord.stopDownloader();
         }
     }

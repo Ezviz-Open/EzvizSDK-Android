@@ -23,6 +23,7 @@ import android.widget.ListAdapter;
 import android.widget.SectionIndexer;
 import android.widget.TextView;
 
+import com.videogo.openapi.bean.EZAlarmInfo;
 import com.videogo.openapi.bean.resp.CloudPartInfoFile;
 import com.videogo.remoteplayback.list.RemoteListContant;
 import com.videogo.remoteplayback.list.RemoteListUtil;
@@ -415,7 +416,11 @@ public class SectionListAdapter implements ListAdapter, OnItemClickListener, Pin
     }
 
     private void imageLoader(String picUrl, ImageView imageView) {
-        EZUtils.loadImage(mContext,imageView,picUrl,mDeviceSerial,null);
+        EZAlarmInfo alarmInfo = new EZAlarmInfo();
+        alarmInfo.setDeviceSerial(mDeviceSerial);
+        alarmInfo.setAlarmPicUrl(picUrl);
+        alarmInfo.setCrypt(1);
+        EZUtils.loadImage(mContext,imageView,alarmInfo,null);
     }
 
 

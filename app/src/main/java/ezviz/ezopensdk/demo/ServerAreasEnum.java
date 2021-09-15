@@ -17,6 +17,13 @@ public enum ServerAreasEnum {
     ASIA_CHINA(0,"Asia-China", "https://open.ys7.com",
             "https://openauth.ys7.com",
             "26810f3acd794862b608b6cfbc32a6b8"),
+
+    /**
+     * 温氏
+     */
+    WENSHI(5, "WENSHI", "https://ezcpcloudopen.wens.com.cn",
+            "https://ezcpcloudopenauth.wens.com.cn", false),
+
     /**
      * 海外：俄罗斯
      */
@@ -44,6 +51,15 @@ public enum ServerAreasEnum {
     EUROPE(25, "Europe", "https://ieuopen.ezvizlife.com",
             "https://ieuopenauth.ezvizlife.com",
             "5cadedf5478d11e7ae26fa163e8bac01",
+            true),
+
+    OTHER(26, "Other", "",
+            "",
+            "1111"),
+
+    OTHER_GLOBAL(27, "Other Global", "",
+            "",
+            "1111",
             true),
 
     /*线上平台的id范围为0到99，测试平台的id范围为100+*/

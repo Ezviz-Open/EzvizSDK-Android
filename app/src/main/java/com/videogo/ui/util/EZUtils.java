@@ -18,6 +18,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.videogo.EzvizApplication;
 import com.videogo.exception.InnerException;
+import com.videogo.openapi.bean.EZAlarmInfo;
 import com.videogo.openapi.bean.EZCameraInfo;
 import com.videogo.openapi.bean.EZDeviceInfo;
 import com.videogo.util.LogUtil;
@@ -128,11 +129,12 @@ public class EZUtils {
         return ret == 1;
     }
 
-
-    public static void loadImage(final Context context, final ImageView imageView, final String url, final String deviceSerial,final VerifyCodeInput.VerifyCodeErrorListener verifyCodeErrorListener) {
-        final String verifyCode = DataManager.getInstance().getDeviceSerialVerifyCode(deviceSerial);
-        if (!isEncrypt(url)){
-            Glide.with(context).load(url)
+    public static void loadImage(final Context context, final ImageView imageView, final EZAlarmInfo alarmInfo, final VerifyCodeInput.VerifyCodeErrorListener verifyCodeErrorListener) {
+        if (alarmInfo == null){
+            return;
+        }
+        if (!isEncrypt(alarmInfo.getAlarmPicUrl())){
+            Glide.with(context).load(alarmInfo.getAlarmPicUrl())
                     .placeholder(R.drawable.notify_bg)
                     .listener(new RequestListener<String, GlideDrawable>() {
                         @Override
@@ -150,15 +152,27 @@ public class EZUtils {
                     .error(R.drawable.event_list_fail_pic)
                     .into(imageView);
         }else{
-            if (TextUtils.isEmpty(verifyCode)){
+            int crypt = 0;
+            String pwd = "";
+            if (alarmInfo.getCrypt() != 2){ //兼容不支持的服务，继续走旧的默认的设备加密
+                crypt = 1;
+                pwd = DataManager.getInstance().getDeviceSerialVerifyCode(alarmInfo.getDeviceSerial());
+            }else {
+                crypt = 2;
+                pwd = alarmInfo.getChecksum();
+            }
+
+            if (TextUtils.isEmpty(pwd)){
                 imageView.setImageResource(R.drawable.alarm_encrypt_image_mid);
                 if (verifyCodeErrorListener != null) {
                     verifyCodeErrorListener.verifyCodeError();
                 }
                 return;
             }
+            final int finalCrypt = crypt;
+            final String finalPwd = pwd;
             Glide.with(context)
-                    .load(url)
+                    .load(alarmInfo.getAlarmPicUrl())
                     .asBitmap()
                     /**************图片加载监听，打印错误信息*************************/
                     .listener(new RequestListener<String, Bitmap>() {
@@ -196,21 +210,22 @@ public class EZUtils {
                                 LogUtil.d("EZUTils","图片加载错误！");
                                 return null;
                             }
-                            if (!isEncrypt(url)){
+                            if (!isEncrypt(alarmInfo.getAlarmPicUrl())){
                                 desBitmap = BitmapFactory.decodeByteArray(src, 0, src.length);
                             }else{
                             /*************** 开发者需要调用此接口解密 ****************/
-                            byte[] data1 = EzvizApplication.getOpenSDK().decryptData(output.toByteArray(), verifyCode);
-                                if (data1 == null || data1.length <= 0){
-                                    LogUtil.d("EZUTils","verifyCodeError！");
+                                byte[] data1 = EzvizApplication.getOpenSDK().decryptData(output.toByteArray(), finalPwd, finalCrypt);
+                                if (data1 == null || data1.length <= 0) {
+                                    LogUtil.d("EZUTils", "verifyCodeError！");
                                     /*************** 验证码错误 ,此处回调是在子线程中，处理UI需调回到主线程****************/
                                     if (verifyCodeErrorListener != null) {
                                         verifyCodeErrorListener.verifyCodeError();
                                     }
-                                }else {
+                                } else {
                                     desBitmap = BitmapFactory.decodeByteArray(data1, 0, data1.length);
                                 }
                             }
+
                             if (desBitmap != null){
                                 return new BitmapResource(desBitmap,DataManager.getInstance().getBitmapPool(context));
                             }
@@ -218,7 +233,7 @@ public class EZUtils {
                         }
                         @Override
                         public String getId() {
-                            return url;
+                            return alarmInfo.getAlarmPicUrl();
                         }
                     })
                     .into(imageView);

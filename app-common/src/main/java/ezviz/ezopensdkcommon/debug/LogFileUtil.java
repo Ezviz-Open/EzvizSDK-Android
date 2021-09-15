@@ -4,6 +4,8 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Environment;
+import android.util.DebugUtils;
 import android.util.Log;
 
 import ezviz.ezopensdkcommon.demo.DemoConfig;
@@ -22,7 +24,7 @@ public class LogFileUtil {
             Log.e(TAG, "startSaveLogToFile failed: lack of Manifest.permission.WRITE_EXTERNAL_STORAGE");
             return;
         }
-        final String logFileNameWithPath = DemoConfig.getDemoFolder() + "/log.txt";
+        final String logFileNameWithPath = Environment.getExternalStorageDirectory().getPath() + "/0_OpenSDK/log.txt";
         LogFileService.start(logFileNameWithPath);
     }
 

@@ -61,20 +61,25 @@ public class LogFileService {
                     Log.w(TAG, "save log of pid" + "(" + currentPid + ")" + " to log file"+
                             "(" + logFile.getPath() +")");
                     // 日志来源
-                    String logcatCommand = "logcat *:D --pid=" + currentPid;
+//                    String logcatCommand = "logcat *:V --pid=" + currentPid;
+                    String logcatCommand = "logcat | grep \"(" + currentPid + ")\"";
                     Log.w(TAG, "logcatCommand is: " + logcatCommand);
                     Process process = Runtime.getRuntime().exec(logcatCommand);
                     BufferedReader bufferedReader = new BufferedReader(
-                            new InputStreamReader(process.getInputStream()));
+                            new InputStreamReader(process.getInputStream()),1024);
                     // 日志输出
                     FileOutputStream fos = new FileOutputStream(logFile, true);
                     String line;
                     Log.w(TAG, "start to write log");
                     while (started) {
                         if ((line = bufferedReader.readLine()) != null){
+//                            Log.d(TAG, "write log file show message");
                             fos.write((line + "\n").getBytes());
                             fos.flush();
                         }
+//                        else{
+//                            Log.d(TAG, "write log file show error");
+//                        }
                     }
                     fos.close();
                 } catch (IOException e) {

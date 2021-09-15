@@ -147,11 +147,13 @@
     <color name="orange">#df2d10</color>
     <color name="color_white">#FFFFFFFF</color>
 
+
     <!--视频通话-->
     <color name="video_talk_sdk_text_color_black">#333333</color>
     <color name="video_talk_sdk_text_color_gray">#666666</color>
     <color name="video_talk_sdk_hint_color_gray">#999999</color>
     <color name="video_talk_sdk_white">#ffffff</color>
+    <color name="darker_gray">#aaa</color>
     <color name="video_talk_sdk_black">#000000</color>
     
 </resources>

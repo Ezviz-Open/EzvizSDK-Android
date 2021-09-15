@@ -103,5 +103,18 @@
 -dontwarn okhttp3.internal.platform.ConscryptPlatform
 # 必须额外加的，否则编译无法通过
 -dontwarn okio.**
+
+
+##Glide
+-dontwarn com.bumptech.glide.**
+-keep class com.bumptech.glide.**{*;}
+-keep public class * implements com.bumptech.glide.module.GlideModule
+-keep public class * extends com.bumptech.glide.AppGlideModule
+-keep public enum com.bumptech.glide.load.resource.bitmap.ImageHeaderParser$** {
+  **[] $VALUES;
+  public *;
+ }
+
+
 #========以上是第三方开源库=======#
 

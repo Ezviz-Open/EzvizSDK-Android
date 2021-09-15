@@ -68,6 +68,22 @@ class MultiTestActivity : Activity() {
 
     @Suppress("UNUSED_PARAMETER")
     fun onClickCreateRoom(view: View) {
+        if(TextUtils.isEmpty(customId_et.text.toString())){
+            Utils.showToast(this,"请输入customId")
+            return
+        }
+        if(TextUtils.isEmpty(limit_id.text.toString())){
+            limit = "100"
+
+        }else{
+            var text = limit_id.text.toString().toInt()
+
+            if(text>100){
+                Utils.showToast(this,"人数不能超过100")
+                return
+            }
+            limit = text.toString()
+        }
         val roomId = try {
             room_id.text.toString().toInt()
         } catch (e:Throwable){
@@ -88,12 +104,18 @@ class MultiTestActivity : Activity() {
             putExtra("is_call_device", is_call_device_cb.isChecked)
             putExtra("enable_video", enable_video_cb.isChecked)
             putExtra("enable_audio", enable_audio_cb.isChecked)
+            putExtra("custom_id", customId_et.text.toString())
+            putExtra("limit", limit)
             startActivity(this)
         }
     }
 
     @Suppress("UNUSED_PARAMETER")
     fun onClickJoinRoom(view: View) {
+        if(TextUtils.isEmpty(customId_et.text.toString())){
+            Utils.showToast(this,"请输入customId")
+            return
+        }
         val roomId = try {
             room_id.text.toString().toInt()
         } catch (e:Throwable){
@@ -107,7 +129,11 @@ class MultiTestActivity : Activity() {
             putExtra("is_call_device", is_call_device_cb.isChecked)
             putExtra("enable_video", enable_video_cb.isChecked)
             putExtra("enable_audio", enable_audio_cb.isChecked)
+            putExtra("enable_audio", enable_audio_cb.isChecked)
+            putExtra("custom_id", customId_et.text.toString())
             startActivity(this)
         }
     }
+
+    var limit: String? = null
 }

@@ -138,7 +138,7 @@ public class EZMessageImageActivity2 extends RootActivity implements VerifyCodeI
     }
 
     private void setAlarmImage(){
-        EZUtils.loadImage(this, mAlarmImageView, mEZAlarmInfo.getAlarmPicUrl(),mEZAlarmInfo.getDeviceSerial(),this);
+        EZUtils.loadImage(this, mAlarmImageView, mEZAlarmInfo,this);
     }
 
     @Override

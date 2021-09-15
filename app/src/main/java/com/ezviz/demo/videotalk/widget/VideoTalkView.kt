@@ -10,7 +10,9 @@ import android.view.WindowManager
 import android.widget.CheckBox
 import android.widget.FrameLayout
 import android.widget.TextView
+import com.ezviz.sdk.videotalk.sdk.EZBaseCall
 import com.ezviz.sdk.videotalk.sdk.EZMeetingCall
+import com.videogo.util.LogUtil
 import ezviz.ezopensdk.R
 
 
@@ -33,6 +35,8 @@ class VideoTalkView(context: Context, val mEZMeetingCall: EZMeetingCall) {
 
     private var mContext = context
 
+    private var isFirstJoinRoom = true
+
     init {
         val inflater = LayoutInflater.from(context)
         rootView = inflater.inflate(R.layout.multi_video_talk_item, null)
@@ -47,18 +51,22 @@ class VideoTalkView(context: Context, val mEZMeetingCall: EZMeetingCall) {
         val width = wm.defaultDisplay.width
 //        val height = wm.defaultDisplay.height
         val lp = cameraLayout.layoutParams
-        lp.width = width / 2
-        lp.height = width / 2
-        cameraLayout.layoutParams = lp
+//        lp.width = width / 2
+//        lp.height = width / 2
+//        cameraLayout.layoutParams = lp
+//        checkMic.isChecked = true
         checkVideo.setOnCheckedChangeListener { _, isChecked ->
             cameraView.visibility = if (isChecked) View.VISIBLE else View.GONE
         }
         checkMic.setOnCheckedChangeListener { _, isChecked ->
+            LogUtil.d(TAG, "Listener_Mute  clientId: $clientId")
             if (clientId > 0) {
                 mEZMeetingCall.mute(!isChecked, clientId)
             }
         }
         handler = Handler(Looper.getMainLooper())
+        // 启动计时器
+//        handler?.postDelayed(runnable, 1000)
     }
 
     fun reset() {
@@ -67,20 +75,28 @@ class VideoTalkView(context: Context, val mEZMeetingCall: EZMeetingCall) {
         checkMic.isChecked = true
         clientIdTv.text = "clientId:"
         usernameTv.text = "name:"
+        timeTv.text = "00:00"
+        joinTime = System.currentTimeMillis()
         // 停止计时器
-        handler?.removeCallbacks(runnable)
+//        handler?.removeCallbacks(runnable)
     }
 
-    fun joinRoom(clientId: Int, username: String) {
+    //    fun joinRoom(clientId: Int, username: String) {
+    fun joinRoom(clientId: Int, username: String, volume: Int) {
         this.username = username
         this.clientId = clientId
         mEZMeetingCall.showJoinUser(cameraView, clientId)
         clientIdTv.text = "client:$clientId"
-        usernameTv.text = "$username"
-        timeTv.text = "00:00"
-        joinTime = System.currentTimeMillis()
-        // 启动计时器
+        usernameTv.text = "音量:$volume"
+
         handler?.postDelayed(runnable, 1000)
+        // 启动计时器
+//        if(isFirstJoinRoom){
+//            timeTv.text = "00:00"
+//            joinTime = System.currentTimeMillis()
+//            handler?.postDelayed(runnable, 1000)
+//        }
+//        isFirstJoinRoom = false
     }
 
 

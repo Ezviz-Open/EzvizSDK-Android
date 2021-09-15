@@ -36,12 +36,24 @@ android {
         ndk {
             abiFilters "armeabi-v7a", "arm64-v8a"
         }
-        /*禁止使用java8，如果sdk使用了java8编译，但是应用层使用了java7编译，会导致应用层打包无法通过*/
+        
         compileOptions {
-            sourceCompatibility JavaVersion.VERSION_1_7
-            targetCompatibility JavaVersion.VERSION_1_7
+            sourceCompatibility JavaVersion.VERSION_1_8
+            targetCompatibility JavaVersion.VERSION_1_8
         }
     }
+
+    signingConfigs {
+        myConfig {
+            storeFile file("test.jks")
+            storePassword "abcd1234"
+            keyAlias "key0"
+            keyPassword "abcd1234"
+            v2SigningEnabled true
+            v1SigningEnabled true //gradle升级到5.4.1之后，取值会默认为false。此时打出的包无法在Android7.0以下机型安装
+        }
+    }
+
     //在Android代码块中添加如下配置：（可优化最上图中transformClassDexBuilderForDebug的时间）
     dexOptions {
         preDexLibraries true
@@ -51,6 +63,12 @@ android {
         debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.myConfig //签名
+        }
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.myConfig //签名
         }
     }
     productFlavors {
@@ -59,22 +77,18 @@ android {
 
 
 dependencies {
-    /*萤石SDK核心模块，必须*/
-//    api project(path: ':ezviz-sdk')
-    api 'com.ezviz.sdk:ezviz-sdk:4.16.1'
+    /*萤石SDK核心模块，必须依赖*/
+    implementation 'io.github.ezviz-open:ezviz-sdk:4.16.8.2'
 
     /*视频通话模块，按需使用*/
-//    api project(path: ':videotalk')
-    api 'com.ezviz.sdk:videotalk:1.2.0'
+    implementation 'io.github.ezviz-open:videotalk:1.2.3'
 
-    /*视频通话模块，按需使用*/
-//    api project(path: ':streamctrl')
-    api 'com.ezviz.sdk:streamctrl:1.2.0'
+    /*码流获取模块，按需使用*/
+    implementation 'io.github.ezviz-open:streamctrl:1.2.3'
 
     /*萤石核心模块的三方依赖*/
 //    implementation 'javax.jmdns:jmdns:3.4.1'
-    implementation 'com.google.code.gson:gson:2.8.0'
-    api 'com.squareup.okhttp3:okhttp:3.12.1'
+//    implementation 'com.google.code.gson:gson:2.8.0'
 
     /*demo的依赖项*/
     api project(path: ':app-common')

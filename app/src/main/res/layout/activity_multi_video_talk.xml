@@ -59,11 +59,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@android:color/darker_gray"
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 android:paddingBottom="20dp"
                 android:gravity="center_horizontal">
 
             </LinearLayout>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -72,8 +76,8 @@
                 android:orientation="vertical">
                 <FrameLayout
                     android:id="@+id/camera_layout_my"
-                    android:layout_width="200dp"
-                    android:layout_height="200dp"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
                     android:background="@android:color/black">
 
                     <com.ezviz.sdk.videotalk.EvcLocalWindowView
@@ -91,7 +95,7 @@
                         android:id="@+id/check_video_my"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:checked="true"
+                        android:checked="false"
                         android:text="摄像头"/>
                     <CheckBox
                         android:id="@+id/check_mic_my"
@@ -130,5 +134,111 @@
                     android:onClick="onClickLeaveRoom"/>
             </LinearLayout>
         </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingStart="15dp"
+            android:paddingEnd="15dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:layout_marginTop="20dp">
+
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="onClickCreateProject"
+                    android:text="创建项目" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="开始录制"
+                    android:onClick="onClickStartRecord"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="停止录制"
+                    android:onClick="onClickStopRecord"/>
+
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="搜索录像"
+                    android:onClick="onClickSearchRecord"/>
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingStart="15dp"
+            android:paddingEnd="15dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:layout_marginTop="20dp">
+
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/file_id"
+                    android:layout_weight="1"
+                    android:hint="fileId"/>
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/project_name"
+                    android:layout_weight="1"
+                    android:hint="projectName"/>
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/project_id"
+                    android:layout_weight="1"
+                    android:hint="projectId"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingStart="15dp"
+            android:paddingEnd="15dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:layout_marginTop="20dp">
+
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/url"
+                    android:hint="URl"/>
+
+            </LinearLayout>
+        </LinearLayout>
+
+
+
     </LinearLayout>
 </ScrollView>

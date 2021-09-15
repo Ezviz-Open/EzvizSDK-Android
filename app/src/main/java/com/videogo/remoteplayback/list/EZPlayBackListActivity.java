@@ -123,6 +123,7 @@ import ezviz.ezopensdkcommon.common.RootActivity;
 
 import static com.videogo.EzvizApplication.getOpenSDK;
 import static com.videogo.openapi.EZConstants.EZPlaybackConstants.MSG_REMOTE_PLAYBACK_RATE_LOWER;
+import static com.videogo.openapi.EZConstants.MSG_GOT_STREAM_TYPE;
 import static com.videogo.ui.cameralist.EZCameraListActivity.mDownloadTaskRecordListAbstract;
 import static com.videogo.ui.cameralist.EZCameraListActivity.showSimpleNotification;
 
@@ -298,6 +299,8 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
     // 标题栏中间日期边上的向下箭头
     private ImageView selDateImage;
 
+    // 取流方式
+    private TextView streamTypeTv;
     // 进度条拖动时的进度圈
     private LinearLayout touchProgressLayout;
 
@@ -385,6 +388,9 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                 case MSG_REMOTE_PLAYBACK_RATE_LOWER:
                     Log.d(TAG, "MSG_REMOTE_PLAYBACK_RATE_LOWER");
                     updatePlaybackRateUi();
+                    break;
+                case MSG_GOT_STREAM_TYPE:
+                    showStreamType(msg.arg1);
                     break;
                 default:
                     break;
@@ -1492,6 +1498,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         cancelBtn = (Button) findViewById(R.id.cancel_auto_play_btn);
         cancelBtn.setOnClickListener(this);
 
+        streamTypeTv = (TextView) findViewById(R.id.stream_type_tv);
         touchProgressLayout = (LinearLayout) findViewById(R.id.touch_progress_layout);
         showDownLoad();
 
@@ -2606,4 +2613,68 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             }
         }
     };
+
+    private void showStreamType(int streamType){
+        String streamTypeMsg = getApplicationContext().getString(R.string.stream_type) + changeIntTypeToStringType(streamType);
+        streamTypeTv.setText(streamTypeMsg);
+        streamTypeTv.setVisibility(View.VISIBLE);
+    }
+
+    private String changeIntTypeToStringType(int streamType) {
+        String strStreamType;
+        switch (streamType){
+            /*
+              取流方式切换到私有流媒体转发模式
+             */
+            case 0:
+                strStreamType = "private_stream";
+                break;
+            /*
+              取流方式切换到P2P模式
+             */
+            case 1:
+                strStreamType = "p2p";
+                break;
+            /*
+              取流方式切换到内网直连模式
+             */
+            case 2:
+                strStreamType = "direct_inner";
+                break;
+            /*
+              取流方式切换到外网直连模式
+             */
+            case 3:
+                strStreamType = "direct_outer";
+                break;
+            /*
+              取流方式切换到云存储回放
+             */
+            case 4:
+                strStreamType = "cloud_playback";
+                break;
+            /*
+              取流方式切换到云存储留言
+             */
+            case 5:
+                strStreamType = "cloud_leave_msg";
+                break;
+            /*
+              取流方式切换到反向直连模式
+             */
+            case 6:
+                strStreamType = "direct_reverse";
+                break;
+            /*
+              取流方式切换到HCNETSDK
+             */
+            case 7:
+                strStreamType = "hcnetsdk";
+                break;
+            default:
+                strStreamType = "unknown(" + streamType + ")";
+                break;
+        }
+        return strStreamType;
+    }
 }
