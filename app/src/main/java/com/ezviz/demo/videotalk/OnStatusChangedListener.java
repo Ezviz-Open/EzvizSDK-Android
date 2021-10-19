@@ -2,13 +2,13 @@ package com.ezviz.demo.videotalk;
 
 import android.view.Surface;
 
-import com.ezviz.videotalk.videomeeting.ConstVideoMeeting;
+import com.ezviz.sdk.videotalk.meeting.EZRtcParam;
 
 public interface OnStatusChangedListener {
 
-    void onSurfaceSet(int clientId, ConstVideoMeeting.StreamState type, Surface surface);
+    void onSurfaceSet(String userId, EZRtcParam.StreamType type, Surface surface);
 
-    void onUnSubscribe(int clientId, ConstVideoMeeting.StreamState type);
+    void onUnSubscribe(String userId, EZRtcParam.StreamType type);
 
-    void onSubscribe(int clientId);
+    void onSubscribe(String clientId);
 }

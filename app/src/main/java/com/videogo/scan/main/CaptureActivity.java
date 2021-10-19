@@ -16,19 +16,27 @@
 
 package com.videogo.scan.main;
 
+import android.Manifest;
+import android.annotation.TargetApi;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
@@ -38,6 +46,8 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewTreeObserver;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.PopupWindow;
@@ -46,13 +56,16 @@ import android.widget.Toast;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Result;
+
 import ezviz.ezopensdkcommon.common.RootActivity;
+
 import com.videogo.exception.BaseException;
 import com.videogo.exception.ExtraException;
 import com.videogo.scan.camera.CameraManager;
 import com.videogo.ui.devicelist.SeriesNumSearchActivity;
 import com.videogo.util.Base64;
 import com.videogo.util.ConnectionDetector;
+import com.videogo.util.LocalInfo;
 import com.videogo.util.LocalValidate;
 import com.videogo.util.LogUtil;
 import com.videogo.util.Utils;
@@ -62,7 +75,9 @@ import com.videogo.widget.TitleBar;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import ezviz.ezopensdk.R;
@@ -87,7 +102,7 @@ public final class CaptureActivity extends RootActivity implements SurfaceHolder
     private static final String PRODUCT_SEARCH_URL_SUFFIX = "/m/products/scan";
 
     private static final String[] ZXING_URLS = {
-        "http://zxing.appspot.com/scan", "zxing://scan/"};
+            "http://zxing.appspot.com/scan", "zxing://scan/"};
 
     public static final int HISTORY_REQUEST_CODE = 0x0000bacc;
 
@@ -148,7 +163,13 @@ public final class CaptureActivity extends RootActivity implements SurfaceHolder
     // mA1DeviceSeries不为空 表示 从a1界面进来扫描
     private String mA1DeviceSeries;
 
-    private PopupWindow mPromptWindow;;
+    private PopupWindow mPromptWindow;
+
+    /**
+     * true为应用权限管理返回
+     */
+    private boolean isFromPermissionSetting;
+
 
     public Handler getHandler() {
         return handler;
@@ -174,6 +195,7 @@ public final class CaptureActivity extends RootActivity implements SurfaceHolder
         initTitleBar();
         findViews();
         setListener();
+        checkPermissions();
     }
 
     private void initTitleBar() {
@@ -227,6 +249,7 @@ public final class CaptureActivity extends RootActivity implements SurfaceHolder
     }
 
     public static final String KEY_FRONT_LIGHT = "preferences_front_light";
+
     private boolean getPramaFrontLight() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(CaptureActivity.this);
         boolean currentSetting = prefs.getBoolean(KEY_FRONT_LIGHT, false);
@@ -265,37 +288,42 @@ public final class CaptureActivity extends RootActivity implements SurfaceHolder
         ViewTreeObserver vto = mTxtResult.getViewTreeObserver();
 
         vto.addOnPreDrawListener(/**
-         * @ClassName: 匿名类
-         * @Description: 用于监听在重绘前获得控件的大小按照屏幕的比例放置控件的位置
-         * @author wangnanayf1
-         * @date 2012-12-3 上午9:14:25
-         */
-        new ViewTreeObserver.OnPreDrawListener() {
-            @Override
-            public boolean onPreDraw() {
-                if (mHasMeasured == false) {
-                    DisplayMetrics dm = new DisplayMetrics();
-                    // 取得窗口属性
-                    getWindowManager().getDefaultDisplay().getMetrics(dm);
-                    int windowsHeight = dm.heightPixels;
-                    int windowsWidth = dm.heightPixels;
-                    int moveLength = (int) ((windowsHeight - windowsWidth * 0.83f) / 2 - mTxtResult.getMeasuredHeight() / 2f);
-                    if (moveLength > 0) {
-                        // 移动控件的位置
-                        mTxtResult.setPadding(0, 0, 0, moveLength);
-                    }
+                 * @ClassName: 匿名类
+                 * @Description: 用于监听在重绘前获得控件的大小按照屏幕的比例放置控件的位置
+                 * @author wangnanayf1
+                 * @date 2012-12-3 上午9:14:25
+                 */
+                new ViewTreeObserver.OnPreDrawListener() {
+                    @Override
+                    public boolean onPreDraw() {
+                        if (mHasMeasured == false) {
+                            DisplayMetrics dm = new DisplayMetrics();
+                            // 取得窗口属性
+                            getWindowManager().getDefaultDisplay().getMetrics(dm);
+                            int windowsHeight = dm.heightPixels;
+                            int windowsWidth = dm.heightPixels;
+                            int moveLength = (int) ((windowsHeight - windowsWidth * 0.83f) / 2 - mTxtResult.getMeasuredHeight() / 2f);
+                            if (moveLength > 0) {
+                                // 移动控件的位置
+                                mTxtResult.setPadding(0, 0, 0, moveLength);
+                            }
 
-                    mHasMeasured = true;
-                    openPromptWindow(findViewById(R.id.flt_layout));
-                }
-                return true;
-            }
-        });
+                            mHasMeasured = true;
+                            openPromptWindow(findViewById(R.id.flt_layout));
+                        }
+                        return true;
+                    }
+                });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        if (isFromPermissionSetting) {
+            checkPermissions();
+            isFromPermissionSetting = false;
+        }
+
         cameraManager = new CameraManager(getApplication());
         // viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_view);
         getmViewfinderView().setCameraManager(cameraManager);
@@ -551,7 +579,7 @@ public final class CaptureActivity extends RootActivity implements SurfaceHolder
             // resultString = "www.xxx.com\n456654855\nABCDEF\nCS-C3-21PPFR\n";
             // 字符集合
             String[] newlineCharacterSet = {
-                "\n\r", "\r\n", "\r", "\n"};
+                    "\n\r", "\r\n", "\r", "\n"};
             String stringOrigin = resultString;
             // 寻找第一次出现的位置
             int a = -1;
@@ -649,7 +677,7 @@ public final class CaptureActivity extends RootActivity implements SurfaceHolder
     private boolean isDeviceQRCode(String qrCode) {
         // 字符集合
         String[] newlineCharacterSet = {
-            "\n\r", "\r\n", "\r", "\n"};
+                "\n\r", "\r\n", "\r", "\n"};
         String[] tempStr;
         for (String sp : newlineCharacterSet) {
             tempStr = qrCode.split(sp);
@@ -668,7 +696,7 @@ public final class CaptureActivity extends RootActivity implements SurfaceHolder
 
     private boolean goAddProbe(String stringOrigin) {
         String[] newlineCharacterSet = {
-            "\n\r", "\r\n", "\r", "\n"};
+                "\n\r", "\r\n", "\r", "\n"};
 
         String[] tempStr;
 //        for (String sp : newlineCharacterSet) {
@@ -905,7 +933,8 @@ public final class CaptureActivity extends RootActivity implements SurfaceHolder
     }
 
     //mj
-    private void openPromptWindow(View parent) {}
+    private void openPromptWindow(View parent) {
+    }
 
     private void closePromptWindow() {
         try {
@@ -929,6 +958,100 @@ public final class CaptureActivity extends RootActivity implements SurfaceHolder
         super.startActivityForResult(intent, requestCode);
         // default no light
         setPramaFrontLight(false);
+    }
+
+    public void checkPermissions() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            checkAndRequestPermission();
+        } else {
+            afterHasPermission();
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private void checkAndRequestPermission() {
+        List<String> lackedPermission = new ArrayList<>();
+        if (!(checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)) {
+            lackedPermission.add(Manifest.permission.CAMERA);
+        }
+//        if (!(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)) {
+//            lackedPermission.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+//        }
+//
+//        if (!(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)) {
+//            lackedPermission.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+//        }
+        // 权限都已经有了
+        if (lackedPermission.size() == 0) {
+            afterHasPermission();
+        } else {
+            // 请求所缺少的权限，在onRequestPermissionsResult中再看是否获得权限
+            String[] requestPermissions = new String[lackedPermission.size()];
+            lackedPermission.toArray(requestPermissions);
+            requestPermissions(requestPermissions, 1000);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1000 && hasAllPermissionsGranted(grantResults)) {
+            afterHasPermission();
+        } else {
+            try {
+                showPermissionDialog();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 权限设置
+     */
+    private void showPermissionDialog() {
+        AlertDialog dialog = new AlertDialog.Builder(CaptureActivity.this)
+                .setMessage("应用缺少必要的权限！请点击\"权限\"，打开所需要的权限。")
+                .setPositiveButton("去设置", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        isFromPermissionSetting = true;
+                        dialog.dismiss();
+                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        intent.setData(Uri.parse("package:" + getPackageName()));
+                        startActivity(intent);
+                    }
+                })
+                .setNegativeButton("退出应用", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        finish();
+                        System.exit(0);
+                    }
+                }).create();
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(CaptureActivity.this, R.color.black));
+        //设置居中，解决Android9.0 AlertDialog不居中问题
+        Window dialogWindow = dialog.getWindow();
+        WindowManager.LayoutParams p = dialogWindow.getAttributes();
+        p.width = (int) (LocalInfo.getInstance().getScreenWidth() * 0.9);
+        p.gravity = Gravity.CENTER;
+        dialogWindow.setAttributes(p);
+    }
+
+    private void afterHasPermission() {
+
+    }
+
+    private boolean hasAllPermissionsGranted(int[] grantResults) {
+        for (int grantResult : grantResults) {
+            if (grantResult == PackageManager.PERMISSION_DENIED) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

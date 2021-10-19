@@ -1,29 +1,33 @@
-/* 
+/*
  * @ProjectName VideoGo
  * @Copyright null
- * 
+ *
  * @FileName RealPlayActivity.java
  * @Description 这里对文件进行描述
- * 
+ *
  * @author chenxingyf1
  * @data 2014-6-11
- * 
+ *
  * @note 这里写本文件的详细功能描述和注释
  * @note 历史记录
- * 
+ *
  * @warning 这里写本文件的相关警告
  */
 package com.videogo.ui.realplay;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.bluetooth.BluetoothClass;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -31,10 +35,13 @@ import android.graphics.Rect;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
+import android.provider.Settings;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -51,6 +58,7 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
@@ -70,7 +78,9 @@ import android.widget.Toast;
 
 import com.ezviz.demo.common.DataTimeUtil;
 import com.videogo.EzvizApplication;
+
 import ezviz.ezopensdkcommon.common.RootActivity;
+
 import com.videogo.constant.Config;
 import com.videogo.constant.Constant;
 import com.videogo.constant.IntentConsts;
@@ -90,6 +100,7 @@ import com.videogo.openapi.bean.EZCameraInfo;
 import com.videogo.openapi.bean.EZDeviceInfo;
 import com.videogo.openapi.bean.EZVideoQualityInfo;
 import com.videogo.realplay.RealPlayStatus;
+import com.videogo.scan.main.CaptureActivity;
 import com.videogo.ui.cameralist.EZCameraListActivity;
 import com.videogo.ui.common.ScreenOrientationHelper;
 import com.videogo.ui.util.ActivityUtils;
@@ -119,7 +130,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -302,15 +315,19 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
     // 视频宽高
     private int mVideoWidth;
     private int mVideoHeight;
+    /**
+     * true为应用权限管理返回
+     */
+    private boolean isFromPermissionSetting;
 
-    public static void launch(Context context, EZDeviceInfo deviceInfo, EZCameraInfo cameraInfo){
+    public static void launch(Context context, EZDeviceInfo deviceInfo, EZCameraInfo cameraInfo) {
         Intent intent = new Intent(context, EZRealPlayActivity.class);
         intent.putExtra(IntentConsts.EXTRA_CAMERA_INFO, cameraInfo);
         intent.putExtra(IntentConsts.EXTRA_DEVICE_INFO, deviceInfo);
         context.startActivity(intent);
     }
 
-    public static void launch(Context context, String deviceSerial, int cameraNo){
+    public static void launch(Context context, String deviceSerial, int cameraNo) {
         EZCameraInfo cameraInfo = new EZCameraInfo();
         cameraInfo.setDeviceSerial(deviceSerial);
         cameraInfo.setCameraNo(cameraNo);
@@ -331,6 +348,10 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
     @Override
     protected void onResume() {
         super.onResume();
+        if (isFromPermissionSetting) {
+            checkPermissions();
+            isFromPermissionSetting = false;
+        }
         if (mOrientation == Configuration.ORIENTATION_LANDSCAPE) {
             return;
         }
@@ -349,7 +370,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         //mRealPlaySv.setVisibility(View.VISIBLE);
 
         LogUtil.i(TAG, "onResume real play status:" + mStatus);
-        if (mCameraInfo != null && mDeviceInfo != null &&  mDeviceInfo.getStatus() != 1) {
+        if (mCameraInfo != null && mDeviceInfo != null && mDeviceInfo.getStatus() != 1) {
             if (mStatus != RealPlayStatus.STATUS_STOP) {
                 stopRealPlay();
             }
@@ -368,11 +389,11 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
     /**
      * 更新清晰切换按钮可见性
      */
-    private void updateQualityBtnVisibility(){
+    private void updateQualityBtnVisibility() {
         // 获取不到清晰度数据时，不展示清晰度
-        if (mCameraInfo != null && mCameraInfo.getVideoQualityInfos() != null && mCameraInfo.getVideoQualityInfos().size() > 0){
+        if (mCameraInfo != null && mCameraInfo.getVideoQualityInfos() != null && mCameraInfo.getVideoQualityInfos().size() > 0) {
             mRealPlayQualityBtn.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             mRealPlayQualityBtn.setVisibility(View.INVISIBLE);
         }
     }
@@ -435,32 +456,32 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         mScreenOrientationHelper = null;
     }
 
-   private void  exit(){
-       closePtzPopupWindow();
-       closeTalkPopupWindow(true, false);
-       if (mStatus != RealPlayStatus.STATUS_STOP) {
-           stopRealPlay();
-           setRealPlayStopUI();
-       }
-       mHandler.removeMessages(MSG_AUTO_START_PLAY);
-       mHandler.removeMessages(MSG_HIDE_PTZ_DIRECTION);
-       mHandler.removeMessages(MSG_CLOSE_PTZ_PROMPT);
-       mHandler.removeMessages(MSG_HIDE_PAGE_ANIM);
-       if (mBroadcastReceiver != null) {
-           // Cancel the registration of the lock screen broadcast
-           unregisterReceiver(mBroadcastReceiver);
-           mBroadcastReceiver = null;
-       }
-       finish();
+    private void exit() {
+        closePtzPopupWindow();
+        closeTalkPopupWindow(true, false);
+        if (mStatus != RealPlayStatus.STATUS_STOP) {
+            stopRealPlay();
+            setRealPlayStopUI();
+        }
+        mHandler.removeMessages(MSG_AUTO_START_PLAY);
+        mHandler.removeMessages(MSG_HIDE_PTZ_DIRECTION);
+        mHandler.removeMessages(MSG_CLOSE_PTZ_PROMPT);
+        mHandler.removeMessages(MSG_HIDE_PAGE_ANIM);
+        if (mBroadcastReceiver != null) {
+            // Cancel the registration of the lock screen broadcast
+            unregisterReceiver(mBroadcastReceiver);
+            mBroadcastReceiver = null;
+        }
+        finish();
     }
 
     @Override
     public void finish() {
-        if (mCameraInfo != null){
+        if (mCameraInfo != null) {
             Intent intent = new Intent();
-            intent.putExtra(IntentConsts.EXTRA_DEVICE_ID,mCameraInfo.getDeviceSerial());
-            intent.putExtra(IntentConsts.EXTRA_CAMERA_NO,mCameraInfo.getCameraNo());
-            intent.putExtra("video_level",mCameraInfo.getVideoLevel().getVideoLevel());
+            intent.putExtra(IntentConsts.EXTRA_DEVICE_ID, mCameraInfo.getDeviceSerial());
+            intent.putExtra(IntentConsts.EXTRA_CAMERA_NO, mCameraInfo.getCameraNo());
+            intent.putExtra("video_level", mCameraInfo.getVideoLevel().getVideoLevel());
             setResult(EZCameraListActivity.RESULT_CODE, intent);
         }
         super.finish();
@@ -541,16 +562,17 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
     }
 
     private boolean isHandset = false;
+
     public void onClickSwitchBetweenSpeakerAndHandset(View view) {
         Button switchButton = (Button) view;
-        if (isHandset){
-            if (mEZPlayer != null){
+        if (isHandset) {
+            if (mEZPlayer != null) {
                 mEZPlayer.setSpeakerphoneOn(true);
             }
             switchButton.setText(getResources().getString(R.string.switch_to_handset));
             isHandset = false;
-        }else{
-            if (mEZPlayer != null){
+        } else {
+            if (mEZPlayer != null) {
                 mEZPlayer.setSpeakerphoneOn(false);
             }
             switchButton.setText(getResources().getString(R.string.switch_to_speaker));
@@ -674,7 +696,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             @Override
             public void onZoom(float scale) {
                 LogUtil.d(TAG, "onZoom:" + scale);
-                if (mEZPlayer != null && mDeviceInfo != null &&  mDeviceInfo.isSupportZoom()) {
+                if (mEZPlayer != null && mDeviceInfo != null && mDeviceInfo.isSupportZoom()) {
                     startZoom(scale);
                 }
             }
@@ -708,32 +730,32 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
              * 已放大情况下，取消画面放大效果
              */
             @SuppressWarnings("PointlessArithmeticExpression")
-            private void changeZoomStatus(View v, MotionEvent e){
-                if (hasZoomIn){
+            private void changeZoomStatus(View v, MotionEvent e) {
+                if (hasZoomIn) {
                     int invalid = -1;
                     mEZPlayer.setDisplayRegion(invalid, invalid, invalid, invalid);
-                }else{
+                } else {
                     // x轴方向
                     double xOffsetRateOfAnchor = (e.getX() / (double) v.getWidth()) - 0.5;
                     int left = (int) (mVideoWidth / 4 * 1 + xOffsetRateOfAnchor * mVideoWidth);
-                    int right = (int) (mVideoWidth / 4 * 3 + + xOffsetRateOfAnchor * mVideoWidth);
-                    if (left < 0){ // left超出边界，需要修正
+                    int right = (int) (mVideoWidth / 4 * 3 + +xOffsetRateOfAnchor * mVideoWidth);
+                    if (left < 0) { // left超出边界，需要修正
                         left = 0;
-                        right = mVideoWidth / 2 ;
+                        right = mVideoWidth / 2;
                     }
-                    if (right > mVideoWidth){ // right超出边界，需要修正
+                    if (right > mVideoWidth) { // right超出边界，需要修正
                         right = mVideoWidth;
                         left = mVideoWidth / 2;
                     }
                     // y轴方向
                     double yOffsetRateOfAnchor = (e.getY() / (double) v.getHeight()) - 0.5;
                     int top = (int) (mVideoHeight / 4 * 1 + yOffsetRateOfAnchor * mVideoHeight);
-                    int bottom = (int) (mVideoHeight / 4 * 3 + + yOffsetRateOfAnchor * mVideoHeight);
-                    if (top < 0){ // top超出边界，需要修正
+                    int bottom = (int) (mVideoHeight / 4 * 3 + +yOffsetRateOfAnchor * mVideoHeight);
+                    if (top < 0) { // top超出边界，需要修正
                         top = 0;
-                        bottom = mVideoHeight / 2 ;
+                        bottom = mVideoHeight / 2;
                     }
-                    if (bottom > mVideoHeight){ // bottom超出边界，需要修正
+                    if (bottom > mVideoHeight) { // bottom超出边界，需要修正
                         bottom = mVideoHeight;
                         top = mVideoHeight / 2;
                     }
@@ -1094,9 +1116,9 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             mRealPlayQualityBtn.setText(R.string.quality_balanced);
         } else if (mCurrentQulityMode.getVideoLevel() == EZVideoLevel.VIDEO_LEVEL_HD.getVideoLevel()) {
             mRealPlayQualityBtn.setText(R.string.quality_hd);
-        }else if (mCurrentQulityMode.getVideoLevel() == EZVideoLevel.VIDEO_LEVEL_SUPERCLEAR.getVideoLevel()){
+        } else if (mCurrentQulityMode.getVideoLevel() == EZVideoLevel.VIDEO_LEVEL_SUPERCLEAR.getVideoLevel()) {
             mRealPlayQualityBtn.setText(R.string.quality_super_hd);
-        }else{
+        } else {
             mRealPlayQualityBtn.setText("unknown");
         }
     }
@@ -1339,6 +1361,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             case R.id.realplay_talk_btn2:
             case R.id.realplay_full_talk_btn:
                 //startVoiceTalk();
+                checkAndRequestPermission();
                 selectTalkbackItems();
                 break;
 
@@ -1604,8 +1627,8 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         handleVoiceTalkStoped(startAnim);
     }
 
-    private void selectTalkbackItems(){
-        View view = LayoutInflater.from(this).inflate(R.layout.select_talkback_items,null,false);
+    private void selectTalkbackItems() {
+        View view = LayoutInflater.from(this).inflate(R.layout.select_talkback_items, null, false);
         final AlertDialog dialog = new AlertDialog.Builder(this).setView(view).create();
 
         Button nvr_talkback = view.findViewById(R.id.select_nvr_talkback);
@@ -1952,12 +1975,12 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         qualityHdBtn.setVisibility(View.GONE);
         qualitySuperHdBtn.setVisibility(View.GONE);
         // 清晰度 0-流畅，1-均衡，2-高清，3-超清
-        for (EZVideoQualityInfo qualityInfo: mCameraInfo.getVideoQualityInfos()){
-            if (mCameraInfo.getVideoLevel().getVideoLevel() == qualityInfo.getVideoLevel()){
+        for (EZVideoQualityInfo qualityInfo : mCameraInfo.getVideoQualityInfos()) {
+            if (mCameraInfo.getVideoLevel().getVideoLevel() == qualityInfo.getVideoLevel()) {
                 // 当前清晰度不添加到可切换清晰度列表中
                 continue;
             }
-            switch (qualityInfo.getVideoLevel()){
+            switch (qualityInfo.getVideoLevel()) {
                 case 0:
                     qualityFlunetBtn.setVisibility(View.VISIBLE);
                     break;
@@ -1970,7 +1993,8 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
                 case 3:
                     qualitySuperHdBtn.setVisibility(View.VISIBLE);
                     break;
-                default:break;
+                default:
+                    break;
             }
         }
 
@@ -2004,6 +2028,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
     }
 
     private String mCurrentRecordPath = null;
+
     private void onRecordBtnClick() {
         mControlDisplaySec = 0;
         if (isRecording) {
@@ -2026,7 +2051,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         }
 
         if (mEZPlayer != null) {
-            final String strRecordFile = DemoConfig.getRecordsFolder() +"/" + System.currentTimeMillis() + ".mp4";
+            final String strRecordFile = DemoConfig.getRecordsFolder() + "/" + System.currentTimeMillis() + ".mp4";
             LogUtil.i(TAG, "recorded video file path is " + strRecordFile);
             mEZPlayer.setStreamDownloadCallback(new EZOpenSDKListener.EZStreamDownloadCallback() {
                 @Override
@@ -2040,14 +2065,14 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
                     LogUtil.e(TAG, "EZStreamDownloadCallback onError " + code.name());
                 }
             });
-            if(mEZPlayer.startLocalRecordWithFile(strRecordFile)){
+            if (mEZPlayer.startLocalRecordWithFile(strRecordFile)) {
                 isRecording = true;
                 mCurrentRecordPath = strRecordFile;
                 mCaptureDisplaySec = 4;
                 updateCaptureUI();
                 mAudioPlayUtil.playAudioFile(AudioPlayUtil.RECORD_SOUND);
                 handleRecordSuccess(strRecordFile);
-            }else{
+            } else {
                 handleRecordFail();
             }
         }
@@ -2140,7 +2165,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Toast.makeText(EZRealPlayActivity.this, getResources().getString(R.string.already_saved_to_volume)+strCaptureFile, Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(EZRealPlayActivity.this, getResources().getString(R.string.already_saved_to_volume) + strCaptureFile, Toast.LENGTH_SHORT).show();
                                 }
                             });
                         } catch (InnerException e) {
@@ -2152,7 +2177,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
                                 return;
                             }
                         }
-                    }else{
+                    } else {
                         showToast("抓图失败, 检查是否开启了硬件解码");
                     }
                     super.run();
@@ -2234,7 +2259,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         setRealPlayLoadingUI();
 
         if (mCameraInfo != null) {
-                mEZPlayer = EzvizApplication.getOpenSDK().createPlayer(mCameraInfo.getDeviceSerial(), mCameraInfo.getCameraNo());
+            mEZPlayer = EzvizApplication.getOpenSDK().createPlayer(mCameraInfo.getDeviceSerial(), mCameraInfo.getCameraNo());
             if (mEZPlayer == null)
                 return;
             if (mDeviceInfo == null) {
@@ -2272,10 +2297,10 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         updateLoadingProgress(0);
     }
 
-    private void startRecordOriginVideo(){
+    private void startRecordOriginVideo() {
         String fileName = DemoConfig.getStreamsFolder() + "/origin_video_real_play_"
                 + DataTimeUtil.INSTANCE.getSimpleTimeInfoForTmpFile() + ".ps";
-        VideoFileUtil.startRecordOriginVideo(mEZPlayer,fileName);
+        VideoFileUtil.startRecordOriginVideo(mEZPlayer, fileName);
     }
 
     private void stopRealPlay() {
@@ -2295,7 +2320,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         setStartloading();
         mRealPlayBtn.setBackgroundResource(R.drawable.play_stop_selector);
 
-        if (mCameraInfo != null  && mDeviceInfo != null) {
+        if (mCameraInfo != null && mDeviceInfo != null) {
             mRealPlayCaptureBtn.setEnabled(false);
             mRealPlayRecordBtn.setEnabled(false);
             if (mDeviceInfo.getStatus() == 1) {
@@ -2507,7 +2532,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         if (this.isFinishing()) {
             return false;
         }
-         LogUtil.i(TAG, "handleMessage:" + msg.what);
+        LogUtil.i(TAG, "handleMessage:" + msg.what);
         switch (msg.what) {
             case MSG_VIDEO_SIZE_CHANGED:
                 LogUtil.d(TAG, "MSG_VIDEO_SIZE_CHANGED");
@@ -2535,7 +2560,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
                 break;
             case EZRealPlayConstants.MSG_REALPLAY_PLAY_SUCCESS:
                 ViewGroup playInfoVg = (ViewGroup) findViewById(R.id.vg_play_info);
-                if (playInfoVg != null){
+                if (playInfoVg != null) {
                     playInfoVg.setVisibility(View.VISIBLE);
                 }
                 showDecodeType();
@@ -2597,28 +2622,28 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         return false;
     }
 
-    private void showDecodeType(){
-        if(mEZPlayer != null && mEZPlayer.getPlayPort() >= 0){
+    private void showDecodeType() {
+        if (mEZPlayer != null && mEZPlayer.getPlayPort() >= 0) {
             int intDecodeType = Player.getInstance().getDecoderType(mEZPlayer.getPlayPort());
             String strDecodeType;
-            if (intDecodeType == 1){
+            if (intDecodeType == 1) {
                 strDecodeType = "hard";
-            }else{
+            } else {
                 strDecodeType = "soft";
             }
             String streamTypeMsg = "decode type: " + strDecodeType;
-            TextView streamTypeTv = (TextView)findViewById(R.id.tv_decode_type);
-            if (streamTypeTv != null){
+            TextView streamTypeTv = (TextView) findViewById(R.id.tv_decode_type);
+            if (streamTypeTv != null) {
                 streamTypeTv.setText(streamTypeMsg);
                 streamTypeTv.setVisibility(View.VISIBLE);
             }
         }
     }
 
-    private void showStreamType(int streamType){
+    private void showStreamType(int streamType) {
         String streamTypeMsg = getApplicationContext().getString(R.string.stream_type) + changeIntTypeToStringType(streamType);
-        TextView streamTypeTv = (TextView)findViewById(R.id.tv_stream_type);
-        if (streamTypeTv != null){
+        TextView streamTypeTv = (TextView) findViewById(R.id.tv_stream_type);
+        if (streamTypeTv != null) {
             streamTypeTv.setText(streamTypeMsg);
             streamTypeTv.setVisibility(View.VISIBLE);
         }
@@ -2626,7 +2651,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
 
     private String changeIntTypeToStringType(int streamType) {
         String strStreamType;
-        switch (streamType){
+        switch (streamType) {
             /*
               取流方式切换到私有流媒体转发模式
              */
@@ -2889,7 +2914,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
                 Utils.showToast(EZRealPlayActivity.this, R.string.realplay_play_talkback_network_exception, errorInfo.errorCode);
                 break;
             case ErrorCode.ERROR_CHANNEL_NO_SUPPORT_TALKBACK:
-                Utils.showToast(EZRealPlayActivity.this, R.string.device_no_support_talkback, errorInfo.errorCode );
+                Utils.showToast(EZRealPlayActivity.this, R.string.device_no_support_talkback, errorInfo.errorCode);
                 break;
             default:
                 Utils.showToast(EZRealPlayActivity.this, R.string.realplay_play_talkback_fail, errorInfo.errorCode);
@@ -2954,13 +2979,13 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             e.printStackTrace();
         }
 //        if (mStatus == RealPlayStatus.STATUS_PLAY) {
-            // 停止对讲
-            closeTalkPopupWindow(true, false);
-            // 停止播放 Stop play
-            stopRealPlay();
-            SystemClock.sleep(500);
-            // 开始播放 start play
-            startRealPlay();
+        // 停止对讲
+        closeTalkPopupWindow(true, false);
+        // 停止播放 Stop play
+        stopRealPlay();
+        SystemClock.sleep(500);
+        // 开始播放 start play
+        startRealPlay();
 //        }
     }
 
@@ -3126,7 +3151,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
     }
 
     private void handlePlaySuccess(Message msg) {
-        LogUtil.d(TAG,"handlePlaySuccess");
+        LogUtil.d(TAG, "handlePlaySuccess");
         mStatus = RealPlayStatus.STATUS_PLAY;
 
         // 声音处理  Sound processing
@@ -3156,7 +3181,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         updateTalkUI();
         if (mDeviceInfo != null && mDeviceInfo.isSupportTalk() != EZConstants.EZTalkbackCapability.EZTalkbackNoSupport) {
             mRealPlayTalkBtn.setEnabled(true);
-        }else{
+        } else {
             mRealPlayTalkBtn.setEnabled(false);
         }
         if (mEZPlayer != null) {
@@ -3233,7 +3258,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
                 break;
             case ErrorCode.ERROR_TRANSF_TERMINAL_BINDING:
                 txt = "请在萤石客户端关闭终端绑定 "
-                    + "Please close the terminal binding on the fluorite client";
+                        + "Please close the terminal binding on the fluorite client";
                 break;
             // 收到这两个错误码，可以弹出对话框，让用户输入密码后，重新取流预览
             case ErrorCode.ERROR_INNER_VERIFYCODE_NEED:
@@ -3256,7 +3281,6 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
     }
 
 
-
     private void startUpdateTimer() {
         stopUpdateTimer();
         mUpdateTimer = new Timer();
@@ -3274,7 +3298,6 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
                 }
 
                 if (mEZPlayer != null && isRecording) {
-
 
 
                     Calendar OSDTime = mEZPlayer.getOSDTime();
@@ -3336,7 +3359,6 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         }
         return false;
     }
-
 
 
     private void showType() {
@@ -3452,5 +3474,95 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             }
         }
     };
+
+    public void checkPermissions() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            checkAndRequestPermission();
+        } else {
+            afterHasPermission();
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private void checkAndRequestPermission() {
+        List<String> lackedPermission = new ArrayList<>();
+        if (!(checkSelfPermission(Manifest.permission.MODIFY_AUDIO_SETTINGS) == PackageManager.PERMISSION_GRANTED)) {
+            lackedPermission.add(Manifest.permission.MODIFY_AUDIO_SETTINGS);
+        }
+        if (!(checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)) {
+            lackedPermission.add(Manifest.permission.RECORD_AUDIO);
+        }
+        // 权限都已经有了
+        if (lackedPermission.size() == 0) {
+            afterHasPermission();
+        } else {
+            // 请求所缺少的权限，在onRequestPermissionsResult中再看是否获得权限
+            String[] requestPermissions = new String[lackedPermission.size()];
+            lackedPermission.toArray(requestPermissions);
+            requestPermissions(requestPermissions, 1000);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1000 && hasAllPermissionsGranted(grantResults)) {
+            afterHasPermission();
+        } else {
+            try {
+                showPermissionDialog();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 权限设置
+     */
+    private void showPermissionDialog() {
+        android.support.v7.app.AlertDialog dialog = new android.support.v7.app.AlertDialog.Builder(this)
+                .setMessage("应用缺少必要的权限！请点击\"权限\"，打开所需要的权限。")
+                .setPositiveButton("去设置", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        isFromPermissionSetting = true;
+                        dialog.dismiss();
+                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        intent.setData(Uri.parse("package:" + getPackageName()));
+                        startActivity(intent);
+                    }
+                })
+                .setNegativeButton("退出应用", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        finish();
+                        System.exit(0);
+                    }
+                }).create();
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+        dialog.getButton(android.support.v7.app.AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(this, R.color.black));
+        //设置居中，解决Android9.0 AlertDialog不居中问题
+        Window dialogWindow = dialog.getWindow();
+        WindowManager.LayoutParams p = dialogWindow.getAttributes();
+        p.width = (int) (LocalInfo.getInstance().getScreenWidth() * 0.9);
+        p.gravity = Gravity.CENTER;
+        dialogWindow.setAttributes(p);
+    }
+
+    private void afterHasPermission() {
+
+    }
+
+    private boolean hasAllPermissionsGranted(int[] grantResults) {
+        for (int grantResult : grantResults) {
+            if (grantResult == PackageManager.PERMISSION_DENIED) {
+                return false;
+            }
+        }
+        return true;
+    }
 
 }

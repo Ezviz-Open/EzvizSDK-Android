@@ -18,17 +18,13 @@ package com.videogo;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 
-import com.ezviz.videotalk.debug.DebugUtils;
 import com.videogo.openapi.EZOpenSDK;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.Date;
 
 import ezviz.ezopensdk.demo.SdkInitParams;
 import ezviz.ezopensdkcommon.common.BaseApplication;

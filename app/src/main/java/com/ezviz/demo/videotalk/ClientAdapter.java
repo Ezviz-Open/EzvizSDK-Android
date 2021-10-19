@@ -2,7 +2,6 @@ package com.ezviz.demo.videotalk;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +9,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import com.ezviz.videotalk.videomeeting.ConstVideoMeeting;
+import com.ezviz.sdk.videotalk.meeting.EZRtcParam;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -45,42 +44,34 @@ public class ClientAdapter extends RecyclerView.Adapter<ClientAdapter.MyViewHold
         holder.radioButtonBig.setVisibility((clientInfo.mVideoAvailable & 1) == 1 ? View.VISIBLE : View.GONE);
         holder.radioButtonSmall.setVisibility(clientInfo.mVideoAvailable == 5 ? View.VISIBLE : View.GONE);
         holder.radioGroup.setOnCheckedChangeListener(null);
-        holder.radioButtonNone.setChecked(clientInfo.subscribeType == ConstVideoMeeting.StreamState.BAV_STREAM_INVALID);
-        holder.radioButtonBig.setChecked(clientInfo.subscribeType == ConstVideoMeeting.StreamState.BAV_SUB_STREAM_BIG_VIDEO);
-        holder.radioButtonSmall.setChecked(clientInfo.subscribeType == ConstVideoMeeting.StreamState.BAV_SUB_STREAM_MIN_VIDEO);
-        holder.radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (onStatusChangedListener != null){
-                    ConstVideoMeeting.StreamState type = ConstVideoMeeting.StreamState.BAV_STREAM_INVALID;
-                    switch (checkedId){
-                        case R.id.rb_big:
-                            type = ConstVideoMeeting.StreamState.BAV_SUB_STREAM_BIG_VIDEO;
-                            break;
-                        case R.id.rb_small:
-                            type = ConstVideoMeeting.StreamState.BAV_SUB_STREAM_MIN_VIDEO;
-                            break;
-                        case R.id.rb_none:
-                            break;
-                    }
-//      
-                    onStatusChangedListener.onSurfaceSet((Integer) group.getTag(), clientInfo.subscribeType, null);
-                    clientInfo.subscribeType = type;
-                    onStatusChangedListener.onSubscribe((Integer) group.getTag());
+        holder.radioButtonNone.setChecked(clientInfo.subscribeType == EZRtcParam.StreamType.NONE);
+        holder.radioButtonBig.setChecked(clientInfo.subscribeType == EZRtcParam.StreamType.MAIN);
+        holder.radioButtonSmall.setChecked(clientInfo.subscribeType == EZRtcParam.StreamType.SUB);
+        holder.radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            if (onStatusChangedListener != null){
+                EZRtcParam.StreamType type = EZRtcParam.StreamType.NONE;
+                switch (checkedId){
+                    case R.id.rb_big:
+                        type = EZRtcParam.StreamType.MAIN;
+                        break;
+                    case R.id.rb_small:
+                        type = EZRtcParam.StreamType.SUB;
+                        break;
+                    case R.id.rb_none:
+                        break;
                 }
+                onStatusChangedListener.onSurfaceSet((String) group.getTag(), clientInfo.subscribeType, null);
+                clientInfo.subscribeType = type;
+                onStatusChangedListener.onSubscribe((String) group.getTag());
             }
         });
-        holder.radioGroup.setTag(clientInfo.id);
+        holder.radioGroup.setTag(clientInfo.userId);
 
         StringBuffer sb = new StringBuffer();
-        sb.append(clientInfo.id);
-        if (!TextUtils.isEmpty(clientInfo.name)){
-            sb.append("-");
-            sb.append(clientInfo.name);
-        }
-        if (clientInfo.mAudioAvailable == 1){
+        sb.append(clientInfo.userId);
+        if (clientInfo.mAudioAvailable){
             sb.append("[说话中][音量");
-            sb.append(String.valueOf(clientInfo.volume));
+            sb.append(clientInfo.volume);
             sb.append("]");
         }
 

@@ -6,12 +6,17 @@
     </style>
 
     <!--主要配置-->
-    <style name="AppTheme" parent="AppBaseTheme">
-    </style>
+    <style name="AppTheme" parent="AppBaseTheme"></style>
 
     <!--指定配置-->
     <style name="FullAppTheme" parent="AppBaseTheme">
         <item name="android:windowFullscreen">true</item>
+    </style>
+
+    <!--回放页面类型选择-->
+    <style name="TRM_ANIM_STYLE">
+        <item name="android:windowEnterAnimation">@anim/trm_popup_enter</item>
+        <item name="android:windowExitAnimation">@anim/trm_popup_exit</item>
     </style>
 
 </resources>

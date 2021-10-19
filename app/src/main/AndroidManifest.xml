@@ -4,26 +4,21 @@
     package="ezviz.ezopensdk">
     <!-- 以下是sdk所需权限 -->
     <!-- 基础功能所需权限 -->
-    <!--用于访问网络-->
     <uses-permission android:name="android.permission.INTERNET" />
-    <!--用于保存抓取图片，码流等行为-->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <!-- 配网所需权限 -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" /> <!-- 配网所需权限 -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+<!--    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />-->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
-    <!-- 对讲所需权限 -->
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" /> <!-- 对讲所需权限 -->
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <!-- 视频通话权限所需 -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" /> <!-- 视频通话权限所需 -->
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <!-- 以上是sdk所需权限 -->
-
+    <uses-permission android:name="android.permission.RECORD_AUDIO" /> <!-- 以上是sdk所需权限 -->
     <!-- 以下是demo所需权限 -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission
@@ -184,9 +179,10 @@
         <activity
             android:name="com.ezviz.demo.videotalk.MultiVideoTalkActivity"
             android:screenOrientation="portrait" />
-        <activity android:name="com.ezviz.demo.videotalk.ConfluenceActivity"
-            android:screenOrientation="portrait"
-            android:launchMode="singleTask"/>
+
+        <activity android:name="com.ezviz.demo.videotalk.EZRtcTestActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"/>
 
         <receiver android:name="com.videogo.ui.cameralist.EZCameraListActivity$NotificationReceiver" />
         <service android:name="com.ezviz.demo.videotalk.EZVideoMeetingService"

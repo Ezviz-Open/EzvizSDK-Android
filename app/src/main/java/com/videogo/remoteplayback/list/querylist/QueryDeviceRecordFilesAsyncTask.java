@@ -6,6 +6,7 @@ import com.videogo.EzvizApplication;
 import com.videogo.device.DeviceReportInfo;
 import com.videogo.errorlayer.ErrorInfo;
 import com.videogo.exception.BaseException;
+import com.videogo.openapi.EZConstants;
 import com.videogo.openapi.bean.EZDeviceRecordFile;
 import com.videogo.openapi.bean.resp.CloudPartInfoFile;
 import com.videogo.remoteplayback.list.RemoteListContant;
@@ -29,6 +30,7 @@ public class QueryDeviceRecordFilesAsyncTask extends HikAsyncTask<String, Void, 
 
     private int channelNo;
     private String deviceSerial;
+    private EZConstants.EZVideoRecordType recordType;
     private Date queryDate;
     private List<CloudPartInfoFileEx> playBackListLocalItems = new ArrayList<CloudPartInfoFileEx>();
     private List<CloudPartInfoFile> convertCalendarFiles;
@@ -41,11 +43,12 @@ public class QueryDeviceRecordFilesAsyncTask extends HikAsyncTask<String, Void, 
     private int cloudTotal;
     private final String MINUTE;
 
-    public QueryDeviceRecordFilesAsyncTask(String deviceSerial, int channelNo,
+    public QueryDeviceRecordFilesAsyncTask(String deviceSerial, int channelNo, EZConstants.EZVideoRecordType recordType,
                                            QueryPlayBackListTaskCallback playBackListTaskCallback) {
         MINUTE = ((Activity) playBackListTaskCallback).getString(R.string.local_play_hour);
         this.channelNo = channelNo;
         this.deviceSerial = deviceSerial;
+        this.recordType = recordType;
         this.playBackListTaskCallback = playBackListTaskCallback;
     }
 
@@ -95,54 +98,55 @@ public class QueryDeviceRecordFilesAsyncTask extends HikAsyncTask<String, Void, 
     }
 
     private String calendar2String(Calendar cal) {
-    	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
         String dateStr = sdf.format(cal.getTime());
-        
+
         return dateStr;
     }
+
     private void convertEZDeviceRecordFile2CloudPartInfoFile(CloudPartInfoFile dst, EZDeviceRecordFile src, int pos) {
-    	dst.setStartTime(calendar2String(src.getStartTime()));
-    	dst.setEndTime(calendar2String(src.getStopTime()));
-    	dst.setPosition(pos);
+        dst.setStartTime(calendar2String(src.getStartTime()));
+        dst.setEndTime(calendar2String(src.getStopTime()));
+        dst.setPosition(pos);
     }
 
     public int searchLocalFile() {
         playBackListLocalItems.clear();
         Date beginDate = DateTimeUtil.beginDate(queryDate);
         Date endDate = DateTimeUtil.endDate(queryDate);
-		Calendar startTime = Calendar.getInstance();
-		Calendar endTime = Calendar.getInstance();
-		startTime.setTime(queryDate);
-		endTime.setTime(queryDate);
-        
-		startTime.set(Calendar.HOUR_OF_DAY, 0);
-		startTime.set(Calendar.MINUTE, 0);
-		startTime.set(Calendar.SECOND, 0);
-		endTime.set(Calendar.HOUR_OF_DAY, 23);
-		endTime.set(Calendar.MINUTE, 59);
-		endTime.set(Calendar.SECOND, 59);
+        Calendar startTime = Calendar.getInstance();
+        Calendar endTime = Calendar.getInstance();
+        startTime.setTime(queryDate);
+        endTime.setTime(queryDate);
 
-		List<EZDeviceRecordFile> tmpList = null;
-		try {
-			tmpList = EzvizApplication.getOpenSDK().searchRecordFileFromDevice(deviceSerial,channelNo,
-					startTime, endTime);
-		} catch (BaseException e) {
-			e.printStackTrace();
+        startTime.set(Calendar.HOUR_OF_DAY, 0);
+        startTime.set(Calendar.MINUTE, 0);
+        startTime.set(Calendar.SECOND, 0);
+        endTime.set(Calendar.HOUR_OF_DAY, 23);
+        endTime.set(Calendar.MINUTE, 59);
+        endTime.set(Calendar.SECOND, 59);
+
+        List<EZDeviceRecordFile> tmpList = null;
+        try {
+            tmpList = EzvizApplication.getOpenSDK().searchRecordFileFromDevice(deviceSerial, channelNo,
+                    startTime, endTime, recordType);
+        } catch (BaseException e) {
+            e.printStackTrace();
 
             ErrorInfo errorInfo = e.getObject();
             LogUtil.d("search file list failed. error ", errorInfo.toString());
-		}
+        }
 
-		convertCalendarFiles = new ArrayList<>();
-		if (tmpList != null && tmpList.size() > 0) {
-			for (int i = 0; i < tmpList.size(); i++) {
-				EZDeviceRecordFile file = tmpList.get(i);
-				CloudPartInfoFile cpif = new CloudPartInfoFile();
+        convertCalendarFiles = new ArrayList<>();
+        if (tmpList != null && tmpList.size() > 0) {
+            for (int i = 0; i < tmpList.size(); i++) {
+                EZDeviceRecordFile file = tmpList.get(i);
+                CloudPartInfoFile cpif = new CloudPartInfoFile();
 
-				convertEZDeviceRecordFile2CloudPartInfoFile(cpif, file, i);
-				convertCalendarFiles.add(cpif);
-			}
-		}
+                convertEZDeviceRecordFile2CloudPartInfoFile(cpif, file, i);
+                convertCalendarFiles.add(cpif);
+            }
+        }
 
         if (CollectionUtil.isNotEmpty(convertCalendarFiles)) {
             Collections.sort(convertCalendarFiles);

@@ -14,7 +14,8 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 
-import com.ezviz.videotalk.EZVideoMeeting;
+import com.ezviz.sdk.videotalk.meeting.EZRtcParam;
+import com.ezviz.sdk.videotalk.sdk.EZRtc;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,16 +36,33 @@ public class EZVideoMeetingService extends Service {
 
     public static final String LAUNCH_FROM_NOTIFICATION = "launch_from_notification";
 
-    private EZVideoMeeting mVideoMeeting;
-    private List<EZClientInfo> mClientList = new ArrayList<>();
+    private EZRtc mEZRtc;
+
+    //用于存储Activity退出后的数据
+    private StoredData storedData = new StoredData();
+
+    public static class StoredData{
+        public List<EZClientInfo> mClientList = new ArrayList<>();
+        public int mRoomId;
+        public String userId;
+        public EZRtcParam.NetQuality selfNetQuality = EZRtcParam.NetQuality.BAV_NETWORK_QUALITY_UNKNOWN;
+        public String sharedUserId;
+
+        //自己当前的状态
+        public boolean videoState;
+        public boolean smallVideoState;
+        public boolean audioState;
+        public boolean shareSwitch;
+    }
 
     class MyBinder extends Binder{
-        public EZVideoMeeting getVideoMeeting(){
-            return mVideoMeeting;
+
+        public EZRtc getRtc(){
+            return mEZRtc;
         }
 
-        public List<EZClientInfo> getClientList(){
-            return mClientList;
+        public StoredData getData(){
+            return storedData;
         }
     }
 
@@ -79,7 +97,7 @@ public class EZVideoMeetingService extends Service {
     }
 
     private void createVideoMeeting(){
-        mVideoMeeting = new EZVideoMeeting();
+        mEZRtc = new EZRtc(this);
         startForeground(110, createNotificationChannel());
     }
 
@@ -87,12 +105,12 @@ public class EZVideoMeetingService extends Service {
         int resultCode = intent.getIntExtra(SCREEN_PARAM_CODE, -1);
         int requestCode = intent.getIntExtra(SCREEN_PARAM_REQUEST, -1);
         Intent data = intent.getParcelableExtra(SCREEN_PARAM_DATA);
-        mVideoMeeting.onActivityResult(requestCode, resultCode, data);
+        mEZRtc.onActivityResult(requestCode, resultCode, data);
     }
 
     private Notification createNotificationChannel(){
         Notification.Builder builder = new Notification.Builder(getApplicationContext()); //获取一个Notification构造器
-        Intent nfIntent = new Intent(getApplicationContext(), ConfluenceActivity.class); //点击后跳转的界面，可以设置跳转数据
+        Intent nfIntent = new Intent(getApplicationContext(), EZRtcTestActivity.class); //点击后跳转的界面，可以设置跳转数据
         nfIntent.putExtra(LAUNCH_FROM_NOTIFICATION, true);
 
         builder.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, nfIntent, PendingIntent.FLAG_CANCEL_CURRENT)) // 设置PendingIntent

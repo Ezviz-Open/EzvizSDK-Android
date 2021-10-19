@@ -37,7 +37,7 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.MyViewHold
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int i, int i1) {
             if (onStatusChangedListener != null){
-                onStatusChangedListener.onSurfaceSet(clientInfo.id, clientInfo.subscribeType, new Surface(surfaceTexture));
+                onStatusChangedListener.onSurfaceSet(clientInfo.userId, clientInfo.subscribeType, new Surface(surfaceTexture));
             }
         }
 
@@ -71,10 +71,10 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.MyViewHold
     @Override
     public void onBindViewHolder(@NonNull @NotNull MyViewHolder holder, int position) {
         EZClientInfo clientInfo = mDataList.get(position);
-        holder.tvName.setText(clientInfo.name);
+        holder.tvName.setText(clientInfo.userId);
         if (holder.playerView.isAvailable()){
             if (onStatusChangedListener != null){
-                onStatusChangedListener.onSurfaceSet(clientInfo.id, clientInfo.subscribeType, new Surface(holder.playerView.getSurfaceTexture()));
+                onStatusChangedListener.onSurfaceSet(clientInfo.userId, clientInfo.subscribeType, new Surface(holder.playerView.getSurfaceTexture()));
             }
         }else {
             holder.playerView.setSurfaceTextureListener(new TagSurfaceTextureListener(clientInfo));

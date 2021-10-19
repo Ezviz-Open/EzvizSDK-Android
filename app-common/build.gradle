@@ -33,12 +33,5 @@ android {
 }
 
 dependencies {
-//    compileOnly fileTree(dir: COMMON_LIB_PATH, include: ['*.jar'])
-//    implementation files('..\\ezviz-sdk\\libs\\configwifi.jar')
-//    if (BUILD_TYPE == "for_config_wifi"){
-//        compileOnly project(path: ':configwifi')
-//    }else{
-//        compileOnly project(path: ':ezviz-sdk')
-//    }
-    implementation 'io.github.ezviz-open:ezviz-sdk:4.16.8.2'
+    implementation 'io.github.ezviz-open:ezviz-sdk:4.18.0'
 }

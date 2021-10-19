@@ -238,6 +238,8 @@ public class MainActivity extends RootActivity {
                         // 保存相关信息
                         SdkInitParams sdkInitParams = SdkInitParams.createBy(mCurrentServerArea);
                         sdkInitParams.appKey = getValidText(mAppKeyET.getText().toString());
+                        sdkInitParams.openApiServer = getValidText(mApiET.getText().toString());
+                        sdkInitParams.openAuthApiServer = getValidText(mAuthET.getText().toString());
                         saveLastSdkInitParams(sdkInitParams);
                         // 跳转到主界面
                         jumpToCameraListActivity();
@@ -383,6 +385,8 @@ public class MainActivity extends RootActivity {
             mAppKeyET.setText(sdkInitParams.appKey);
             try {
                 mAccessTokenET.setText(EZOpenSDK.getInstance().getEZAccessToken().getAccessToken());
+                mApiET.setText(sdkInitParams.openApiServer);
+                mAuthET.setText(sdkInitParams.openAuthApiServer);
             } catch (Exception e) {
                 LogUtil.d(TAG, "failed to load AccessToken");
             }
@@ -414,13 +418,13 @@ public class MainActivity extends RootActivity {
 //            mAccessTokenET.setText("at.77ytj1783a7bajs0a09u0a0u64tiolca-26k51q60pv-1sb9ipj-kxcdnnmap");
             // 李海涛appKey
             mAppKeyET.setText("680948cc41c44fbaac23d8b47be4028b");
-            mAccessTokenET.setText("at.2xwvzh454swdqgj26jscn4cl6o71kd3r-77cacr5ymf-1befzkz-psipk4zq7");
-            // 温氏appKey
-//            mAppKeyET.setText("5aeb97218dc24acd8003c8dd6f8055c0");
-//            mAccessTokenET.setText("at.9irsiwajbgyt3ka11gbxp1nf8shq0h67-9ri4e1i5i1-08f5vpv-yezskuhfu");
+            mAccessTokenET.setText("at.6xy57hb9csyw6gxa88yb4tl15etbz3o7-77ccfaak18-0786lcg-t8gnjapxn");
             // 程骏appKey
-            mAppKeyET.setText("fd82f9a6f0154aa2aa9284ae7af25a5b");
-            mAccessTokenET.setText("");
+//            mAppKeyET.setText("fd82f9a6f0154aa2aa9284ae7af25a5b");
+//            mAccessTokenET.setText("");
+            // 开发者反馈问题提供的账号信息
+            mAppKeyET.setText("4308f6d5e14340be8015b5b15ddea676");
+            mAccessTokenET.setText("at.1z8jwaum3n63wt4a243rswuh5nsjlrsy-2vdj7qgh04-0o2qdpw-nwe49hqgt");
 
             // 仅预置了appKey的区域才展示萤石账号登录按钮
             if (mCurrentServerArea.defaultOpenAuthAppKey != null) {

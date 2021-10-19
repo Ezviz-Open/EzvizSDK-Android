@@ -80,7 +80,7 @@ public enum ServerAreasEnum {
      */
     TEST12(110, "test12", "https://test12open.ys7.com",
             "https://test12openauth.ys7.com",
-            "680948cc41c44fbaac23d8b47be4028b"),
+            "b22035492c7949bca95286382ed90b01"),
 
     TEST14(112, "test14", "https://test14open.ys7.com",
             "https://test14openauth.ys7.com"),

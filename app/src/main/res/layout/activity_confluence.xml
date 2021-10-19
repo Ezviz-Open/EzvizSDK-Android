@@ -53,7 +53,7 @@
         android:layout_height="120dp"
         android:orientation="horizontal">
 
-        <com.ezviz.mediarecoder.ui.CameraLivingView
+        <TextureView
             android:id="@+id/view_child_watch_video_talk_camera"
             android:layout_width="120dp"
             android:layout_height="match_parent"

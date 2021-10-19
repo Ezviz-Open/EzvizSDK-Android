@@ -7,8 +7,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import com.ezviz.demo.videotalk.ConfluenceActivity
 import com.ezviz.demo.videotalk.ConfluenceTestEntranceActivity
+import com.ezviz.demo.videotalk.EZRtcTestActivity
 import com.ezviz.demo.videotalk.EZVideoMeetingService
 import com.ezviz.demo.videotalk.MultiTestActivity
 import com.videogo.ui.LanDevice.LanDeviceActivity
@@ -51,7 +51,7 @@ class MoreFeaturesEntranceActivity : RootActivity() {
 
         //判断当前会议是否正在进行中
         if (isServiceRunning(EZVideoMeetingService::class.java.name)){
-            val nfIntent = Intent(this, ConfluenceActivity::class.java) //点击后跳转的界面，可以设置跳转数据
+            val nfIntent = Intent(this, EZRtcTestActivity::class.java) //点击后跳转的界面，可以设置跳转数据
             nfIntent.putExtra(EZVideoMeetingService.LAUNCH_FROM_NOTIFICATION, true)
             startActivity(nfIntent)
         }else{
