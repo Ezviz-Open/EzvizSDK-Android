@@ -31,8 +31,8 @@ android {
         minSdkVersion 21
         //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 29
-        versionCode 4180
-        versionName "v4.18.0"
+        versionCode 4183
+        versionName "v4.18.3"
         ndk {
             abiFilters "armeabi-v7a", "arm64-v8a"
         }
@@ -78,7 +78,7 @@ android {
 
 dependencies {
     /*萤石SDK核心模块，必须*/
-    implementation 'io.github.ezviz-open:ezviz-sdk:4.18.0'
+    implementation 'io.github.ezviz-open:ezviz-sdk:4.18.3'
 
     /*视频通话模块，按需使用*/
     implementation 'io.github.ezviz-open:videotalk:1.2.4'
@@ -91,6 +91,7 @@ dependencies {
 //    implementation 'com.google.code.gson:gson:2.8.0'
 
     /*demo的依赖项*/
+    implementation project(path: ':app-common')
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
