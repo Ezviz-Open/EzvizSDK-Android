@@ -419,9 +419,9 @@ class WatchVideoTalkActivity : Activity(){
 
     private val mSurfaceTextureListener = object : TextureView.SurfaceTextureListener{
         var mLastSurface: SurfaceTexture? = null
-        override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture?, width: Int, height: Int) {
+        override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {
             LogUtil.d(TAG, "onSurfaceTextureAvailable")
-            mEzvizVideoCall?.setDisplay(Surface(surface!!))
+            mEzvizVideoCall?.setDisplay(Surface(surface))
             if (mLastSurface == null){
                 mEzvizVideoCall?.setDisplay(Surface(surface))
                 mLastSurface = surface;
@@ -430,17 +430,17 @@ class WatchVideoTalkActivity : Activity(){
             }
         }
 
-        override fun onSurfaceTextureUpdated(surface: SurfaceTexture?) {
+        override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {
             // do nothing
         }
 
-        override fun onSurfaceTextureDestroyed(surface: SurfaceTexture?): Boolean {
+        override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {
             mEzvizVideoCall?.setDisplay(null)
             return true
         }
 
-        override fun onSurfaceTextureAvailable(surface: SurfaceTexture?, width: Int, height: Int) {
-            mEzvizVideoCall?.setDisplay(Surface(surface!!))
+        override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
+            mEzvizVideoCall?.setDisplay(Surface(surface))
         }
 
     }

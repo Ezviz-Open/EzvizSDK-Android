@@ -3,14 +3,12 @@ package com.ezviz.demo.videotalk;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
-import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -103,7 +101,6 @@ public class EZRtcTestActivity extends AppCompatActivity implements OnStatusChan
             EZVideoMeetingService.MyBinder myBinder = (EZVideoMeetingService.MyBinder) iBinder;
             mEZRtc = myBinder.getRtc();
             mEZRtc.setMsgCallback(new EZRtcTestActivity.TalkStateCallBack());
-            initByRole();
             mStoredData = myBinder.getData();
             mClientInfoList = mStoredData.mClientList;
             if (isRecovery){
@@ -111,6 +108,7 @@ public class EZRtcTestActivity extends AppCompatActivity implements OnStatusChan
                 mUserId = mStoredData.userId;
                 showContent();
             }else {
+                initByRole();
                 new Thread(() -> {
                     if (mRoomID == -1){
                         int limit = getIntent().getIntExtra(InIntentKeysAndValues.KEY_LIMIT, 100);
@@ -137,6 +135,7 @@ public class EZRtcTestActivity extends AppCompatActivity implements OnStatusChan
                 }).start();
 
             }
+            initLocalView();
             initRecycleView();
         }
 
@@ -256,9 +255,6 @@ public class EZRtcTestActivity extends AppCompatActivity implements OnStatusChan
         }else{
             onPermissionsGranted();
         }
-
-        AudioManager audioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
-        audioManager.setSpeakerphoneOn(true);
     }
 
     @Override
@@ -282,7 +278,6 @@ public class EZRtcTestActivity extends AppCompatActivity implements OnStatusChan
 
     private void onPermissionsGranted(){
         init();
-        createCall();
     }
 
     private void init() {
@@ -483,7 +478,6 @@ public class EZRtcTestActivity extends AppCompatActivity implements OnStatusChan
     private boolean initByRole() {
 
         EZRtc.setLogPrintEnable(true);
-
         EZRtcParam.EncodeParam encodeParam = EZRtcParam.EncodeParam.createDefault();
 
         encodeParam.width = getIntent().getIntExtra(InIntentKeysAndValues.KEY_PARAM_WIDTH, DEFAULT_CAMERA_WIDTH);
@@ -507,6 +501,12 @@ public class EZRtcTestActivity extends AppCompatActivity implements OnStatusChan
         shareEncodeParam.ifi = DEFAULT_IFI;
         mEZRtc.setScreenShareEncodeParam(shareEncodeParam);
 
+        mEZRtc.setAudioEncodeType(getIntent().getBooleanExtra(InIntentKeysAndValues.KEY_PARAM_OPUS, false) ? 1 : 0);
+
+        return true;
+    }
+
+    private void initLocalView(){
         if (mLocalView.isAvailable()){
             mEZRtc.setLocalWindow(new Surface(mLocalView.getSurfaceTexture()), mLocalView.getWidth(), mLocalView.getHeight());
         }
@@ -532,8 +532,6 @@ public class EZRtcTestActivity extends AppCompatActivity implements OnStatusChan
 
             }
         });
-
-        return true;
     }
 
     private void connectToService(){
@@ -549,18 +547,6 @@ public class EZRtcTestActivity extends AppCompatActivity implements OnStatusChan
         }
 
         bindService(service, mServiceConnection, 0);
-    }
-
-    private synchronized void createCall() {
-        // 搭配MediaPlayer的setAudioStreamType(AudioManager.STREAM_VOICE_CALL)使用，实现通过通话的形式播放声音
-        AudioManager manager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        if (manager != null){
-/*
-            manager.setMode(AudioManager.MODE_IN_COMMUNICATION);
-*/
-            manager.setSpeakerphoneOn(true);
-        }
-
     }
 
     private void debug(String info){
@@ -843,6 +829,9 @@ public class EZRtcTestActivity extends AppCompatActivity implements OnStatusChan
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (mEZRtc != null){
+            mEZRtc.release();
+        }
         unbindService(mServiceConnection);
     }
 
@@ -882,6 +871,8 @@ public class EZRtcTestActivity extends AppCompatActivity implements OnStatusChan
         public final static String KEY_PARAM_HEIGHT = "key_param_height";
         public final static String KEY_PARAM_BITRATE = "key_param_bitrate";
         public final static String KEY_PARAM_FPS = "key_param_fps";
+
+        public final static String KEY_PARAM_OPUS = "key_param_opus";
     }
 
 }

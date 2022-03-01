@@ -5,7 +5,6 @@ import android.content.Intent;
 
 import com.ezviz.sdk.configwifi.EZConfigWifiInfoEnum;
 import com.videogo.EzvizApplication;
-import com.videogo.openapi.EZOpenSDK;
 import com.videogo.wificonfig.APWifiConfig;
 
 import ezviz.ezopensdkcommon.common.IntentConstants;
@@ -17,7 +16,7 @@ public class ApConfigWifiPresenterForFullSdk extends ConfigWifiExecutingActivity
 
     private final static String TAG = ApConfigWifiPresenterForFullSdk.class.getSimpleName();
 
-    public ApConfigWifiPresenterForFullSdk(){
+    public ApConfigWifiPresenterForFullSdk() {
         mType = ConfigWifiTypeConstants.FULL_SDK_AP;
     }
 
@@ -28,10 +27,11 @@ public class ApConfigWifiPresenterForFullSdk extends ConfigWifiExecutingActivity
         String routerWifiPwd = configParam.getStringExtra(IntentConstants.ROUTER_WIFI_PASSWORD);
         String deviceSerial = configParam.getStringExtra(IntentConstants.DEVICE_SERIAL);
         String deviceVerifyCode = configParam.getStringExtra(IntentConstants.DEVICE_VERIFY_CODE);
-        String deviceHotspotSSID /*设备热点名称，可以为空*/= configParam.getStringExtra(IntentConstants.DEVICE_HOTSPOT_SSID);
-        String deviceHotspotPwd /*设备热点密码，可以为空*/= configParam.getStringExtra(IntentConstants.DEVICE_HOTSPOT_PWD);
-        boolean autoConnect /*是否自动连接到设备热点*/= !configParam.getBooleanExtra(IntentConstants.USE_MANUAL_AP_CONFIG,
+        String deviceHotspotSSID /*设备热点名称，可以为空*/ = configParam.getStringExtra(IntentConstants.DEVICE_HOTSPOT_SSID);
+        String deviceHotspotPwd /*设备热点密码，可以为空*/ = configParam.getStringExtra(IntentConstants.DEVICE_HOTSPOT_PWD);
+        boolean autoConnect /*是否自动连接到设备热点*/ = !configParam.getBooleanExtra(IntentConstants.USE_MANUAL_AP_CONFIG,
                 false);
+        // 注意：如果你的设备热点是EZVIZ_开头的，deviceHotspotSSID和deviceHotspotPwd可传空；如果不是，这两个参数一定要传入对应的设备热点名和设备热点密码，否则配网失败
         // 开始配网
         EzvizApplication.getOpenSDK().startAPConfigWifiWithSsid(routerWifiName, routerWifiPwd,
                 deviceSerial, deviceVerifyCode,
@@ -47,7 +47,7 @@ public class ApConfigWifiPresenterForFullSdk extends ConfigWifiExecutingActivity
     private APWifiConfig.APConfigCallback mConfigCallback = new APWifiConfig.APConfigCallback() {
         @Override
         public void onSuccess() {
-            if (mCallback == null){
+            if (mCallback == null) {
                 return;
             }
             mCallback.onConnectedToWifi();
@@ -55,17 +55,17 @@ public class ApConfigWifiPresenterForFullSdk extends ConfigWifiExecutingActivity
 
         @Override
         public void onInfo(int code, String message) {
-            if (mCallback == null){
+            if (mCallback == null) {
                 return;
             }
-            if (code == EZConfigWifiInfoEnum.CONNECTED_TO_PLATFORM.code){
+            if (code == EZConfigWifiInfoEnum.CONNECTED_TO_PLATFORM.code) {
                 mCallback.onConnectedToPlatform();
             }
         }
 
         @Override
         public void OnError(int code) {
-            if (mCallback == null){
+            if (mCallback == null) {
                 return;
             }
             LogUtil.e(TAG, "OnError: " + code);
@@ -92,7 +92,7 @@ public class ApConfigWifiPresenterForFullSdk extends ConfigWifiExecutingActivity
                     // TODO: 2018/7/24 未知错误
                     break;
             }
-            if (!solved){
+            if (!solved) {
                 mCallback.onConfigError(code, null);
             }
         }

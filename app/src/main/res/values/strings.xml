@@ -566,7 +566,7 @@
     <string name="app_add_device_success">Added device to account!</string>
     <string name="tip_playback_again">Finished to playback, click to playback again!</string>
     <string name="please_operate_after_select_any_record">Please operate after select any record!</string>
-<!--    <String name="device_no_support_talkback">the device does not support talkback</String>-->
+    <!--    <String name="device_no_support_talkback">the device does not support talkback</String>-->
     <!--儿童手表-视频通话-->
     <string name="video_talk_sdk_toast_hang_up">通话已结束</string>
     <string name="video_talk_sdk_toast_nobody">对方无应答</string>
@@ -585,4 +585,13 @@
     <string name="device_no_support_talkback">该设备不支持对讲</string>
     <!--儿童手表-视频通话-->
 
+    <!-- 云存储新接口-->
+    <string name="copy">Copy</string>
+    <string name="copied_to_clipboard">copied to clipboard</string>
+    <string name="pause_or_recovery_cloud_storage_function">pause/recovery cloud storage function</string>
+    <string name="recovery">recovery</string>
+    <string name="pause">pause</string>
+    <string name="cloud_storage_services_interface">overseas cloud storage service interface</string>
+    <string name="cloud_storage_services_is_supported">cloud storage services is supported in this country</string>
+    <string name="cloud_storage_services_is_not_supported">cloud storage services is not supported in this country</string>
 </resources>

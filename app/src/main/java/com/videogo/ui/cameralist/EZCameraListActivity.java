@@ -15,7 +15,6 @@
  */
 package com.videogo.ui.cameralist;
 
-import android.app.Activity;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.app.NotificationManager;
@@ -44,23 +43,21 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ez.stream.EZStreamClientManager;
 import com.ezviz.demo.common.CollectDeviceInfoActivity;
 import com.ezviz.demo.common.MoreFeaturesEntranceActivity;
 import com.ezviz.demo.videotalk.WatchVideoTalkActivity;
-import com.ez.stream.EZStreamClientManager;
-
-import ezviz.ezopensdk.preview.MultiScreenPreviewActivity;
-import ezviz.ezopensdkcommon.common.BaseApplication;
-import ezviz.ezopensdkcommon.common.RootActivity;
-
+import com.google.gson.Gson;
 import com.videogo.constant.Constant;
 import com.videogo.constant.IntentConsts;
 import com.videogo.constants.ReceiverKeys;
 import com.videogo.devicemgt.EZDeviceSettingActivity;
+import com.videogo.devicemgt.EZUpgradeDeviceActivity;
 import com.videogo.download.DownLoadTaskRecordAbstract;
 import com.videogo.errorlayer.ErrorInfo;
 import com.videogo.exception.BaseException;
 import com.videogo.exception.ErrorCode;
+import com.videogo.openapi.EZGlobalSDK;
 import com.videogo.openapi.bean.EZCameraInfo;
 import com.videogo.openapi.bean.EZDeviceInfo;
 import com.videogo.remoteplayback.list.EZPlayBackListActivity;
@@ -92,7 +89,12 @@ import java.util.List;
 import ezviz.ezopensdk.R;
 import ezviz.ezopensdk.debug.TestActivityForFullSdk;
 import ezviz.ezopensdk.demo.DemoConfig;
+import ezviz.ezopensdk.demo.SdkInitParams;
+import ezviz.ezopensdk.demo.SpTool;
 import ezviz.ezopensdk.demo.ValueKeys;
+import ezviz.ezopensdk.preview.MultiScreenPreviewActivity;
+import ezviz.ezopensdkcommon.common.BaseApplication;
+import ezviz.ezopensdkcommon.common.RootActivity;
 
 import static com.ez.stream.EZError.EZ_OK;
 import static com.videogo.EzvizApplication.getOpenSDK;
@@ -181,7 +183,11 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
         setContentView(R.layout.cameralist_page);
 
         // 只展示单个设备
-        mSingleDeviceSerial = getIntent().getStringExtra(ValueKeys.DEVICE_SERIAL.name());
+        String sdkInitParamStr = SpTool.obtainValue(ValueKeys.SDK_INIT_PARAMS);
+        if (sdkInitParamStr != null) {
+            SdkInitParams mInitParams = new Gson().fromJson(sdkInitParamStr, SdkInitParams.class);
+            mSingleDeviceSerial = mInitParams.specifiedDevice;
+        }
         if (!TextUtils.isEmpty(mSingleDeviceSerial)) {
             Log.e(TAG, "only show the device which serial is " + mSingleDeviceSerial);
         }
@@ -382,8 +388,7 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
             }
 
             @Override
-            public void onDeviceDefenceClick(BaseAdapter adapter, View view,
-                                             int position) {
+            public void onDeviceDefenceClick(BaseAdapter adapter, View view, int position) {
             }
 
         });
@@ -531,13 +536,13 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
                 if (mLoadType == LOAD_MY_DEVICE) {
 
                     if (mHeaderOrFooter) {
-                        result = getOpenSDK().getDeviceList(0, 10);
+                        result = getOpenSDK().getDeviceList(0, 20);
                     } else {
                         result = getOpenSDK().getDeviceList((mAdapter.getCount() / 20) + (mAdapter.getCount() % 20 > 0 ? 1 : 0), 20);
                     }
                 } else if (mLoadType == LOAD_SHARE_DEVICE) {
                     if (mHeaderOrFooter) {
-                        result = getOpenSDK().getSharedDeviceList(0, 10);
+                        result = getOpenSDK().getSharedDeviceList(0, 20);
                     } else {
                         result = getOpenSDK().getSharedDeviceList((mAdapter.getCount() / 20) + (mAdapter.getCount() % 20 > 0 ? 1 : 0), 20);
                     }

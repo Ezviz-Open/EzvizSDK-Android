@@ -12,12 +12,8 @@ kapt {
 }
 
 android {
-
-
-    compileSdkVersion 29
-    buildToolsVersion "29.0.3"
-
-
+    compileSdkVersion rootProject.ext.compileVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
     sourceSets {
         main {
             jniLibs.srcDirs = ['libs']
@@ -28,11 +24,10 @@ android {
     }
     defaultConfig {
         applicationId "ezviz.ezopensdk"
-        minSdkVersion 21
-        //noinspection ExpiredTargetSdkVersion
-        targetSdkVersion 29
-        versionCode 4183
-        versionName "v4.18.3"
+        minSdkVersion rootProject.ext.minSdk
+        targetSdkVersion rootProject.ext.targetSdk
+        versionCode 4195
+        versionName "v4.19.5"
         ndk {
             abiFilters "armeabi-v7a", "arm64-v8a"
         }
@@ -78,17 +73,16 @@ android {
 
 dependencies {
     /*萤石SDK核心模块，必须*/
-    implementation 'io.github.ezviz-open:ezviz-sdk:4.18.3'
+    implementation 'io.github.ezviz-open:ezviz-sdk:4.19.5'
+    // 4.19.0版本之后需要自行依赖okhttp和gson库
+    implementation 'com.squareup.okhttp3:okhttp:3.12.1'
+    implementation 'com.google.code.gson:gson:2.8.5'
 
     /*视频通话模块，按需使用*/
-    implementation 'io.github.ezviz-open:videotalk:1.2.4'
+    implementation 'io.github.ezviz-open:videotalk:1.2.5'
 
     /*视频通话模块，按需使用*/
-    implementation 'io.github.ezviz-open:streamctrl:1.2.4'
-
-    /*萤石核心模块的三方依赖*/
-//    implementation 'javax.jmdns:jmdns:3.4.1'
-//    implementation 'com.google.code.gson:gson:2.8.0'
+    implementation 'io.github.ezviz-open:streamctrl:1.2.5'
 
     /*demo的依赖项*/
     implementation project(path: ':app-common')

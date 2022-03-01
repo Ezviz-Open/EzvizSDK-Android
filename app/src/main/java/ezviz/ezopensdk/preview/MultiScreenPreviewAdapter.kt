@@ -23,6 +23,7 @@ import com.videogo.openapi.EZConstants.EZRealPlayConstants.MSG_REALPLAY_PLAY_SUC
 import com.videogo.openapi.bean.EZCameraInfo
 import com.videogo.openapi.bean.EZDeviceInfo
 import com.videogo.ui.realplay.EZRealPlayActivity
+import com.videogo.ui.util.DataManager
 import ezviz.ezopensdk.R
 import ezviz.ezopensdkcommon.common.LogUtil
 import kotlin.concurrent.thread
@@ -35,14 +36,14 @@ class MultiScreenPreviewAdapter(private val mContext: Context, private val mDevi
                                 private val mCameraList: List<EZCameraInfo>?, private var mColumn: Int = 1) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    fun stopAll(){
-        for (playInfo in PlayInfoManager.getAll().values){
+    fun stopAll() {
+        for (playInfo in PlayInfoManager.getAll().values) {
             playInfo.player?.stopRealPlay()
         }
     }
 
-    fun startAll(){
-        for (playInfo in PlayInfoManager.getAll().values){
+    fun startAll() {
+        for (playInfo in PlayInfoManager.getAll().values) {
             playInfo.player?.startRealPlay()
         }
     }
@@ -63,10 +64,10 @@ class MultiScreenPreviewAdapter(private val mContext: Context, private val mDevi
             LogUtil.d(TAG, "onBindViewHolder: $cameraName")
             val playInfoKey = getPlayInfoKeyBy(this)
             var playInfo = PlayInfoManager.get(playInfoKey)
-            if (playInfo == null){
+            if (playInfo == null) {
                 var deviceInfo: EZDeviceInfo? = null
-                for (device in mDeviceList){
-                    if (device.deviceSerial == deviceSerial){
+                for (device in mDeviceList) {
+                    if (device.deviceSerial == deviceSerial) {
                         deviceInfo = device
                         break
                     }
@@ -75,17 +76,17 @@ class MultiScreenPreviewAdapter(private val mContext: Context, private val mDevi
                 PlayInfoManager.put(playInfo)
             }
             playInfo.holder = holder
-            if (playInfo.deviceInfo.status == 1){
+            if (playInfo.deviceInfo.status == 1) {
                 changePlayViewsBy(PlayStatusEnum.LOADING, playInfoKey)
-            }else{
+            } else {
                 changePlayViewsBy(PlayStatusEnum.OFFLINE, playInfoKey)
             }
         }
     }
 
-    fun changePlayViewsBy(playStatus: PlayStatusEnum, playInfoKey: String){
+    fun changePlayViewsBy(playStatus: PlayStatusEnum, playInfoKey: String) {
         val playInfo = PlayInfoManager.get(playInfoKey)
-        if (playInfo == null){
+        if (playInfo == null) {
             LogUtil.e(TAG, "changePlayViewsBy: return")
             return
         }
@@ -94,11 +95,11 @@ class MultiScreenPreviewAdapter(private val mContext: Context, private val mDevi
         val cameraInfo = playInfo.cameraInfo
         viewHolder.apply {
             cameraNameTv?.text = cameraInfo.cameraName
-            if (playStatus != PlayStatusEnum.OFFLINE){
+            if (playStatus != PlayStatusEnum.OFFLINE) {
                 playWindowTextureView?.surfaceTextureListener = SurfaceTextureListerWithControlPreview(playInfoKey)
             }
         }
-        when(playStatus){
+        when (playStatus) {
             PlayStatusEnum.OFFLINE -> {
                 viewHolder.playLoadingPb?.visibility = View.GONE
                 viewHolder.playErrorTv?.apply {
@@ -139,38 +140,37 @@ class MultiScreenPreviewAdapter(private val mContext: Context, private val mDevi
         return cnt
     }
 
-    class PlayWindowOnClickListener(private val mPlayInfoKey: String): View.OnClickListener{
+    class PlayWindowOnClickListener(private val mPlayInfoKey: String) : View.OnClickListener {
 
         override fun onClick(view: View?) {
             val context = view?.context!!
             val playInfo = PlayInfoManager.get(mPlayInfoKey)
-            if (playInfo?.playStatus == PlayStatusEnum.PLAYING){
+            if (playInfo?.playStatus == PlayStatusEnum.PLAYING) {
                 EZRealPlayActivity.launch(context, playInfo.deviceInfo, playInfo.cameraInfo)
-            }else{
+            } else {
                 LogUtil.d(TAG, "非播放状态，点击无效")
             }
         }
 
     }
 
-    class ErrorMessageOnClickListener(private val mPlayInfoKey: String): View.OnClickListener{
+    class ErrorMessageOnClickListener(private val mPlayInfoKey: String) : View.OnClickListener {
 
         override fun onClick(view: View?) {
             val playInfo = PlayInfoManager.get(mPlayInfoKey)
-            when(playInfo?.lastError){
+            when (playInfo?.lastError) {
                 ERROR_INNER_VERIFYCODE_ERROR -> {
                     val context = view?.context!!
                     val verifyCodeEt = EditText(context)
                     AlertDialog.Builder(context)
                             .setTitle("请输入验证码")
                             .setView(verifyCodeEt)
-                            .setPositiveButton("确定") {
-                                dialog, _ ->
+                            .setPositiveButton("确定") { dialog, _ ->
                                 run {
                                     val verifyCode = verifyCodeEt.text.toString()
-                                    if (TextUtils.isEmpty(verifyCode)){
+                                    if (TextUtils.isEmpty(verifyCode)) {
                                         Toast.makeText(context, "请输入有效的验证码", Toast.LENGTH_SHORT).show()
-                                    }else{
+                                    } else {
                                         dialog.dismiss()
                                         playInfo.verifyCode = verifyCode
                                         playInfo.adapter.changePlayViewsBy(PlayStatusEnum.LOADING, mPlayInfoKey)
@@ -191,17 +191,17 @@ class MultiScreenPreviewAdapter(private val mContext: Context, private val mDevi
 
     }
 
-    class SurfaceTextureListerWithControlPreview(private val mPlayInfoKey: String): TextureView.SurfaceTextureListener{
+    class SurfaceTextureListerWithControlPreview(private val mPlayInfoKey: String) : TextureView.SurfaceTextureListener {
 
-        override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture?, width: Int, height: Int) {
-
-        }
-
-        override fun onSurfaceTextureUpdated(surface: SurfaceTexture?) {
+        override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {
 
         }
 
-        override fun onSurfaceTextureDestroyed(surface: SurfaceTexture?): Boolean {
+        override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {
+
+        }
+
+        override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {
             releasePlayer()
             return true
         }
@@ -216,7 +216,7 @@ class MultiScreenPreviewAdapter(private val mContext: Context, private val mDevi
             }
         }
 
-        override fun onSurfaceTextureAvailable(surface: SurfaceTexture?, width: Int, height: Int) {
+        override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
             initPlayer(surface)
         }
 
@@ -224,9 +224,10 @@ class MultiScreenPreviewAdapter(private val mContext: Context, private val mDevi
             LogUtil.d(TAG, "startPlay")
             thread {
                 val playInfo = PlayInfoManager.get(mPlayInfoKey)
-                EzvizApplication.getOpenSDK().createPlayer(playInfo?.cameraInfo?.deviceSerial, playInfo?.cameraInfo?.cameraNo!!)?.apply {
+                EzvizApplication.getOpenSDK().createPlayer(playInfo?.cameraInfo?.deviceSerial, playInfo?.cameraInfo?.cameraNo!!, true)?.apply {
+                    setPlayVerifyCode(DataManager.getInstance().getDeviceSerialVerifyCode(playInfo.cameraInfo.deviceSerial))
                     playInfo.player = this
-                    Handler(Looper.getMainLooper()).post{
+                    Handler(Looper.getMainLooper()).post {
                         PlayMessageHandler(mPlayInfoKey).apply {
                             playInfo.handler = this
                             setHandler(this)
@@ -239,10 +240,10 @@ class MultiScreenPreviewAdapter(private val mContext: Context, private val mDevi
         }
     }
 
-    class PlayMessageHandler(private val mPlayInfoKey: String): Handler(){
-        override fun handleMessage(msg: Message?) {
-            LogUtil.d(TAG, "handleMessage" + msg?.toString())
-            when(msg?.what){
+    class PlayMessageHandler(private val mPlayInfoKey: String) : Handler() {
+        override fun handleMessage(msg: Message) {
+            LogUtil.d(TAG, "handleMessage" + msg.toString())
+            when (msg?.what) {
                 // 播放成功
                 MSG_REALPLAY_PLAY_SUCCESS -> {
                     PlayInfoManager.get(mPlayInfoKey)?.apply {
@@ -254,7 +255,7 @@ class MultiScreenPreviewAdapter(private val mContext: Context, private val mDevi
                     val errCd = msg.arg1
                     PlayInfoManager.get(mPlayInfoKey)?.apply {
                         lastError = errCd
-                        when(errCd) {
+                        when (errCd) {
                             // 验证码错误
                             ERROR_INNER_VERIFYCODE_ERROR -> adapter.changePlayViewsBy(PlayStatusEnum.ERROR_VERIFY_CODE, mPlayInfoKey)
                             else -> LogUtil.e(TAG, "未知错误，摄像头：$mPlayInfoKey, 错误码：$errCd")
@@ -265,7 +266,7 @@ class MultiScreenPreviewAdapter(private val mContext: Context, private val mDevi
         }
     }
 
-    enum class PlayStatusEnum(){
+    enum class PlayStatusEnum() {
         LOADING, PLAYING, PAUSED, OFFLINE, ERROR_VERIFY_CODE
     }
 
@@ -291,10 +292,10 @@ class MultiScreenPreviewAdapter(private val mContext: Context, private val mDevi
 
     }
 
-    companion object{
+    companion object {
         private val TAG = MultiScreenPreviewAdapter::class.java.simpleName
 
-        fun getPlayInfoKeyBy(cameraInfo: EZCameraInfo): String{
+        fun getPlayInfoKeyBy(cameraInfo: EZCameraInfo): String {
             return cameraInfo.deviceSerial + "-" + cameraInfo.cameraNo
         }
     }

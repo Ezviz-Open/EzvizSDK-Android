@@ -5,20 +5,25 @@
     <!-- 以下是sdk所需权限 -->
     <!-- 基础功能所需权限 -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" /> <!-- 配网所需权限 -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <!-- 配网所需权限 -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-<!--    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />-->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" /> <!-- 对讲所需权限 -->
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <!-- 对讲所需权限 -->
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" /> <!-- 视频通话权限所需 -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+
+    <!-- 视频通话权限所需 -->
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" /> <!-- 以上是sdk所需权限 -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- 以上是sdk所需权限 -->
+
     <!-- 以下是demo所需权限 -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission
@@ -27,16 +32,17 @@
     <uses-permission
         android:name="android.permission.READ_LOGS"
         tools:ignore="ProtectedPermissions" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- 以上是sdk所需权限 -->
-    <!-- 以下是demo所需权限 -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <!-- 以上是demo所需权限 -->
 
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
 
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.FLASHLIGHT" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> <!-- App receives push messages."my_app_package.push.sdk.permission.EZVIZ_MESSAGE" -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!-- App receives push messages."my_app_package.push.sdk.permission.EZVIZ_MESSAGE" -->
     <permission
         android:name="ezviz.ezopensdk.push.sdk.permission.EZVIZ_MESSAGE"
         android:protectionLevel="signature" />
@@ -51,22 +57,21 @@
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" /> <!-- GCM connects to Google Services. -->
     <uses-permission android:name="android.permission.INTERNET" /> <!-- GCM requires a Google account. -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" /> <!-- Keeps the processor from sleeping when a message is received. -->
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-
-    <!--  videoTalk call -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" /> <!-- videoTalk call -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:name="com.videogo.EzvizApplication"
-        android:requestLegacyExternalStorage="true"
         android:allowBackup="true"
         android:icon="@mipmap/videogo_icon"
         android:label="@string/app_name"
+        android:requestLegacyExternalStorage="true"
         android:supportsRtl="true"
         android:testOnly="false"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning, LockedOrientationActivity">
-        <activity android:name="com.ezviz.demo.videotalk.JoinRoomActivity"></activity>
+        <activity android:name="com.videogo.remoteplayback.list.EZAbroadCloudServiceExAct"></activity>
+        <activity android:name="com.ezviz.demo.videotalk.JoinRoomActivity" />
         <activity android:name="com.ezviz.demo.videotalk.OrderRoomActivity" />
         <activity android:name="com.ezviz.demo.videotalk.ConfluenceTestEntranceActivity" />
         <activity android:name="com.ezviz.demo.common.CollectDeviceInfoActivity" />
@@ -179,15 +184,17 @@
         <activity
             android:name="com.ezviz.demo.videotalk.MultiVideoTalkActivity"
             android:screenOrientation="portrait" />
-
-        <activity android:name="com.ezviz.demo.videotalk.EZRtcTestActivity"
+        <activity
+            android:name="com.ezviz.demo.videotalk.EZRtcTestActivity"
             android:launchMode="singleTask"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
 
         <receiver android:name="com.videogo.ui.cameralist.EZCameraListActivity$NotificationReceiver" />
-        <service android:name="com.ezviz.demo.videotalk.EZVideoMeetingService"
+
+        <service
+            android:name="com.ezviz.demo.videotalk.EZVideoMeetingService"
             android:enabled="true"
-            android:foregroundServiceType="mediaProjection"/>
+            android:foregroundServiceType="mediaProjection" />
     </application>
 
 </manifest>

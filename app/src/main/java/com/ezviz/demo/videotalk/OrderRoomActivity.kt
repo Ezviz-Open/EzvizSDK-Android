@@ -7,7 +7,15 @@ import android.text.TextUtils
 import android.view.View
 import android.widget.Toast
 import ezviz.ezopensdk.R
+import kotlinx.android.synthetic.main.activity_join_room.*
 import kotlinx.android.synthetic.main.activity_order_room.*
+import kotlinx.android.synthetic.main.activity_order_room.cb_opus
+import kotlinx.android.synthetic.main.activity_order_room.edt_bitrate
+import kotlinx.android.synthetic.main.activity_order_room.edt_fps
+import kotlinx.android.synthetic.main.activity_order_room.edt_height
+import kotlinx.android.synthetic.main.activity_order_room.edt_nick
+import kotlinx.android.synthetic.main.activity_order_room.edt_passwd
+import kotlinx.android.synthetic.main.activity_order_room.edt_width
 
 class OrderRoomActivity : AppCompatActivity() {
 
@@ -62,6 +70,7 @@ class OrderRoomActivity : AppCompatActivity() {
             .putExtra(EZRtcTestActivity.InIntentKeysAndValues.KEY_PARAM_HEIGHT, height)
             .putExtra(EZRtcTestActivity.InIntentKeysAndValues.KEY_PARAM_FPS, fps)
             .putExtra(EZRtcTestActivity.InIntentKeysAndValues.KEY_PARAM_BITRATE, bitrate * 1024)
+            .putExtra(EZRtcTestActivity.InIntentKeysAndValues.KEY_PARAM_OPUS, cb_opus.isChecked)
         startActivityForResult(intent, 100)
     }
 

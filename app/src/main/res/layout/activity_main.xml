@@ -1,102 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/page_container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/page_container">
-
-    <RelativeLayout
-        android:id="@+id/handle_lyt"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
-        android:visibility="gone">
-        <Button
-            android:id="@+id/btn_ezviz_login"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:background="@drawable/interface_call_btn_selector"
-            android:text="ezviz_login"
-            android:textColor="@color/white"
-            android:textSize="@dimen/login_text_size"
-            android:onClick="onClick" />
-
-        <Button
-            android:id="@+id/btn_sdk_login"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/interface_call_btn_selector"
-            android:text="sdk_login"
-            android:textColor="@color/white"
-            android:textSize="@dimen/login_text_size"
-            android:layout_below="@id/btn_ezviz_login"
-            android:onClick="onClick" />
-
-        <Button
-            android:id="@+id/btn_logout"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/interface_call_btn_selector"
-            android:text="logout"
-            android:textColor="@color/white"
-            android:textSize="@dimen/login_text_size"
-            android:layout_below="@id/btn_sdk_login"
-            android:onClick="onClick" />
-
-        <Button
-            android:id="@+id/btn_support"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/interface_call_btn_selector"
-            android:text="support"
-            android:textColor="@color/white"
-            android:textSize="@dimen/login_text_size"
-            android:layout_below="@id/btn_logout" />
-    </RelativeLayout>
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
+        android:gravity="center_horizontal"
         android:orientation="vertical"
         android:paddingLeft="30dp"
         android:paddingRight="30dp"
-        android:visibility="visible"
-        android:gravity="center_horizontal">
+        android:visibility="visible">
 
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:clickable="true"
+            android:onClick="jcTestClick"
             android:src="@drawable/login_logo" />
 
         <TextView
             android:id="@+id/tv_sdk_ver"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/gray"
-            android:textSize="@dimen/button_text_size"
             android:layout_marginTop="25dp"
             android:layout_marginBottom="25dp"
-            android:text="v1.0.0.20190815"/>
+            android:text="v1.0.0.20190815"
+            android:textColor="@color/gray"
+            android:textSize="@dimen/button_text_size" />
 
+        <!--服务器区域 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:gravity="center_vertical"
+            android:orientation="vertical"
             android:paddingBottom="10dp">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="18dp"
-                android:text="@string/server_area"/>
+                android:text="@string/server_area"
+                android:textSize="18dp" />
 
             <Spinner
                 android:id="@+id/sp_server_area"
@@ -112,126 +59,133 @@
 
         </LinearLayout>
 
+        <!-- ApiUrl -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="18dp"
-                android:text="@string/string_apiurl"/>
+                android:text="@string/string_apiurl"
+                android:textSize="18dp" />
 
             <EditText
                 android:id="@+id/et_api_url"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="10dp"/>
+                android:textSize="10dp" />
 
         </LinearLayout>
 
+        <!-- WebUrl -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="18dp"
-                android:text="@string/string_authurl"/>
+                android:text="@string/string_authurl"
+                android:textSize="18dp" />
 
             <EditText
                 android:id="@+id/et_auth_server"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="10dp"/>
+                android:textSize="10dp" />
 
         </LinearLayout>
 
+        <!-- AppKey -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="18dp"
-                android:text="@string/app_key"/>
+                android:text="@string/app_key"
+                android:textSize="18dp" />
 
             <EditText
                 android:id="@+id/et_app_key"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/explain_of_app_key"
-                android:textSize="10dp"/>
+                android:textSize="10dp" />
 
         </LinearLayout>
 
+        <!-- AccessToken -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/access_token"
-                android:textSize="18dp"/>
+                android:textSize="18dp" />
 
             <EditText
                 android:id="@+id/et_access_token"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/explain_of_access_token"
-                android:textSize="10dp"/>
+                android:textSize="10dp" />
 
         </LinearLayout>
 
+        <!-- Specified device -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/specified_device"
-                android:textSize="18dp"/>
+                android:textSize="18dp" />
 
             <EditText
                 android:id="@+id/et_specified_device"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/tip_specified_device"
-                android:textSize="10dp"/>
+                android:textSize="10dp" />
 
         </LinearLayout>
 
+        <!-- token登录按钮-->
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/start_to_experience"
             android:layout_marginTop="20dp"
-            android:onClick="onClickStartExperience"/>
+            android:onClick="onClickStartExperience"
+            android:text="@string/start_to_experience" />
 
+        <!-- 账号登录按钮-->
         <TextView
             android:id="@+id/tv_ezviz_account_login"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:onClick="onClickLoginByEzvizAccount"
             android:text="@string/login_by_ezviz_account"
             android:textColor="@color/blue_text"
-            android:onClick="onClickLoginByEzvizAccount"
-            android:layout_marginTop="10dp"
             android:textSize="16dp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
     </LinearLayout>
 
@@ -239,9 +193,9 @@
         android:id="@+id/vg_login_anim"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="invisible">
+        android:visibility="gone">
 
-        <include layout="@layout/layout_login_anim"/>
+        <include layout="@layout/layout_login_anim" />
 
     </FrameLayout>
 

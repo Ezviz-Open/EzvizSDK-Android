@@ -137,9 +137,9 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
     private String mDeviceType;
     private DeviceModel mDeviceModel;
 
-    
+
     private boolean isActivated; // Used to determine whether the jump from the activation page
-    
+
     private EZProbeDeviceInfoResult mEZProbeDeviceInfo = null;
 
     private EditText mVerifyCodeEt;
@@ -283,7 +283,7 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
                 intent.putExtra(BUNDE_SERIANO, mSeriesNumberEt.getText().toString());
                 intent.putExtra(BUNDE_VERYCODE, mVerifyCodeEt.getText().toString());
                 if (mEZProbeDeviceInfo != null && mEZProbeDeviceInfo.getEZProbeDeviceInfo() != null){
-                    if (mEZProbeDeviceInfo.getEZProbeDeviceInfo().getSupportAP() == 2 || mEZProbeDeviceInfo.getEZProbeDeviceInfo().getSupportAP() == 1){
+                    if (mEZProbeDeviceInfo.getEZProbeDeviceInfo().getSupportAP() == 2){
                         ConfigWifiExecutingActivityPresenter.addPresenter(new ApConfigWifiPresenterForFullSdk());
                         intent.putExtra("support_Ap", true);
                     }
@@ -512,7 +512,7 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
         intent.putExtra(AutoWifiConnectingActivity.FROM_PAGE,
                 AutoWifiConnectingActivity.FROM_PAGE_SERIES_NUM_SEARCH_ACTIVITY);
         startActivity(intent);
-        
+
         mHasShowInputPswDialog = false;
     }
 

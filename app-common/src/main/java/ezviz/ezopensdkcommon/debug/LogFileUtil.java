@@ -18,16 +18,10 @@ public class LogFileUtil {
      * 保存日志文件：启动
      */
     public static void startSaveLogToFile(Context context){
-        // 检查存储权限
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED){
-            Log.e(TAG, "startSaveLogToFile failed: lack of Manifest.permission.WRITE_EXTERNAL_STORAGE");
-            return;
-        }
-
         Calendar calendar = Calendar.getInstance();
         String time = String.format(Locale.CHINA, "log_%04d%02d%02d_%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.HOUR_OF_DAY));
-        final String logFileNameWithPath = Environment.getExternalStorageDirectory().getPath() + "/0_OpenSDK/" + time + ".txt";
+        final String logFileNameWithPath = context.getExternalFilesDir(null).getPath() + "/0_OpenSDK/" + time + ".txt";
+        Log.d(TAG, "logFileNameWithPath = " + logFileNameWithPath);
         LogFileService.start(logFileNameWithPath);
     }
 

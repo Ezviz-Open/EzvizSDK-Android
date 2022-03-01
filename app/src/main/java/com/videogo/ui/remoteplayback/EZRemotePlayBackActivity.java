@@ -82,7 +82,6 @@ import com.videogo.util.LocalInfo;
 import com.videogo.util.LogUtil;
 import com.videogo.util.MediaScanner;
 import com.videogo.util.RotateViewUtil;
-import com.videogo.util.SDCardUtil;
 import com.videogo.util.Utils;
 import com.videogo.widget.CheckTextButton;
 import com.videogo.widget.CustomRect;
@@ -1244,17 +1243,17 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
             return;
         }
 
-        if (!SDCardUtil.isSDCardUseable()) {
-            // 提示SD卡不可用
-            Utils.showToast(this, R.string.remoteplayback_SDCard_disable_use);
-            return;
-        }
-
-        if (SDCardUtil.getSDCardRemainSize() < SDCardUtil.PIC_MIN_MEM_SPACE) {
-            // 提示内存不足
-            Utils.showToast(this, R.string.remoteplayback_record_fail_for_memory);
-            return;
-        }
+//        if (!SDCardUtil.isSDCardUseable()) {
+//            // 提示SD卡不可用
+//            Utils.showToast(this, R.string.remoteplayback_SDCard_disable_use);
+//            return;
+//        }
+//
+//        if (SDCardUtil.getSDCardRemainSize() < SDCardUtil.PIC_MIN_MEM_SPACE) {
+//            // 提示内存不足
+//            Utils.showToast(this, R.string.remoteplayback_record_fail_for_memory);
+//            return;
+//        }
 
         if (mEZMediaPlayer != null) {
             mCaptureDisplaySec = 4;
@@ -1262,7 +1261,7 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
             mAudioPlayUtil.playAudioFile(AudioPlayUtil.RECORD_SOUND);
             // 可以采用deviceSerial+时间作为文件命名，demo中简化，只用时间命名
             java.util.Date date = new java.util.Date();
-            final String strRecordFile = Environment.getExternalStorageDirectory().getPath() + "/EZOpenSDK/Records/" + String.format("%tY", date)
+            final String strRecordFile = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + String.format("%tY", date)
                     + String.format("%tm", date) + String.format("%td", date) + "/"
                     + String.format("%tH", date) + String.format("%tM", date) + String.format("%tS", date) + String.format("%tL", date) + ".mp4";
 
@@ -1386,17 +1385,17 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
 
     private void onCapturePicBtnClick() {
         mControlDisplaySec = 0;
-        if (!SDCardUtil.isSDCardUseable()) {
-            // 提示SD卡不可用
-            Utils.showToast(this, R.string.remoteplayback_SDCard_disable_use);
-            return;
-        }
-
-        if (SDCardUtil.getSDCardRemainSize() < SDCardUtil.PIC_MIN_MEM_SPACE) {
-            // 提示内存不足
-            Utils.showToast(this, R.string.remoteplayback_capture_fail_for_memory);
-            return;
-        }
+//        if (!SDCardUtil.isSDCardUseable()) {
+//            // 提示SD卡不可用
+//            Utils.showToast(this, R.string.remoteplayback_SDCard_disable_use);
+//            return;
+//        }
+//
+//        if (SDCardUtil.getSDCardRemainSize() < SDCardUtil.PIC_MIN_MEM_SPACE) {
+//            // 提示内存不足
+//            Utils.showToast(this, R.string.remoteplayback_capture_fail_for_memory);
+//            return;
+//        }
 
         if (mEZMediaPlayer != null) {
             mCaptureDisplaySec = 4;
@@ -1415,7 +1414,7 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
 
                             // 可以采用deviceSerial+时间作为文件命名，demo中简化，只用时间命名
                             java.util.Date date = new java.util.Date();
-                            final String path = Environment.getExternalStorageDirectory().getPath() + "/EZOpenSDK/CapturePicture/" + String.format("%tY", date)
+                            final String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + String.format("%tY", date)
                                     + String.format("%tm", date) + String.format("%td", date) + "/"
                                     + String.format("%tH", date) + String.format("%tM", date) + String.format("%tS", date) + String.format("%tL", date) +".jpg";
 

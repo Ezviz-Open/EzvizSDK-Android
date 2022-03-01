@@ -19,13 +19,10 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.ezviz.opensdk.auth.EZAuthAPI;
 import com.google.gson.Gson;
 import com.videogo.exception.BaseException;
 import com.videogo.openapi.EZOpenSDK;
-import com.videogo.openapi.EzvizAPI;
 import com.videogo.ui.cameralist.EZCameraListActivity;
 import com.videogo.util.LocalInfo;
 import com.videogo.util.LogUtil;
@@ -43,133 +40,67 @@ import ezviz.ezopensdkcommon.common.RootActivity;
 
 import static com.videogo.EzvizApplication.getOpenSDK;
 import static com.videogo.constant.Constant.OAUTH_SUCCESS_ACTION;
+import static ezviz.ezopensdk.demo.ServerAreasEnum.ASIA_CHINA;
 
 public class MainActivity extends RootActivity {
 
     private final static String TAG = MainActivity.class.getSimpleName();
-    private ServerAreasEnum mCurrentServerArea = null;
+    private ServerAreasEnum mCurrentServerArea;
     private EditText mApiET;
     private EditText mAuthET;
-    private EditText mAppKeyET = null;
-    private EditText mAccessTokenET = null;
+    private EditText mAppKeyET;
+    private EditText mAccessTokenET;
+    private EditText mSpecifiedDeviceET;
+    // token登录参数
     public static SdkInitParams mInitParams;
+    // 萤石云账号登录参数
+    private SdkInitParams mSdkInitParams;
+    // 萤石账号登录成功回调广播
+    private BroadcastReceiver mLoginResultReceiver;
+
+    // JuneCheng's AppKey
+    private final static String APPKEY_JC = "请输入你的appkey";
+    private final static String TOKEN_JC = "请输入你的accessToken";
+    // 开发者反馈问题提供的账号信息
+    private final static String APPKEY_DEV = "请输入你的appkey";
+    private final static String TOKEN_DEV = "请输入你的accessToken";
+    private final static String DEVICE_DEV = "请输入你的设备序列号";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         initData();
         initUI();
+        autoLogin();
 
-        View view = findViewById(R.id.page_container);
-        if (view != null) {
-            view.post(new Runnable() {
-                @Override
-                public void run() {
-                    if (TextUtils.isEmpty(mInitParams.appKey)) {
-                        showToast("AppKey is empty!");
-                        return;
-                    }
-                    if (LocalInfo.getInstance().getEZAccesstoken() == null || LocalInfo.getInstance().getEZAccesstoken().getAccessToken() == null) {
-                        String tip = "AccessToken is empty!";
-                        LogUtil.i(TAG, tip);
-//                        showToast(tip);
-                        return;
-                    }
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            startCheckLoginValidity();
-                        }
-                    }).start();
-                }
-            });
-        }
-
-        findViewById(R.id.btn_sdk_login).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (EzvizAPI.getInstance().isLogin()) {
-                    jumpToCameraListActivity();
-                    finish();
-                } else {
-                    getOpenSDK().openLoginPage();
-                }
-            }
-        });
-        findViewById(R.id.btn_ezviz_login).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (EZAuthAPI.isEzvizAppInstalledWithType(MainActivity.this, EZAuthAPI.EZAuthPlatform.EZVIZ)) {
-                    /**
-                     * ezviz_login
-                     */
-                    EZAuthAPI.sendAuthReq(MainActivity.this, EZAuthAPI.EZAuthPlatform.EZVIZ);
-                } else {
-                    Toast.makeText(MainActivity.this, "uninstalled or version is not newest", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-        findViewById(R.id.btn_logout).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                /**
-                 * logout
-                 */
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        getOpenSDK().logout();
-                    }
-                }).start();
-
-            }
-        });
-        findViewById(R.id.btn_support).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), SupportActivity.class);
-                startActivity(intent);
-            }
-        });
-    }
-
-    private void initData() {
-        SpTool.init(getApplicationContext());
-        if (!loadLastSdkInitParams()) {
-            LoadDefaultSdkInitParams();
-        }
-        mInitParams.accessToken = null;
-        SdkInitTool.initSdk(getApplication(), mInitParams);
-    }
-
-    private boolean loadLastSdkInitParams() {
-        String sdkInitParamStr = SpTool.obtainValue(ValueKeys.SDK_INIT_PARAMS);
-        if (sdkInitParamStr != null) {
-            mInitParams = new Gson().fromJson(sdkInitParamStr, SdkInitParams.class);
-            return mInitParams != null && mInitParams.appKey != null;
-        }
-        return false;
-    }
-
-    private void LoadDefaultSdkInitParams() {
-        mInitParams = SdkInitParams.createBy(null);
-        mInitParams.appKey = "26810f3acd794862b608b6cfbc32a6b8";
-        mInitParams.openApiServer = "https://open.ys7.com";
-        mInitParams.openAuthApiServer = "https://openauth.ys7.com";
+        mAppKeyET.setText(APPKEY_DEV);
+        mAccessTokenET.setText(TOKEN_DEV);
+        mSpecifiedDeviceET.setText(DEVICE_DEV);
     }
 
     /**
-     * 检查AccessToken是否有效
+     * 通过AccessToken进行体验
      */
-    private void startCheckLoginValidity() {
-        showLoginAnim(true);
-        if (checkAppKeyAndAccessToken()) {
-            jumpToCameraListActivity();
-            finish();
+    public void onClickStartExperience(View view) {
+        if (checkLoginInfo()) {
+            SdkInitParams sdkInitParams = SdkInitParams.createBy(mCurrentServerArea);
+            sdkInitParams.appKey = getValidText(mAppKeyET.getText().toString());
+            sdkInitParams.accessToken = getValidText(mAccessTokenET.getText().toString());
+            sdkInitParams.openApiServer = getValidText(mApiET.getText().toString());
+            sdkInitParams.openAuthApiServer = getValidText(mAuthET.getText().toString());
+            sdkInitParams.specifiedDevice = getValidText(mSpecifiedDeviceET.getText().toString());
+            SdkInitTool.initSdk(getApplication(), sdkInitParams);
+            new Thread(() -> {
+                showLoginAnim(true);
+                if (checkAppKeyAndAccessToken()) {
+                    // 保存相关信息
+                    saveLastSdkInitParams(sdkInitParams);
+                    jumpToCameraListActivity();
+                }
+                showLoginAnim(false);
+            }).start();
         }
-        showLoginAnim(false);
     }
 
     /**
@@ -188,8 +119,32 @@ public class MainActivity extends RootActivity {
         getOpenSDK().openLoginPage();
     }
 
-    private SdkInitParams mSdkInitParams = null;
-    private BroadcastReceiver mLoginResultReceiver = null;
+    public void jcTestClick(View view) {
+        mSpecifiedDeviceET.setText("");
+        SdkInitParams sdkInitParams = SdkInitParams.createBy(ASIA_CHINA);
+        sdkInitParams.appKey = APPKEY_JC;
+        sdkInitParams.accessToken = TOKEN_JC;
+        sdkInitParams.specifiedDevice = "";
+        SdkInitTool.initSdk(getApplication(), sdkInitParams);
+        new Thread(() -> {
+            showLoginAnim(true);
+            if (checkAppKeyAndAccessToken()) {
+                // 保存相关信息
+                saveLastSdkInitParams(sdkInitParams);
+                jumpToCameraListActivity();
+            }
+            showLoginAnim(false);
+        }).start();
+    }
+
+    /**
+     * 跳转设备列表页面
+     */
+    private void jumpToCameraListActivity() {
+        Intent toCameraListIntent = new Intent(getApplicationContext(), EZCameraListActivity.class);
+        startActivity(toCameraListIntent);
+        finish();
+    }
 
     private void registerLoginResultReceiver() {
         if (mLoginResultReceiver == null) {
@@ -217,38 +172,49 @@ public class MainActivity extends RootActivity {
         }
     }
 
-    /**
-     * 通过AccessToken进行体验
-     */
-    public void onClickStartExperience(View view) {
-        if (checkLoginInfo()) {
-            SdkInitParams sdkInitParams = SdkInitParams.createBy(mCurrentServerArea);
-            sdkInitParams.openApiServer = getValidText(mApiET.getText().toString());
-            sdkInitParams.openAuthApiServer = getValidText(mAuthET.getText().toString());
-            sdkInitParams.appKey = getValidText(mAppKeyET.getText().toString());
-            sdkInitParams.accessToken = getValidText(mAccessTokenET.getText().toString());
-            SdkInitTool.initSdk(getApplication(), sdkInitParams);
-//            switchServerToCurrent();
-
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    showLoginAnim(true);
-                    if (checkAppKeyAndAccessToken()) {
-                        // 保存相关信息
-                        SdkInitParams sdkInitParams = SdkInitParams.createBy(mCurrentServerArea);
-                        sdkInitParams.appKey = getValidText(mAppKeyET.getText().toString());
-                        sdkInitParams.openApiServer = getValidText(mApiET.getText().toString());
-                        sdkInitParams.openAuthApiServer = getValidText(mAuthET.getText().toString());
-                        saveLastSdkInitParams(sdkInitParams);
-                        // 跳转到主界面
-                        jumpToCameraListActivity();
-                    }
-                    showLoginAnim(false);
-                }
-            }).start();
-
+    private void initData() {
+        SpTool.init(getApplicationContext());
+        if (!loadLastSdkInitParams()) {
+            loadDefaultSdkInitParams();
         }
+        mInitParams.accessToken = null;
+        SdkInitTool.initSdk(getApplication(), mInitParams);
+    }
+
+    /**
+     * 是否能获取到之前的初始化参数
+     *
+     * @return 是否能获取到之前的初始化参数
+     */
+    private boolean loadLastSdkInitParams() {
+        String sdkInitParamStr = SpTool.obtainValue(ValueKeys.SDK_INIT_PARAMS);
+        if (sdkInitParamStr != null) {
+            mInitParams = new Gson().fromJson(sdkInitParamStr, SdkInitParams.class);
+            return mInitParams != null && mInitParams.appKey != null;
+        }
+        return false;
+    }
+
+    /**
+     * 设置默认参数
+     */
+    private void loadDefaultSdkInitParams() {
+        mInitParams = SdkInitParams.createBy(null);
+        mInitParams.appKey = "fd82f9a6f0154aa2aa9284ae7af25a5b";
+        mInitParams.openApiServer = "https://open.ys7.com";
+        mInitParams.openAuthApiServer = "https://openauth.ys7.com";
+    }
+
+    /**
+     * 检查AccessToken是否有效
+     */
+    private void startCheckLoginValidity() {
+        showLoginAnim(true);
+        if (checkAppKeyAndAccessToken()) {
+            jumpToCameraListActivity();
+            finish();
+        }
+        showLoginAnim(false);
     }
 
     private String getValidText(String origin) {
@@ -266,39 +232,31 @@ public class MainActivity extends RootActivity {
         return target.toString();
     }
 
-    private void jumpToCameraListActivity() {
-        Intent toCameraListIntent = new Intent(getApplicationContext(), EZCameraListActivity.class);
-        EditText specifiedDeviceEt = (EditText) findViewById(R.id.et_specified_device);
-        if (specifiedDeviceEt != null && !TextUtils.isEmpty(specifiedDeviceEt.getText().toString())) {
-            toCameraListIntent.putExtra(ValueKeys.DEVICE_SERIAL.name(), specifiedDeviceEt.getText().toString());
-        }
-        MainActivity.this.startActivity(toCameraListIntent);
-        MainActivity.this.finish();
-    }
 
     private ViewGroup mLoginAnimVg = null;
     private boolean isShowLoginAnim = false;
 
     private void showLoginAnim(final boolean show) {
         if (mLoginAnimVg == null) {
-            mLoginAnimVg = (ViewGroup) findViewById(R.id.vg_login_anim);
+            mLoginAnimVg = findViewById(R.id.vg_login_anim);
         }
         if (mLoginAnimVg == null) {
             return;
         }
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                isShowLoginAnim = show;
-                if (show) {
-                    mLoginAnimVg.setVisibility(View.VISIBLE);
-                } else {
-                    mLoginAnimVg.setVisibility(View.INVISIBLE);
-                }
-            }
+        runOnUiThread(() -> {
+            isShowLoginAnim = show;
+            mLoginAnimVg.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
         });
     }
 
+    /**
+     * 保存上次sdk初始化的参数
+     */
+    private void saveLastSdkInitParams(SdkInitParams sdkInitParams) {
+        // 不保存AccessToken
+        sdkInitParams.accessToken = null;
+        SpTool.storeValue(ValueKeys.SDK_INIT_PARAMS, sdkInitParams.toString());
+    }
 
     /**
      * 获取上次sdk初始化的参数
@@ -310,15 +268,6 @@ public class MainActivity extends RootActivity {
         } else {
             return new Gson().fromJson(lastSdkInitParamsStr, SdkInitParams.class);
         }
-    }
-
-    /**
-     * 保存上次sdk初始化的参数
-     */
-    private void saveLastSdkInitParams(SdkInitParams sdkInitParams) {
-        // 不保存AccessToken
-        sdkInitParams.accessToken = null;
-        SpTool.storeValue(ValueKeys.SDK_INIT_PARAMS, sdkInitParams.toString());
     }
 
     /**
@@ -349,11 +298,9 @@ public class MainActivity extends RootActivity {
         return isValid;
     }
 
-    private void switchServerToCurrent() {
-        EzvizAPI.getInstance().setServerUrl(mCurrentServerArea.openApiServer, mCurrentServerArea.openAuthApiServer);
-        Log.e(TAG, "switched server area!!!\n" + mCurrentServerArea.toString());
-    }
-
+    /**
+     * 验证是否输入 AppKey 和 AccessToken
+     */
     private boolean checkLoginInfo() {
         if (mAppKeyET.getText().toString().equals("")) {
             toast("AppKey不能为空");
@@ -368,17 +315,17 @@ public class MainActivity extends RootActivity {
 
     private void initUI() {
         // 设置服务器区域下拉框显示和监听
-        Spinner areaServerSp = (Spinner) findViewById(R.id.sp_server_area);
+        Spinner areaServerSp = findViewById(R.id.sp_server_area);
         if (areaServerSp != null) {
             ServerAreasSpAdapter adapter = new ServerAreasSpAdapter(getApplicationContext(), ServerAreasEnum.getAllServers());
             areaServerSp.setAdapter(adapter);
             areaServerSp.setOnItemSelectedListener(mServerAreasOnItemCLickLister);
         }
-
-        mAppKeyET = (EditText) findViewById(R.id.et_app_key);
-        mAccessTokenET = (EditText) findViewById(R.id.et_access_token);
+        mAppKeyET = findViewById(R.id.et_app_key);
+        mAccessTokenET = findViewById(R.id.et_access_token);
         mApiET = findViewById(R.id.et_api_url);
         mAuthET = findViewById(R.id.et_auth_server);
+        mSpecifiedDeviceET = findViewById(R.id.et_specified_device);
 
         SdkInitParams sdkInitParams = getLastSdkInitParams();
         if (sdkInitParams != null) {
@@ -387,6 +334,7 @@ public class MainActivity extends RootActivity {
                 mAccessTokenET.setText(EZOpenSDK.getInstance().getEZAccessToken().getAccessToken());
                 mApiET.setText(sdkInitParams.openApiServer);
                 mAuthET.setText(sdkInitParams.openAuthApiServer);
+                mSpecifiedDeviceET.setText(sdkInitParams.specifiedDevice);
             } catch (Exception e) {
                 LogUtil.d(TAG, "failed to load AccessToken");
             }
@@ -399,9 +347,30 @@ public class MainActivity extends RootActivity {
             }
         }
 
-        TextView sdkVerTv = (TextView) findViewById(R.id.tv_sdk_ver);
+        TextView sdkVerTv = findViewById(R.id.tv_sdk_ver);
         if (sdkVerTv != null) {
             sdkVerTv.setText("SDK Version: " + BuildConfig.VERSION_NAME);
+        }
+    }
+
+    /**
+     * 自动登录
+     */
+    private void autoLogin() {
+        View view = findViewById(R.id.page_container);
+        if (view != null) {
+            view.post(() -> {
+                if (TextUtils.isEmpty(mInitParams.appKey)) {
+                    showToast("AppKey is empty!");
+                    return;
+                }
+                if (LocalInfo.getInstance().getEZAccesstoken() == null || LocalInfo.getInstance().getEZAccesstoken().getAccessToken() == null) {
+                    String tip = "AccessToken is empty!";
+                    LogUtil.i(TAG, tip);
+                    return;
+                }
+                new Thread(() -> startCheckLoginValidity()).start();
+            });
         }
     }
 
@@ -412,26 +381,8 @@ public class MainActivity extends RootActivity {
             mCurrentServerArea = ServerAreasEnum.getAllServers().get(position);
             mApiET.setText(mCurrentServerArea.openApiServer);
             mAuthET.setText(mCurrentServerArea.openAuthApiServer);
-
-            // http://canal.hikvision.com.cn/browse/BUGOL-11702
-//            mAppKeyET.setText("26810f3acd794862b608b6cfbc32a6b8");
-//            mAccessTokenET.setText("at.77ytj1783a7bajs0a09u0a0u64tiolca-26k51q60pv-1sb9ipj-kxcdnnmap");
-            // 李海涛appKey
-            mAppKeyET.setText("680948cc41c44fbaac23d8b47be4028b");
-            mAccessTokenET.setText("at.6xy57hb9csyw6gxa88yb4tl15etbz3o7-77ccfaak18-0786lcg-t8gnjapxn");
-            // 程骏appKey
-//            mAppKeyET.setText("fd82f9a6f0154aa2aa9284ae7af25a5b");
-//            mAccessTokenET.setText("");
-            // 开发者反馈问题提供的账号信息
-            mAppKeyET.setText("4308f6d5e14340be8015b5b15ddea676");
-            mAccessTokenET.setText("at.1z8jwaum3n63wt4a243rswuh5nsjlrsy-2vdj7qgh04-0o2qdpw-nwe49hqgt");
-
             // 仅预置了appKey的区域才展示萤石账号登录按钮
-            if (mCurrentServerArea.defaultOpenAuthAppKey != null) {
-                showEzvizAccountLoginTv(true);
-            } else {
-                showEzvizAccountLoginTv(false);
-            }
+            showEzvizAccountLoginTv(mCurrentServerArea.defaultOpenAuthAppKey != null);
         }
 
         @Override
@@ -440,15 +391,8 @@ public class MainActivity extends RootActivity {
         }
 
         private void showEzvizAccountLoginTv(boolean show) {
-            View loginTv = MainActivity.this.findViewById(R.id.tv_ezviz_account_login);
-            if (loginTv == null) {
-                return;
-            }
-            if (show) {
-                loginTv.setVisibility(View.VISIBLE);
-            } else {
-                loginTv.setVisibility(View.INVISIBLE);
-            }
+            View loginTv = findViewById(R.id.tv_ezviz_account_login);
+            loginTv.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
         }
 
     };

@@ -38,22 +38,22 @@ class RtpStreamPlayActivity : RootActivity(), EscDataCallback {
 
         textureView_play.surfaceTextureListener = object : TextureView.SurfaceTextureListener {
 
-            override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture?, width: Int, height: Int) {
+            override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {
 
             }
 
-            override fun onSurfaceTextureUpdated(surface: SurfaceTexture?) {
+            override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {
 
             }
 
-            override fun onSurfaceTextureDestroyed(surface: SurfaceTexture?): Boolean {
+            override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {
                 Player.getInstance()?.apply {
                     stop(mPlayerPort)
                 }
                 return true
             }
 
-            override fun onSurfaceTextureAvailable(surface: SurfaceTexture?, width: Int, height: Int) {
+            override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
                 Player.getInstance().playEx(mPlayerPort, surface)
                 OriginStreamControlActivity.mDataCallback2 = this@RtpStreamPlayActivity
             }

@@ -78,6 +78,7 @@ class JoinRoomActivity : AppCompatActivity() {
             .putExtra(EZRtcTestActivity.InIntentKeysAndValues.KEY_PARAM_HEIGHT, height)
             .putExtra(EZRtcTestActivity.InIntentKeysAndValues.KEY_PARAM_FPS, fps)
             .putExtra(EZRtcTestActivity.InIntentKeysAndValues.KEY_PARAM_BITRATE, bitrate * 1024)
+            .putExtra(EZRtcTestActivity.InIntentKeysAndValues.KEY_PARAM_OPUS, cb_opus.isChecked)
         startActivityForResult(intent, 100)
     }
 }

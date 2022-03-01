@@ -128,8 +128,7 @@ public class QueryDeviceRecordFilesAsyncTask extends HikAsyncTask<String, Void, 
 
         List<EZDeviceRecordFile> tmpList = null;
         try {
-            tmpList = EzvizApplication.getOpenSDK().searchRecordFileFromDevice(deviceSerial, channelNo,
-                    startTime, endTime, recordType);
+            tmpList = EzvizApplication.getOpenSDK().searchRecordFileFromDevice(deviceSerial, channelNo, startTime, endTime);
         } catch (BaseException e) {
             e.printStackTrace();
 

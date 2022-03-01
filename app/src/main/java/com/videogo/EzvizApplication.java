@@ -23,9 +23,8 @@ import com.videogo.openapi.EZOpenSDK;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
 
+import ezviz.ezopensdk.BuildConfig;
 import ezviz.ezopensdk.demo.SdkInitParams;
 import ezviz.ezopensdkcommon.common.BaseApplication;
 
@@ -50,19 +49,15 @@ public class EzvizApplication extends BaseApplication {
 
                     saveLogToFile(thread, throwable);
 
-                restartApp(EzvizApplication.this);
+                    if (!BuildConfig.DEBUG){
+                        restartApp(EzvizApplication.this);
+                    }
             }
         });
     }
 
     public void saveLogToFile(Thread th, Throwable throwable)  {
-
-        String logPath = Environment.getExternalStorageDirectory().getAbsolutePath()+ File.separator+"log";
-
-        Writer info = new StringWriter();
-
-        String str = Environment.getExternalStorageDirectory().getPath()+"/2_videoTalk_crash/log.txt";
-        final File logFile = new File(Environment.getExternalStorageDirectory().getPath()+"/2_videoTalk_crash/log.txt");
+        final File logFile = new File(getExternalFilesDir(null)+"/0_OpenSDK/crash.txt");
 
         PrintWriter printWriter = null;
 
