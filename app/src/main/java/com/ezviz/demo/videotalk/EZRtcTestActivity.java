@@ -31,10 +31,14 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ezviz.sdk.videotalk.bean.ClientJoinInfo;
 import com.ezviz.sdk.videotalk.meeting.EZRtcCallback;
 import com.ezviz.sdk.videotalk.meeting.EZRtcParam;
 import com.ezviz.sdk.videotalk.sdk.EZRtc;
+import com.ezviz.videotalk.videomeeting.ConstVideoMeeting;
 import com.videogo.exception.BaseException;
+import com.videogo.openapi.bean.EZDeviceInfo;
+import com.videogo.ui.cameralist.SelectCameraInviteDeviceDialog;
 import com.videogo.util.LogUtil;
 
 import java.util.ArrayList;
@@ -72,7 +76,8 @@ public class EZRtcTestActivity extends AppCompatActivity implements OnStatusChan
     private TextureView mLocalView;
     private TextureView mShareView;
     private TextView mShareName, tvRoomId, tvNetQuality, tvCount;
-    private Button btnDiss, btnExit;
+    private Button btnInviteDevice, btnDiss, btnExit;
+    private CheckBox checkboxBavlog;
 
     //capture
     private CheckBox cbVideo;
@@ -84,7 +89,10 @@ public class EZRtcTestActivity extends AppCompatActivity implements OnStatusChan
     private RecyclerView mPlayerGridView;
     private RecyclerView mClientListView;
 
+    private List<EZDeviceInfo> mEZDeviceInfoList = new ArrayList<>();
+
     //info
+    private String mAppId;
     private int mRoomID;
     private String mUserId;
     private String mPassword;
@@ -92,6 +100,8 @@ public class EZRtcTestActivity extends AppCompatActivity implements OnStatusChan
     //ScreenRecord
     private static final int REQUEST_MEDIA_PROJECTION = 1000;
     private Switch switchScreen, switchSubShare;
+
+    private SelectCameraInviteDeviceDialog selectCameraInviteDeviceDialog;
 
     //service
     private boolean isRecovery;
@@ -104,6 +114,7 @@ public class EZRtcTestActivity extends AppCompatActivity implements OnStatusChan
             mStoredData = myBinder.getData();
             mClientInfoList = mStoredData.mClientList;
             if (isRecovery){
+                mAppId = mStoredData.mAppId;
                 mRoomID = mStoredData.mRoomId;
                 mUserId = mStoredData.userId;
                 showContent();
@@ -125,7 +136,7 @@ public class EZRtcTestActivity extends AppCompatActivity implements OnStatusChan
                     mStoredData.mRoomId = mRoomID;
                     mStoredData.userId = mUserId;
                     try {
-                        mEZRtc.enterRoom(mRoomID, mPassword, mUserId);
+                        mEZRtc.enterRoom(mAppId, mRoomID, mPassword, mUserId);
                     } catch (BaseException e) {
                         e.printStackTrace();
                         toast("加入房间失败" + e.getErrorCode());
@@ -288,6 +299,7 @@ public class EZRtcTestActivity extends AppCompatActivity implements OnStatusChan
         }
 
         mPassword = getIntent().getStringExtra(InIntentKeysAndValues.KEY_PASSWORD);
+        mAppId = getIntent().getStringExtra(InIntentKeysAndValues.KEY_APP_ID);
         mRoomID = getIntent().getIntExtra(InIntentKeysAndValues.KEY_ROOM_ID, -1);
         mUserId = getIntent().getStringExtra(InIntentKeysAndValues.KEY_USER_ID);
 
@@ -330,8 +342,11 @@ public class EZRtcTestActivity extends AppCompatActivity implements OnStatusChan
         tvRoomId = findViewById(R.id.tv_room);
         tvCount = findViewById(R.id.tv_count);
         tvNetQuality = findViewById(R.id.tv_net_quality);
+        btnInviteDevice = findViewById(R.id.btn_invite_device);
         btnDiss = findViewById(R.id.btn_diss);
         btnExit = findViewById(R.id.btn_exit);
+
+        checkboxBavlog = findViewById(R.id.checkbox_bavlog);
 
         mPlayerGridView = findViewById(R.id.player_list);
         mClientListView = findViewById(R.id.client_list);
@@ -382,6 +397,7 @@ public class EZRtcTestActivity extends AppCompatActivity implements OnStatusChan
         cbAudio.setChecked(mStoredData.audioState);
         switchScreen.setChecked(mStoredData.shareSwitch);
 
+        btnInviteDevice.setEnabled(true);
         btnDiss.setEnabled(true);
         btnExit.setEnabled(true);
         cbVideo.setEnabled(true);
@@ -403,6 +419,21 @@ public class EZRtcTestActivity extends AppCompatActivity implements OnStatusChan
     }
 
     private void initListener() {
+        checkboxBavlog.setOnCheckedChangeListener((buttonView, isChecked) ->
+                mEZRtc.setBavLevel(isChecked? ConstVideoMeeting.BavLogLevel.BAV_LOG_LEVEL_DEBUG : ConstVideoMeeting.BavLogLevel.BAV_LOG_LEVEL_INFO)
+        );
+
+        btnInviteDevice.setOnClickListener(v -> {
+            if(selectCameraInviteDeviceDialog == null) {
+                selectCameraInviteDeviceDialog = new SelectCameraInviteDeviceDialog();
+                selectCameraInviteDeviceDialog.setCameraItemClick(deviceInfo -> {
+                    mEZRtc.deviceEnterRoom(mRoomID, deviceInfo.getDeviceSerial(), deviceInfo.getCameraNum(), EZRtcParam.StreamType.MAIN, EZRtcParam.JoinAVMode.TWO_WAY_AV_MODE, 0);
+                    mEZDeviceInfoList.add(deviceInfo);
+                });
+            }
+            selectCameraInviteDeviceDialog.show(getFragmentManager(), "selectDevice");
+        });
+
         btnDiss.setOnClickListener(view -> {
             AlertDialog ensureDialog = new AlertDialog.Builder(EZRtcTestActivity.this)
                     .setTitle("确定解散房间吗？")
@@ -625,14 +656,41 @@ public class EZRtcTestActivity extends AppCompatActivity implements OnStatusChan
 
     }
 
+    @Override
+    public void onkickoutDevice(ClientJoinInfo info) {
+        AlertDialog ensureKickoutDialog = new AlertDialog.Builder(this)
+                    .setTitle("踢出设备：" + info.customId)
+                    .setPositiveButton("确定", (dialog, which) -> {
+                        EZDeviceInfo mEZDeviceInfo = null;
+                        for (EZDeviceInfo deviceInfo : mEZDeviceInfoList) {
+                            if (info.isDevice && info.customId.equals(deviceInfo.getDeviceSerial() + "_" + deviceInfo.getCameraNum())) {
+                                mEZDeviceInfo = deviceInfo;
+                                break;
+                            }
+                        }
+                        if (mEZDeviceInfo != null) {
+                            kickoutDeviceMoveOutRoom(info.roomId, mEZDeviceInfo);
+                        }
+                        dialog.dismiss();
+                    })
+                    .create();
+        ensureKickoutDialog.show();
+    }
+
+    private void kickoutDeviceMoveOutRoom(int roomId, EZDeviceInfo mEZDeviceInfo) {
+        if(mEZDeviceInfo != null) {
+            mEZRtc.deviceKickoutRoom(roomId, mEZDeviceInfo.getDeviceSerial(), mEZDeviceInfo.getCameraNum());
+        }
+    }
+
     private class TalkStateCallBack implements EZRtcCallback {
 
         @Override
-        public void onUserJoinRoom(String userId) {
+        public void onUserJoinRoom(ClientJoinInfo joinInfo) {
 
             runOnUiThread(() -> {
                 EZClientInfo clientInfo = new EZClientInfo();
-                clientInfo.userId = userId;
+                clientInfo.joinInfo = joinInfo;
                 EZClientInfo.insertOrReplace(clientInfo, mClientInfoList);
                 mClientListView.getAdapter().notifyDataSetChanged();
                 tvCount.setText("共" + (mClientInfoList.size() + 1) + "人");
@@ -696,9 +754,9 @@ public class EZRtcTestActivity extends AppCompatActivity implements OnStatusChan
 
                 mClientListView.getAdapter().notifyItemChanged(mClientInfoList.indexOf(clientInfo));
                 if (lastSubscribeType != clientInfo.subscribeType){
-                    int deletePos = EZClientInfo.delete(clientInfo.userId, mSubscribeList);
+                    int deletePos = EZClientInfo.delete(clientInfo.joinInfo.customId, mSubscribeList);
                     mPlayerGridView.getAdapter().notifyItemRemoved(deletePos);
-                    mEZRtc.setRemoteWindow(null, clientInfo.userId, lastSubscribeType);
+                    mEZRtc.setRemoteWindow(null, clientInfo.joinInfo.customId, lastSubscribeType);
                 }
 
             });
@@ -731,7 +789,7 @@ public class EZRtcTestActivity extends AppCompatActivity implements OnStatusChan
                     switchSubShare.setOnCheckedChangeListener(subShareChangeListener);
                     EZClientInfo clientInfo = EZClientInfo.findClient(userId, mClientInfoList);
                     if (clientInfo != null){
-                        mShareName.setText(clientInfo.userId + "正在分享");
+                        mShareName.setText(clientInfo.joinInfo.customId + "正在分享");
                     }else {
                         mShareName.setText(userId);
                         mShareName.append("正在分享");
@@ -771,12 +829,12 @@ public class EZRtcTestActivity extends AppCompatActivity implements OnStatusChan
 
         @Override
         public void onError(final int eventCode) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    showAlertDialog(eventCode);
-                }
-            });
+            runOnUiThread(() -> showAlertDialog(eventCode));
+        }
+
+        @Override
+        public void onDeviceStateError(int errorCode, String errorMsg) {
+            runOnUiThread(() -> toast("设备相关errorCode：" + errorCode + " errorMsg:" + errorMsg));
         }
 
     }
@@ -793,7 +851,7 @@ public class EZRtcTestActivity extends AppCompatActivity implements OnStatusChan
                 .setPositiveButton("确定", (dialog, which) -> {
                     dialog.dismiss();
                     for (EZClientInfo clientInfo : mClientInfoList){
-                        mEZRtc.setRemoteWindow(null, clientInfo.userId, clientInfo.subscribeType);
+                        mEZRtc.setRemoteWindow(null, clientInfo.joinInfo.customId, clientInfo.subscribeType);
                         clientInfo.subscribeType = EZRtcParam.StreamType.NONE;
                     }
 
@@ -809,6 +867,7 @@ public class EZRtcTestActivity extends AppCompatActivity implements OnStatusChan
         ensureDialog.show();
     }
 
+    @SuppressLint("NewApi")
     private void showAlertDialog(String content){
         stopService();
         AlertDialog ensureDialog = new AlertDialog.Builder(this)
@@ -819,6 +878,9 @@ public class EZRtcTestActivity extends AppCompatActivity implements OnStatusChan
                     finish();
                 })
                 .create();
+        if(isFinishing() || isDestroyed()) {
+            return;
+        }
         ensureDialog.show();
     }
 
@@ -864,6 +926,7 @@ public class EZRtcTestActivity extends AppCompatActivity implements OnStatusChan
     public static class InIntentKeysAndValues {
         public final static String KEY_ROOM_ID = "room_id";
         public final static String KEY_USER_ID = "user_id";
+        public final static String KEY_APP_ID = "app_id";
         public final static String KEY_PASSWORD = "key_password";
         public final static String KEY_LIMIT = "key_limit";
 

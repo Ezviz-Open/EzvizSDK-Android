@@ -8,7 +8,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="10dp"
@@ -43,8 +43,16 @@
                 </LinearLayout>
 
             </LinearLayout>
-
-        </LinearLayout>
+            <CheckBox
+                android:id="@+id/checkbox_bavlog"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:background="@null"
+                android:text="bav日志"
+                />
+        </RelativeLayout>
 
 
         <LinearLayout
@@ -190,11 +198,18 @@
             android:orientation="horizontal"
             android:layout_marginBottom="10dp"
             android:gravity="center">
+            <Button
+                android:id="@+id/btn_invite_device"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:text="邀请设备"/>
 
             <Button
                 android:id="@+id/btn_diss"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
                 android:enabled="false"
                 android:text="解散房间"/>
 

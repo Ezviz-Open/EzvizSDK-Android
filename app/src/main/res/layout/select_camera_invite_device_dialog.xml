@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+    <com.videogo.widget.pulltorefresh.PullToRefreshListView
+        android:id="@+id/camera_listview"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_marginBottom="3dp"
+        android:cacheColorHint="@color/transparent"
+        android:divider="@color/transparent"
+        android:drawingCacheQuality="high"
+        android:fadingEdge="none"
+        android:fastScrollEnabled="false"
+        android:listSelector="@null"
+        android:overScrollFooter="@null"
+        android:scrollingCache="true"/>
+
+    <LinearLayout
+        android:id="@+id/no_camera_tip_ly"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:onClick="onClick"
+        android:orientation="vertical"
+        android:visibility="visible"
+        android:gravity="center_horizontal">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/my_no_video"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/not_find_any_devices"
+            android:layout_marginTop="10dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/get_camera_fail_tip_ly"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/get_camera_list_fail_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:gravity="center"
+            android:text="@string/get_camera_list_fail"
+            android:textSize="@dimen/title_text_size"/>
+
+        <Button
+            android:id="@+id/camera_list_refresh_btn"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/refresh_selector"
+            android:onClick="onClick"
+            android:text="@string/refresh"
+            android:textColor="@color/black_text"
+            android:textSize="@dimen/title_text_size"/>
+    </LinearLayout>
+
+</RelativeLayout>

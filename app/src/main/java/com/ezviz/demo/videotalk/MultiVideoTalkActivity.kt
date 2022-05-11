@@ -21,6 +21,7 @@ import com.ezviz.sdk.videotalk.EvcErrorMessage
 import com.ezviz.sdk.videotalk.EvcParam
 import com.ezviz.sdk.videotalk.sdk.EZMeetingCall
 import com.ezviz.videotalk.JNAApi
+import com.ezviz.videotalk.jna.BavClientJoinInfo
 import com.videogo.exception.BaseException
 import com.videogo.openapi.EZOpenSDK
 import ezviz.ezopensdk.R
@@ -435,7 +436,7 @@ class MultiVideoTalkActivity : Activity() {
         }
 
 
-        override fun onJoinRoom(joinInfo: JNAApi.BavJoinInfo, customId: String?) {
+        override fun onJoinRoom(joinInfo: BavClientJoinInfo, customId: String?) {
             runOnUiThread {
 
                 if(TextUtils.isEmpty(mClient)){
@@ -463,7 +464,7 @@ class MultiVideoTalkActivity : Activity() {
             }
         }
         //静音m_szMute为'\u0001',非静音为'\u0000'
-        override fun onClientUpdated(bavJoinInfo: JNAApi.BavJoinInfo?){
+        override fun onClientUpdated(bavJoinInfo: BavClientJoinInfo?){
 
             /*runOnUiThread{
 //                if(videoTalkMap[bavJoinInfo!!.m_uClientId]==null){

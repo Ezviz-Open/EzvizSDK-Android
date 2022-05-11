@@ -40,6 +40,7 @@
     <color name="trans_bg_color">#c0ffffff</color>
     <color name="gray_bg">#ffe5e7e9</color>
     <color name="unopen">#748dac</color>
+    <color name="color_648FFC">#648FFC</color>
     <!-- scan color -->
     <color name="viewfinder_frame">#929292</color>
     <color name="viewfinder_laser">#fe5600</color>

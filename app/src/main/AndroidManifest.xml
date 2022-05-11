@@ -17,11 +17,11 @@
     <!-- 对讲所需权限 -->
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.BLUETOOTH" />
 
     <!-- 视频通话权限所需 -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
     <!-- 以上是sdk所需权限 -->
 
     <!-- 以下是demo所需权限 -->
@@ -42,6 +42,7 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.FLASHLIGHT" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <!-- App receives push messages."my_app_package.push.sdk.permission.EZVIZ_MESSAGE" -->
     <permission
         android:name="ezviz.ezopensdk.push.sdk.permission.EZVIZ_MESSAGE"

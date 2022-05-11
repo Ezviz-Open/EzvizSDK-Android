@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
 import android.view.View
 import android.widget.Toast
+import com.ezviz.demo.other.DataConfig.APPID_DEV
 import ezviz.ezopensdk.R
 import kotlinx.android.synthetic.main.activity_join_room.*
 
@@ -13,6 +14,7 @@ import kotlinx.android.synthetic.main.activity_join_room.*
 class JoinRoomActivity : AppCompatActivity() {
 
     private var roomId = 0
+    private var appId = ""
     private var customerId = ""
     private var password = ""
 
@@ -27,6 +29,7 @@ class JoinRoomActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_join_room)
 
+        edt_appid.setText(APPID_DEV)
         edt_width.setText("$width")
         edt_height.setText("$height")
         edt_bitrate.setText("$bitrate")
@@ -42,6 +45,7 @@ class JoinRoomActivity : AppCompatActivity() {
     }
 
     fun onClickJoin(view : View) {
+        appId = edt_appid.text.toString()
         try {
             roomId = Integer.valueOf(edt_room.text.toString())
         }catch (e : Exception){
@@ -71,6 +75,7 @@ class JoinRoomActivity : AppCompatActivity() {
 
     private fun gotoRoom(){
         val intent = Intent(this, EZRtcTestActivity::class.java)
+            .putExtra(EZRtcTestActivity.InIntentKeysAndValues.KEY_APP_ID, appId)
             .putExtra(EZRtcTestActivity.InIntentKeysAndValues.KEY_ROOM_ID, roomId)
             .putExtra(EZRtcTestActivity.InIntentKeysAndValues.KEY_USER_ID, customerId)
             .putExtra(EZRtcTestActivity.InIntentKeysAndValues.KEY_PASSWORD, password)

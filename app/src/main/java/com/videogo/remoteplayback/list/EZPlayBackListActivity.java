@@ -786,9 +786,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         progressSeekbar.setProgress(progress);
         progressBar.setProgress(progress);
 
-        LogUtil.i(TAG,
-"handlePlayProgress, begin time:" + begin + " endtime:" + end + " osdTime:" + osdTime.getTimeInMillis() + " " +
- "progress:" + progress);
+        LogUtil.i(TAG, "handlePlayProgress, begin time:" + begin + " endtime:" + end + " osdTime:" + osdTime.getTimeInMillis() + " " + "progress:" + progress);
 
         int beginTimeClock = (int) ((osd - begin) / 1000);
         updateTimeBucketBeginTime(beginTimeClock);
@@ -1141,8 +1139,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         getTaskManager().submit(new Runnable() {
             @Override
             public void run() {
-                String strRecordFilePath = DemoConfig.getRecordsFolder() + "/device_" + System.currentTimeMillis() +
-                ".mp4";
+                String strRecordFilePath = DemoConfig.getRecordsFolder() + "/device_" + System.currentTimeMillis() + ".mp4";
                 File file = new File(strRecordFilePath);
                 if (!file.getParentFile().exists()) {
                     file.getParentFile().mkdirs();
@@ -1179,6 +1176,9 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             LogUtil.d(TAG, successMsg);
             toast(successMsg);
             updateNotification(notificationId, successMsg);
+            // 将录像存储到相册，需要动态申请权限
+            File file = new File(filepath);
+            RemoteListUtil.saveVideo2Album(EZPlayBackListActivity.this, file);
         }
 
         @Override

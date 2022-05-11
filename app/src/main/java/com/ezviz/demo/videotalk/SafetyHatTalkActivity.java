@@ -40,6 +40,7 @@ import com.ezviz.sdk.videotalk.EzvizVideoCall;
 import com.ezviz.sdk.videotalk.EzvizVoiceCall;
 import com.ezviz.videotalk.JNAApi;
 import com.ezviz.videotalk.debug.DebugUtils;
+import com.ezviz.videotalk.jna.BavClientJoinInfo;
 import com.videogo.exception.BaseSdkRuntimeException;
 
 import org.json.JSONObject;
@@ -630,12 +631,12 @@ public class SafetyHatTalkActivity extends Activity {
         }
 
         @Override
-        public void onJoinRoom(JNAApi.BavJoinInfo joinInfo) {
+        public void onJoinRoom(BavClientJoinInfo joinInfo) {
 
         }
 
         @Override
-        public void onClientUpdated(JNAApi.BavJoinInfo bavJoinInfo){
+        public void onClientUpdated(BavClientJoinInfo bavJoinInfo){
 
         }
 

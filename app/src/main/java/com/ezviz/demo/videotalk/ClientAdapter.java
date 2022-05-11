@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -65,10 +66,14 @@ public class ClientAdapter extends RecyclerView.Adapter<ClientAdapter.MyViewHold
                 onStatusChangedListener.onSubscribe((String) group.getTag());
             }
         });
-        holder.radioGroup.setTag(clientInfo.userId);
+        holder.radioGroup.setTag(clientInfo.joinInfo.customId);
+        holder.moveoutDeviceBtn.setVisibility(clientInfo.joinInfo.isDevice? View.VISIBLE : View.GONE);
+        holder.moveoutDeviceBtn.setOnClickListener(v -> {
+            onStatusChangedListener.onkickoutDevice(clientInfo.joinInfo);
+        });
 
         StringBuffer sb = new StringBuffer();
-        sb.append(clientInfo.userId);
+        sb.append(clientInfo.joinInfo.customId);
         if (clientInfo.mAudioAvailable){
             sb.append("[说话中][音量");
             sb.append(clientInfo.volume);
@@ -93,6 +98,7 @@ public class ClientAdapter extends RecyclerView.Adapter<ClientAdapter.MyViewHold
         public RadioButton radioButtonBig;
         public RadioButton radioButtonSmall;
         public RadioButton radioButtonNone;
+        public Button moveoutDeviceBtn;
 
         public MyViewHolder(View itemView) {
             super(itemView);
@@ -101,6 +107,7 @@ public class ClientAdapter extends RecyclerView.Adapter<ClientAdapter.MyViewHold
             radioButtonSmall = itemView.findViewById(R.id.rb_small);
             radioButtonNone = itemView.findViewById(R.id.rb_none);
             radioGroup = itemView.findViewById(R.id.radio_group);
+            moveoutDeviceBtn = itemView.findViewById(R.id.moveout_device_btn);
         }
     }
 

@@ -2,6 +2,7 @@ package com.ezviz.demo.videotalk;
 
 import android.view.Surface;
 
+import com.ezviz.sdk.videotalk.bean.ClientJoinInfo;
 import com.ezviz.sdk.videotalk.meeting.EZRtcParam;
 
 public interface OnStatusChangedListener {
@@ -11,4 +12,6 @@ public interface OnStatusChangedListener {
     void onUnSubscribe(String userId, EZRtcParam.StreamType type);
 
     void onSubscribe(String clientId);
+
+    void onkickoutDevice(ClientJoinInfo info);
 }

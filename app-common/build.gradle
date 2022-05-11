@@ -32,5 +32,5 @@ android {
 }
 
 dependencies {
-    implementation 'io.github.ezviz-open:ezviz-sdk:4.19.5'
+    implementation 'io.github.ezviz-open:ezviz-sdk:4.19.8.1'
 }

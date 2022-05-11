@@ -22,7 +22,7 @@ import java.util.List;
 
 import ezviz.ezopensdk.R;
 
-@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+//@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class EZVideoMeetingService extends Service {
 
     public static final int SCREEN_RECORDER_CREATE = 1;
@@ -43,6 +43,7 @@ public class EZVideoMeetingService extends Service {
 
     public static class StoredData{
         public List<EZClientInfo> mClientList = new ArrayList<>();
+        public String mAppId;
         public int mRoomId;
         public String userId;
         public EZRtcParam.NetQuality selfNetQuality = EZRtcParam.NetQuality.BAV_NETWORK_QUALITY_UNKNOWN;

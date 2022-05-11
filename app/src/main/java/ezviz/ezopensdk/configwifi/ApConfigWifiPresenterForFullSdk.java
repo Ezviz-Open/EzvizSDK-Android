@@ -37,6 +37,8 @@ public class ApConfigWifiPresenterForFullSdk extends ConfigWifiExecutingActivity
                 deviceSerial, deviceVerifyCode,
                 deviceHotspotSSID, deviceHotspotPwd,
                 autoConnect, mConfigCallback);
+        // 关于AP配网过程中连接设备热点不断弹出的问题说明：系统在wifi连接到设备的AP 热点后，大概过了30s，系统启动外网的检测机制，当发现该设备热点wifi无外网时，给该设备热点打上一个无外网的标签并且缓存到系统里面。当App调用API主动连接wifi名相同的热点时，系统读取到缓存认为这个wifi无网络，直接强行关闭弹窗，重新弹窗。
+        // 解决方案：手动去wifi管理页面，把缓存的相同wifi名删除掉即可。
     }
 
     @Override

@@ -38,6 +38,11 @@ import ezviz.ezopensdk.demo.SpTool;
 import ezviz.ezopensdk.demo.ValueKeys;
 import ezviz.ezopensdkcommon.common.RootActivity;
 
+import static com.ezviz.demo.other.DataConfig.APPKEY_DEV;
+import static com.ezviz.demo.other.DataConfig.APPKEY_JC;
+import static com.ezviz.demo.other.DataConfig.DEVICE_DEV;
+import static com.ezviz.demo.other.DataConfig.TOKEN_DEV;
+import static com.ezviz.demo.other.DataConfig.TOKEN_JC;
 import static com.videogo.EzvizApplication.getOpenSDK;
 import static com.videogo.constant.Constant.OAUTH_SUCCESS_ACTION;
 import static ezviz.ezopensdk.demo.ServerAreasEnum.ASIA_CHINA;
@@ -57,7 +62,7 @@ public class MainActivity extends RootActivity {
     private SdkInitParams mSdkInitParams;
     // 萤石账号登录成功回调广播
     private BroadcastReceiver mLoginResultReceiver;
-
+    
     // JuneCheng's AppKey
     private final static String APPKEY_JC = "请输入你的appkey";
     private final static String TOKEN_JC = "请输入你的accessToken";

@@ -98,6 +98,7 @@ import com.videogo.openapi.EZOpenSDKListener;
 import com.videogo.openapi.EZPlayer;
 import com.videogo.openapi.bean.EZCameraInfo;
 import com.videogo.openapi.bean.EZDeviceInfo;
+import com.videogo.openapi.bean.EZDevicePtzAngleInfo;
 import com.videogo.openapi.bean.EZVideoQualityInfo;
 import com.videogo.realplay.RealPlayStatus;
 import com.videogo.scan.main.CaptureActivity;
@@ -119,6 +120,7 @@ import com.videogo.util.Utils;
 import com.videogo.widget.CheckTextButton;
 import com.videogo.widget.CustomRect;
 import com.videogo.widget.CustomTouchListener;
+import com.videogo.widget.PtzControlAngleView;
 import com.videogo.widget.RingView;
 import com.videogo.widget.TitleBar;
 import com.videogo.widget.WaitDialog;
@@ -157,7 +159,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
 
     public static final int MSG_CLOSE_PTZ_PROMPT = 203;
 
-    public static final int MSG_HIDE_PTZ_DIRECTION = 204;
+    public static final int MSG_HIDE_PTZ_ANGLE = 204;
 
     public static final int MSG_HIDE_PAGE_ANIM = 205;
 
@@ -191,6 +193,9 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
 
     private SurfaceView mRealPlaySv = null;
     private SurfaceHolder mRealPlaySh = null;
+    private PtzControlAngleView mPtzControlAngleViewVer;// 云台垂直比例尺
+    private PtzControlAngleView mPtzControlAngleViewHor;// 云台水平比例尺
+    private boolean isDevicePtzAngleInited;// 设备云台比例尺是否初始化过，如果是NO，接收到数据后需要初始化下
     private CustomTouchListener mRealPlayTouchListener = null;
 
 
@@ -263,7 +268,6 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
     private ImageButton mRealPlayFullPtzAnimBtn = null;
     private ImageView mRealPlayFullPtzPromptIv = null;
     private boolean mIsOnPtz = false;
-    private ImageView mRealPlayPtzDirectionIv = null;
     private ImageButton mRealPlayFullAnimBtn = null;
     private int[] mStartXy = new int[2];
     private int[] mEndXy = new int[2];
@@ -443,9 +447,9 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             mEZPlayer.release();
         }
         mHandler.removeMessages(MSG_AUTO_START_PLAY);
-        mHandler.removeMessages(MSG_HIDE_PTZ_DIRECTION);
         mHandler.removeMessages(MSG_CLOSE_PTZ_PROMPT);
         mHandler.removeMessages(MSG_HIDE_PAGE_ANIM);
+        mHandler.removeMessages(MSG_HIDE_PTZ_ANGLE);
         mHandler = null;
 
         if (mBroadcastReceiver != null) {
@@ -464,9 +468,9 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             setRealPlayStopUI();
         }
         mHandler.removeMessages(MSG_AUTO_START_PLAY);
-        mHandler.removeMessages(MSG_HIDE_PTZ_DIRECTION);
         mHandler.removeMessages(MSG_CLOSE_PTZ_PROMPT);
         mHandler.removeMessages(MSG_HIDE_PAGE_ANIM);
+        mHandler.removeMessages(MSG_HIDE_PTZ_ANGLE);
         if (mBroadcastReceiver != null) {
             // Cancel the registration of the lock screen broadcast
             unregisterReceiver(mBroadcastReceiver);
@@ -769,7 +773,8 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         };
         mRealPlaySv.setOnTouchListener(mRealPlayTouchListener);
 
-        mRealPlayPtzDirectionIv = (ImageView) findViewById(R.id.realplay_ptz_direction_iv);
+        mPtzControlAngleViewVer = findViewById(R.id.vertical_angle);
+        mPtzControlAngleViewHor = findViewById(R.id.horizontal_angle);
 
         mRealPlayControlRl = (LinearLayout) findViewById(R.id.realplay_control_rl);
         mRealPlayBtn = (ImageButton) findViewById(R.id.realplay_play_btn);
@@ -857,95 +862,6 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             //            mEZOpenSDK.controlPTZ(mZoomScale > 1.01 ? RealPlayStatus.PTZ_ZOOMIN
             //                    : RealPlayStatus.PTZ_ZOOMOUT, RealPlayStatus.PTZ_SPEED_DEFAULT, EZPlayer.PTZ_COMMAND_STOP);
             mZoomScale = 0;
-        }
-    }
-
-    private void setPtzDirectionIv(int command) {
-        setPtzDirectionIv(command, 0);
-    }
-
-    private void setPtzDirectionIv(int command, int errorCode) {
-        if (command != -1 && errorCode == 0) {
-            LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT,
-                    LayoutParams.WRAP_CONTENT);
-            switch (command) {
-                case RealPlayStatus.PTZ_LEFT:
-                    mRealPlayPtzDirectionIv.setBackgroundResource(R.drawable.left_twinkle);
-                    params.addRule(RelativeLayout.CENTER_VERTICAL);
-                    params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-                    mRealPlayPtzDirectionIv.setLayoutParams(params);
-                    break;
-                case RealPlayStatus.PTZ_RIGHT:
-                    mRealPlayPtzDirectionIv.setBackgroundResource(R.drawable.right_twinkle);
-                    params.addRule(RelativeLayout.CENTER_VERTICAL);
-                    params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-                    mRealPlayPtzDirectionIv.setLayoutParams(params);
-                    break;
-                case RealPlayStatus.PTZ_UP:
-                    mRealPlayPtzDirectionIv.setBackgroundResource(R.drawable.up_twinkle);
-                    params.addRule(RelativeLayout.CENTER_HORIZONTAL);
-                    params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-                    mRealPlayPtzDirectionIv.setLayoutParams(params);
-                    break;
-                case RealPlayStatus.PTZ_DOWN:
-                    mRealPlayPtzDirectionIv.setBackgroundResource(R.drawable.down_twinkle);
-                    params.addRule(RelativeLayout.CENTER_HORIZONTAL);
-                    params.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.realplay_sv);
-                    mRealPlayPtzDirectionIv.setLayoutParams(params);
-                    break;
-                default:
-                    break;
-            }
-            mRealPlayPtzDirectionIv.setVisibility(View.VISIBLE);
-            mHandler.removeMessages(MSG_HIDE_PTZ_DIRECTION);
-            Message msg = new Message();
-            msg.what = MSG_HIDE_PTZ_DIRECTION;
-            msg.arg1 = 1;
-            mHandler.sendMessageDelayed(msg, 500);
-        } else if (errorCode != 0) {
-            LayoutParams svParams = (LayoutParams) mRealPlaySv.getLayoutParams();
-            LayoutParams params = null;
-            switch (errorCode) {
-                case ErrorCode.ERROR_CAS_PTZ_ROTATION_LEFT_LIMIT_FAILED:
-                    params = new LayoutParams(LayoutParams.WRAP_CONTENT, svParams.height);
-                    mRealPlayPtzDirectionIv.setBackgroundResource(R.drawable.ptz_left_limit);
-                    params.addRule(RelativeLayout.CENTER_VERTICAL);
-                    params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-                    mRealPlayPtzDirectionIv.setLayoutParams(params);
-                    break;
-                case ErrorCode.ERROR_CAS_PTZ_ROTATION_RIGHT_LIMIT_FAILED:
-                    params = new LayoutParams(LayoutParams.WRAP_CONTENT, svParams.height);
-                    mRealPlayPtzDirectionIv.setBackgroundResource(R.drawable.ptz_right_limit);
-                    params.addRule(RelativeLayout.CENTER_VERTICAL);
-                    params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-                    mRealPlayPtzDirectionIv.setLayoutParams(params);
-                    break;
-                case ErrorCode.ERROR_CAS_PTZ_ROTATION_UP_LIMIT_FAILED:
-                    params = new LayoutParams(svParams.width, LayoutParams.WRAP_CONTENT);
-                    mRealPlayPtzDirectionIv.setBackgroundResource(R.drawable.ptz_top_limit);
-                    params.addRule(RelativeLayout.CENTER_HORIZONTAL);
-                    params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-                    mRealPlayPtzDirectionIv.setLayoutParams(params);
-                    break;
-                case ErrorCode.ERROR_CAS_PTZ_ROTATION_DOWN_LIMIT_FAILED:
-                    params = new LayoutParams(svParams.width, LayoutParams.WRAP_CONTENT);
-                    mRealPlayPtzDirectionIv.setBackgroundResource(R.drawable.ptz_bottom_limit);
-                    params.addRule(RelativeLayout.CENTER_HORIZONTAL);
-                    params.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.realplay_sv);
-                    mRealPlayPtzDirectionIv.setLayoutParams(params);
-                    break;
-                default:
-                    break;
-            }
-            mRealPlayPtzDirectionIv.setVisibility(View.VISIBLE);
-            mHandler.removeMessages(MSG_HIDE_PTZ_DIRECTION);
-            Message msg = new Message();
-            msg.what = MSG_HIDE_PTZ_DIRECTION;
-            msg.arg1 = 1;
-            mHandler.sendMessageDelayed(msg, 500);
-        } else {
-            mRealPlayPtzDirectionIv.setVisibility(View.GONE);
-            mHandler.removeMessages(MSG_HIDE_PTZ_DIRECTION);
         }
     }
 
@@ -1706,6 +1622,11 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
                 try {
                     ptz_result = EzvizApplication.getOpenSDK().controlPTZ(mCameraInfo.getDeviceSerial(), mCameraInfo.getCameraNo(), command,
                             action, EZConstants.PTZ_SPEED_DEFAULT);
+                    if (action == EZPTZAction.EZPTZActionSTOP) {
+                        Message msg = Message.obtain();
+                        msg.what = MSG_HIDE_PTZ_ANGLE;
+                        mHandler.sendMessage(msg);
+                    }
                 } catch (BaseException e) {
                     e.printStackTrace();
                 }
@@ -1729,23 +1650,23 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
                             mEZPlayer.setVoiceTalkStatus(true);
                             break;
                         case R.id.ptz_top_btn:
+                            mPtzControlAngleViewVer.setVisibility(View.VISIBLE);
                             mPtzControlLy.setBackgroundResource(R.drawable.ptz_up_sel);
-                            setPtzDirectionIv(RealPlayStatus.PTZ_UP);
                             ptzOption(EZPTZCommand.EZPTZCommandUp, EZPTZAction.EZPTZActionSTART);
                             break;
                         case R.id.ptz_bottom_btn:
+                            mPtzControlAngleViewVer.setVisibility(View.VISIBLE);
                             mPtzControlLy.setBackgroundResource(R.drawable.ptz_bottom_sel);
-                            setPtzDirectionIv(RealPlayStatus.PTZ_DOWN);
                             ptzOption(EZPTZCommand.EZPTZCommandDown, EZPTZAction.EZPTZActionSTART);
                             break;
                         case R.id.ptz_left_btn:
+                            mPtzControlAngleViewHor.setVisibility(View.VISIBLE);
                             mPtzControlLy.setBackgroundResource(R.drawable.ptz_left_sel);
-                            setPtzDirectionIv(RealPlayStatus.PTZ_LEFT);
                             ptzOption(EZPTZCommand.EZPTZCommandLeft, EZPTZAction.EZPTZActionSTART);
                             break;
                         case R.id.ptz_right_btn:
+                            mPtzControlAngleViewHor.setVisibility(View.VISIBLE);
                             mPtzControlLy.setBackgroundResource(R.drawable.ptz_right_sel);
-                            setPtzDirectionIv(RealPlayStatus.PTZ_RIGHT);
                             ptzOption(EZPTZCommand.EZPTZCommandRight, EZPTZAction.EZPTZActionSTART);
                             break;
                         default:
@@ -2575,6 +2496,9 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             case EZRealPlayConstants.MSG_SET_VEDIOMODE_FAIL:
                 handleSetVedioModeFail(msg.arg1);
                 break;
+            case EZRealPlayConstants.MSG_PTZ_GET_SUCCESS:
+                handleDevicePtzAngleInfo(msg.obj);
+                break;
             case EZRealPlayConstants.MSG_PTZ_SET_FAIL:
                 handlePtzControlFail(msg);
                 break;
@@ -2597,8 +2521,9 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             case MSG_CLOSE_PTZ_PROMPT:
                 mRealPlayFullPtzPromptIv.setVisibility(View.GONE);
                 break;
-            case MSG_HIDE_PTZ_DIRECTION:
-                handleHidePtzDirection(msg);
+            case MSG_HIDE_PTZ_ANGLE:
+                mPtzControlAngleViewVer.setVisibility(View.GONE);
+                mPtzControlAngleViewHor.setVisibility(View.GONE);
                 break;
             case MSG_HIDE_PAGE_ANIM:
                 hidePageAnim();
@@ -2707,22 +2632,6 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         return strStreamType;
     }
 
-    private void handleHidePtzDirection(Message msg) {
-        if (mHandler == null) {
-            return;
-        }
-        mHandler.removeMessages(MSG_HIDE_PTZ_DIRECTION);
-        if (msg.arg1 > 2) {
-            mRealPlayPtzDirectionIv.setVisibility(View.GONE);
-        } else {
-            mRealPlayPtzDirectionIv.setVisibility(msg.arg1 == 1 ? View.GONE : View.VISIBLE);
-            Message message = new Message();
-            message.what = MSG_HIDE_PTZ_DIRECTION;
-            message.arg1 = msg.arg1 + 1;
-            mHandler.sendMessageDelayed(message, 500);
-        }
-    }
-
     private void handlePtzControlFail(Message msg) {
         LogUtil.d(TAG, "handlePtzControlFail:" + msg.arg1);
         switch (msg.arg1) {
@@ -2780,7 +2689,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             case ErrorCode.ERROR_CAS_PTZ_ROTATION_DOWN_LIMIT_FAILED:// 设备云台旋转到达下限位 The PTZ rotation reaches the lower limit
             case ErrorCode.ERROR_CAS_PTZ_ROTATION_LEFT_LIMIT_FAILED:// 设备云台旋转到达左限位  The PTZ rotation reaches the left limit
             case ErrorCode.ERROR_CAS_PTZ_ROTATION_RIGHT_LIMIT_FAILED:// 设备云台旋转到达右限位 The PTZ rotation reaches the right limit
-                setPtzDirectionIv(-1, msg.arg1);
+
                 break;
             default:
                 Utils.showToast(EZRealPlayActivity.this, R.string.ptz_operation_failed, msg.arg1);
@@ -2999,6 +2908,20 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             e.printStackTrace();
         }
         Utils.showToast(EZRealPlayActivity.this, R.string.realplay_set_vediomode_fail, errorCode);
+    }
+
+    private void handleDevicePtzAngleInfo (Object obj) {
+        if (mPtzControlAngleViewHor.getVisibility() == View.VISIBLE || mPtzControlAngleViewVer.getVisibility() == View.VISIBLE) {
+            EZDevicePtzAngleInfo info = (EZDevicePtzAngleInfo) obj;
+            mPtzControlAngleViewHor.setAngle(info.getHorStartAng(), info.getHorEndAng(), info.getHorCurAng());
+            mPtzControlAngleViewVer.setAngle(info.getVerStartAng(), info.getVerEndAng(), info.getVerCurAng());
+        }
+        if (!isDevicePtzAngleInited) {
+            isDevicePtzAngleInited = true;
+            EZDevicePtzAngleInfo info = (EZDevicePtzAngleInfo) obj;
+            mPtzControlAngleViewHor.setAngle(info.getHorStartAng(), info.getHorEndAng(), info.getHorCurAng());
+            mPtzControlAngleViewVer.setAngle(info.getVerStartAng(), info.getVerEndAng(), info.getVerCurAng());
+        }
     }
 
     private void handleRecordSuccess(String recordFilePath) {

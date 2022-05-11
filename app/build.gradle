@@ -26,8 +26,8 @@ android {
         applicationId "ezviz.ezopensdk"
         minSdkVersion rootProject.ext.minSdk
         targetSdkVersion rootProject.ext.targetSdk
-        versionCode 4195
-        versionName "v4.19.5"
+        versionCode 4198
+        versionName "v4.19.8"
         ndk {
             abiFilters "armeabi-v7a", "arm64-v8a"
         }
@@ -73,16 +73,16 @@ android {
 
 dependencies {
     /*萤石SDK核心模块，必须*/
-    implementation 'io.github.ezviz-open:ezviz-sdk:4.19.5'
+    implementation 'io.github.ezviz-open:ezviz-sdk:4.19.8.1'
     // 4.19.0版本之后需要自行依赖okhttp和gson库
     implementation 'com.squareup.okhttp3:okhttp:3.12.1'
     implementation 'com.google.code.gson:gson:2.8.5'
 
     /*视频通话模块，按需使用*/
-    implementation 'io.github.ezviz-open:videotalk:1.2.5'
+    implementation 'io.github.ezviz-open:videotalk:1.2.6'
 
     /*视频通话模块，按需使用*/
-    implementation 'io.github.ezviz-open:streamctrl:1.2.5'
+    implementation 'io.github.ezviz-open:streamctrl:1.2.6'
 
     /*demo的依赖项*/
     implementation project(path: ':app-common')

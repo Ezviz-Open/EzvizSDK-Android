@@ -1,12 +1,13 @@
 package com.ezviz.demo.videotalk;
 
+import com.ezviz.sdk.videotalk.bean.ClientJoinInfo;
 import com.ezviz.sdk.videotalk.meeting.EZRtcParam;
 
 import java.util.List;
 
 public class EZClientInfo {
 
-    public String userId;
+    public ClientJoinInfo joinInfo;
     public int volume;
     public int mVideoAvailable;  //视频启用状态 0-关闭 1-主流 5-主子流
     public boolean mAudioAvailable;
@@ -18,7 +19,7 @@ public class EZClientInfo {
             return null;
         }
         for (EZClientInfo clientInfo : clientInfoList){
-            if (clientInfo.userId.equals(userName)){
+            if (clientInfo.joinInfo.customId.equals(userName)){
                 return clientInfo;
             }
         }
@@ -30,7 +31,7 @@ public class EZClientInfo {
             return;
         }
 
-        EZClientInfo in = findClient(clientInfo.userId, clientInfoList);
+        EZClientInfo in = findClient(clientInfo.joinInfo.customId, clientInfoList);
         if (in == null){
             clientInfoList.add(clientInfo);
         }else {
@@ -44,7 +45,7 @@ public class EZClientInfo {
         int ret = -1;
         if (clientInfoList != null){
             for (EZClientInfo clientInfo : clientInfoList){
-                if (clientInfo.userId.equals(userId)){
+                if (clientInfo.joinInfo.customId.equals(userId)){
                     ret = clientInfoList.indexOf(clientInfo);
                     clientInfoList.remove(clientInfo);
                     break;

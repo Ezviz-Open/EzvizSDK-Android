@@ -6,8 +6,8 @@ import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
 import android.view.View
 import android.widget.Toast
+import com.ezviz.demo.other.DataConfig.APPID_DEV
 import ezviz.ezopensdk.R
-import kotlinx.android.synthetic.main.activity_join_room.*
 import kotlinx.android.synthetic.main.activity_order_room.*
 import kotlinx.android.synthetic.main.activity_order_room.cb_opus
 import kotlinx.android.synthetic.main.activity_order_room.edt_bitrate
@@ -19,6 +19,7 @@ import kotlinx.android.synthetic.main.activity_order_room.edt_width
 
 class OrderRoomActivity : AppCompatActivity() {
 
+    private var appid = ""
     private var password = ""
     private var customerId = ""
 
@@ -31,6 +32,7 @@ class OrderRoomActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_order_room)
 
+        edt_appId.setText(APPID_DEV)
         edt_width.setText("$width")
         edt_height.setText("$height")
         edt_bitrate.setText("$bitrate")
@@ -45,6 +47,7 @@ class OrderRoomActivity : AppCompatActivity() {
     }
 
     fun onClickOrder(view : View) {
+        appid = edt_appId.text.toString()
         password = edt_passwd.text.toString()
         customerId = edt_nick.text.toString()
         if (TextUtils.isEmpty(customerId)){
@@ -63,6 +66,7 @@ class OrderRoomActivity : AppCompatActivity() {
         }
 
         val intent = Intent(this, EZRtcTestActivity::class.java)
+            .putExtra(EZRtcTestActivity.InIntentKeysAndValues.KEY_APP_ID, appid)
             .putExtra(EZRtcTestActivity.InIntentKeysAndValues.KEY_USER_ID, customerId)
             .putExtra(EZRtcTestActivity.InIntentKeysAndValues.KEY_PASSWORD, password)
             .putExtra(EZRtcTestActivity.InIntentKeysAndValues.KEY_LIMIT, limit)
