@@ -115,6 +115,7 @@ public class QueryCloudRecordFilesAsyncTask extends HikAsyncTask<String, Void, I
     	dst.setCameraNo(src.getCameraNo());
     	dst.setVideoType(src.getVideoType());
         dst.setiStorageVersion(src.getiStorageVersion());
+        dst.setFileSize(src.getFileSize());
     }
 
     private int queryCloudFile(){

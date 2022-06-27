@@ -77,6 +77,14 @@
             android:paddingBottom="10dp"
             android:onClick="onClickLanDevice"/>
 
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="p2p测试"
+            android:layout_marginTop="10dp"
+            android:paddingBottom="10dp"
+            android:onClick="onClickP2pTest"/>
+
     </LinearLayout>
 
 </RelativeLayout>

@@ -189,6 +189,10 @@
             android:name="com.ezviz.demo.videotalk.EZRtcTestActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
+        <activity
+            android:name="com.ezviz.demo.common.EZP2pTestActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
 
         <receiver android:name="com.videogo.ui.cameralist.EZCameraListActivity$NotificationReceiver" />
 

@@ -54,19 +54,23 @@ class MoreFeaturesEntranceActivity : RootActivity() {
             val nfIntent = Intent(this, EZRtcTestActivity::class.java) //点击后跳转的界面，可以设置跳转数据
             nfIntent.putExtra(EZVideoMeetingService.LAUNCH_FROM_NOTIFICATION, true)
             startActivity(nfIntent)
-        }else{
+        } else {
             Intent(this, ConfluenceTestEntranceActivity::class.java).run {
                 startActivity(this)
             }
         }
-
     }
 
     fun onClickLanDevice(view: View) {
         Intent(this, LanDeviceActivity::class.java).run {
             startActivity(this)
         }
+    }
 
+    fun onClickP2pTest(view: View) {
+        Intent(this, EZP2pTestActivity::class.java).run {
+            startActivity(this)
+        }
     }
 
     /**

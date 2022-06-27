@@ -1113,7 +1113,8 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                 }
                 final EZCloudStreamDownload ezCloudStreamDownloader = new EZCloudStreamDownload(strFileNameWithPath,
                         cloudFile);
-                ezCloudStreamDownloader.setStreamDownloadCallback(new EZStreamDownloadCallbackWithNotify(notificationId, notificationTitle));
+                // 云存储录像支持下载进度回调，SD卡录像下载不支持
+                ezCloudStreamDownloader.setStreamDownloadCallback(new EZStreamDownloadCallbackWithNotify(cloudFile, notificationId, notificationTitle));
                 ezCloudStreamDownloader.setSecretKey(DataManager.getInstance().getDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial()));
                 ezCloudStreamDownloader.start();
                 mDownloadTaskRecordListAbstract.add(new DownloadTaskRecordOfCloud(ezCloudStreamDownloader,
@@ -1162,12 +1163,26 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
 
     private class EZStreamDownloadCallbackWithNotify extends EZOpenSDKListener.EZStreamDownloadCallbackEx {
 
+        private EZCloudRecordFile cloudFile;
         private int notificationId;
         private String notificationTitle;
 
         public EZStreamDownloadCallbackWithNotify(int notificationId, String notificationTitle) {
             this.notificationId = notificationId;
             this.notificationTitle = notificationTitle;
+        }
+
+        public EZStreamDownloadCallbackWithNotify(EZCloudRecordFile cloudFile, int notificationId, String notificationTitle) {
+            this.cloudFile = cloudFile;
+            this.notificationId = notificationId;
+            this.notificationTitle = notificationTitle;
+        }
+
+        @Override
+        public void onDownloadingSize(int downloadSize) {
+            if (cloudFile != null) {
+                LogUtil.d(TAG, "percent--->"+ downloadSize*100/ cloudFile.getFileSize());
+            }
         }
 
         @Override
@@ -1901,6 +1916,7 @@ mCameraInfo.getCameraNo(), EZPlayBackListActivity.this);
         dst.setCameraNo(src.getCameraNo());
         dst.setVideoType(src.getVideoType());
         dst.setiStorageVersion(src.getiStorageVersion());
+        dst.setFileSize(src.getFileSize());
     }
 
     private void convertCloudPartInfoFile2EZDeviceRecordFile(EZDeviceRecordFile dst, CloudPartInfoFile src) {
