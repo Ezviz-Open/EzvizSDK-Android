@@ -1,9 +1,6 @@
 package com.ezviz.demo.other
 
 object DataConfig {
-    // JuneCheng's AppKey
-    public const val APPKEY_JC = "fd82f9a6f0154aa2aa9284ae7af25a5b"
-    public const val TOKEN_JC = "at.ajyhvn1p0u0ryay0dsbbpapo9zjacev7-39k4mq5ndy-1jqhmod-xqoy8voam"
 
     // 开发者反馈问题提供的账号信息
     public const val APPID_DEV = "f758a146b2b24fc7b9705e232bce9f02"

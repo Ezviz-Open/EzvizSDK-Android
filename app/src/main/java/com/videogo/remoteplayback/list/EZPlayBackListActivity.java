@@ -757,16 +757,16 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
     }
 
     private void setRemoteListSvLayout() {
-        // 设置播放窗口位置
         final int screenWidth = localInfo.getScreenWidth();
-        final int screenHeight = (mOrientation == Configuration.ORIENTATION_PORTRAIT) ?
-         (localInfo.getScreenHeight() - localInfo.getNavigationBarHeight()) : localInfo.getScreenHeight();
+        final int screenHeight = (mOrientation == Configuration.ORIENTATION_PORTRAIT) ? (localInfo.getScreenHeight() - localInfo
+                .getNavigationBarHeight()) : localInfo.getScreenHeight();
         final RelativeLayout.LayoutParams realPlaySvlp = Utils.getPlayViewLp(mRealRatio, mOrientation,
-         localInfo.getScreenWidth(), (int) (localInfo.getScreenWidth() * Constant.LIVE_VIEW_RATIO), screenWidth,
-          screenHeight);
+                localInfo.getScreenWidth(), (int) (localInfo.getScreenWidth() * Constant.LIVE_VIEW_RATIO),
+                screenWidth, screenHeight);
 
         RelativeLayout.LayoutParams svLp = new RelativeLayout.LayoutParams(realPlaySvlp.width, realPlaySvlp.height);
-        svLp.addRule(RelativeLayout.CENTER_IN_PARENT);
+        svLp.addRule(RelativeLayout.CENTER_HORIZONTAL);
+
         ViewGroup playWindowVg = (ViewGroup) findViewById(R.id.vg_play_window);
         playWindowVg.setLayoutParams(svLp);
 
@@ -788,8 +788,10 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
 
         LogUtil.i(TAG, "handlePlayProgress, begin time:" + begin + " endtime:" + end + " osdTime:" + osdTime.getTimeInMillis() + " " + "progress:" + progress);
 
-        int beginTimeClock = (int) ((osd - begin) / 1000);
-        updateTimeBucketBeginTime(beginTimeClock);
+        if (osd >= begin && osd <= end) {
+            int beginTimeClock = (int) ((osd - begin) / 1000);
+            updateTimeBucketBeginTime(beginTimeClock);
+        }
     }
 
     private void updateTimeBucketBeginTime(int beginTimeClock) {

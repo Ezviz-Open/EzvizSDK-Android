@@ -3034,6 +3034,9 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         }
     }
 
+    /**
+     * 录像过程中计时UI更新
+     */
     private void updateRecordTime() {
         if (mRealPlayRecordIv.getVisibility() == View.VISIBLE) {
             mRealPlayRecordIv.setVisibility(View.INVISIBLE);
@@ -3119,7 +3122,10 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         final LayoutParams realPlaySvlp = Utils.getPlayViewLp(mRealRatio, mOrientation,
                 mLocalInfo.getScreenWidth(), (int) (mLocalInfo.getScreenWidth() * Constant.LIVE_VIEW_RATIO),
                 screenWidth, screenHeight);
+
         LayoutParams svLp = new LayoutParams(realPlaySvlp.width, realPlaySvlp.height);
+        svLp.addRule(RelativeLayout.CENTER_HORIZONTAL);
+
         ViewGroup playWindowVg = (ViewGroup) findViewById(R.id.vg_play_window);
         playWindowVg.setLayoutParams(svLp);
 
@@ -3221,16 +3227,14 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
                 }
 
                 if (mEZPlayer != null && isRecording) {
-
-
-                    Calendar OSDTime = mEZPlayer.getOSDTime();
-                    if (OSDTime != null) {
-                        String playtime = Utils.OSD2Time(OSDTime);
-                        if (!TextUtils.equals(playtime, mRecordTime)) {
+//                    Calendar OSDTime = mEZPlayer.getOSDTime();
+//                    if (OSDTime != null) {
+//                        String playtime = Utils.OSD2Time(OSDTime);
+//                        if (!TextUtils.equals(playtime, mRecordTime)) {
                             mRecordSecond++;
-                            mRecordTime = playtime;
-                        }
-                    }
+//                            mRecordTime = playtime;
+//                        }
+//                    }
                 }
                 if (mHandler != null) {
                     mHandler.sendEmptyMessage(MSG_PLAY_UI_UPDATE);

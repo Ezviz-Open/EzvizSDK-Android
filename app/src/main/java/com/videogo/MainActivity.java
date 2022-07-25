@@ -37,12 +37,6 @@ import ezviz.ezopensdk.demo.ServerAreasEnum;
 import ezviz.ezopensdk.demo.SpTool;
 import ezviz.ezopensdk.demo.ValueKeys;
 import ezviz.ezopensdkcommon.common.RootActivity;
-
-import static com.ezviz.demo.other.DataConfig.APPKEY_DEV;
-import static com.ezviz.demo.other.DataConfig.APPKEY_JC;
-import static com.ezviz.demo.other.DataConfig.DEVICE_DEV;
-import static com.ezviz.demo.other.DataConfig.TOKEN_DEV;
-import static com.ezviz.demo.other.DataConfig.TOKEN_JC;
 import static com.videogo.EzvizApplication.getOpenSDK;
 import static com.videogo.constant.Constant.OAUTH_SUCCESS_ACTION;
 import static ezviz.ezopensdk.demo.ServerAreasEnum.ASIA_CHINA;
