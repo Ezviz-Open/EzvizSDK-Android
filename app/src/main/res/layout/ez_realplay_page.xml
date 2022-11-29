@@ -30,11 +30,20 @@
                 android:layout_height="match_parent"
                 android:background="@android:color/transparent" />
 
+            <!-- 封面 -->
+            <ImageView
+                android:id="@+id/coverImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone" />
+
+            <!-- 加载UI -->
             <include
                 layout="@layout/realplay_loading_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
+            <!-- 云台垂直比例尺 -->
             <com.videogo.widget.PtzControlAngleView
                 xmlns:angle="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/vertical_angle"
@@ -44,6 +53,7 @@
                 android:visibility="gone"
                 angle:liveplay_angle_style="left" />
 
+            <!-- 云台水平比例尺 -->
             <com.videogo.widget.PtzControlAngleView
                 xmlns:angle="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/horizontal_angle"
@@ -56,42 +66,19 @@
 
         </RelativeLayout>
 
+        <!-- 播放器工具条 -->
         <include
             layout="@layout/ez_play_control"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_below="@id/vg_play_window" />
 
+        <!-- 提示布局：如录制时的动画，云台操作提示 -->
         <include layout="@layout/ez_realplay_prompt_layout" />
 
-        <RelativeLayout
-            android:id="@+id/realplay_capture_rl"
-            android:layout_width="65dp"
-            android:layout_height="45dp"
-            android:layout_alignStart="@+id/vg_play_window"
-            android:layout_alignLeft="@+id/vg_play_window"
-            android:layout_alignBottom="@+id/vg_play_window"
-            android:background="@color/white"
-            android:onClick="onClick"
-            android:padding="1dp"
-            android:visibility="gone">
-
-            <ImageView
-                android:id="@+id/realplay_capture_iv"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="fitXY" />
-
-            <ImageView
-                android:id="@+id/realplay_capture_watermark_iv"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="fitXY"
-                android:src="@drawable/video_file_watermark"
-                android:visibility="gone" />
-        </RelativeLayout>
-
+        <!-- 横屏时，播放器操作栏 -->
         <include layout="@layout/realplay_full_operate_layout" />
+
 
         <ImageButton
             android:id="@+id/realplay_full_anim_btn"
@@ -100,6 +87,7 @@
             android:background="@drawable/yuntai_pressed"
             android:visibility="gone" />
 
+        <!-- 解码方式 & 取流方式 -->
         <LinearLayout
             android:id="@+id/vg_play_info"
             android:layout_width="wrap_content"

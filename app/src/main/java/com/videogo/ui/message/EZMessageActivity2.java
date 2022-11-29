@@ -545,7 +545,7 @@ public class EZMessageActivity2 extends RootActivity implements VerifyCodeInput.
             mStartTime = Calendar.getInstance();
             mStartTime.set(Calendar.AM_PM, 0);
             mStartTime.set(mStartTime.get(Calendar.YEAR), mStartTime.get(Calendar.MONTH), 
-                    mStartTime.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
+                    mStartTime.get(Calendar.DAY_OF_MONTH)-7, 0, 0, 0);
             mEndTime = Calendar.getInstance();
             mEndTime.set(Calendar.AM_PM, 0);
             mEndTime.set(mEndTime.get(Calendar.YEAR), mEndTime.get(Calendar.MONTH), 

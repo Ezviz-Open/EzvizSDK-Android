@@ -108,7 +108,7 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
     public static final int MSG_SEARCH_CLOUD_FILE_SUCCUSS = 101;
     public static final int MSG_SEARCH_CLOUD_FILE_FAIL = 102;
 
-    public static final int ALARM_MAX_DURATION = 45;
+    public static final int ALARM_MAX_DURATION = 30;
 
     public static final int STATUS_INIT = 0;
 
@@ -1374,6 +1374,7 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
     }
 
     private void setRemotePlaySound() {
+        LogUtil.e("aaaaa", mLocalInfo.isSoundOpen()+"");
         if (mEZMediaPlayer != null) {
             if (mLocalInfo.isSoundOpen()) {
                 mEZMediaPlayer.openSound();
@@ -1635,6 +1636,7 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
         if (mEZMediaPlayer != null && mStatus == STATUS_PAUSE) {
             resumeRemotePlayBack();
             setRemotePlayBackSuccessUI();
+            setRemotePlaySound();
             return;
         }
 

@@ -47,7 +47,7 @@
         android:maxLength="16"
         android:minHeight="44dp"
         android:singleLine="true"
-        android:text="test1234"
+        android:text=""
         />
 
 

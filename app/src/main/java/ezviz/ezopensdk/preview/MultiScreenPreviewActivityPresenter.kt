@@ -21,15 +21,19 @@ class MultiScreenPreviewActivityPresenter {
     fun getDeviceList(){
         LogUtil.i(TAG, "getDeviceList")
         thread {
-            val deviceList = EzvizApplication.getOpenSDK().getDeviceList(0, 50)
-            val cameraList = ArrayList<EZCameraInfo>()
-            for (deviceInfo in deviceList){
-                deviceInfo.cameraInfoList?.run {
-                    cameraList.addAll(this)
+            try {
+                val deviceList = EzvizApplication.getOpenSDK().getDeviceList(0, 50)
+                val cameraList = ArrayList<EZCameraInfo>()
+                for (deviceInfo in deviceList){
+                    deviceInfo.cameraInfoList?.run {
+                        cameraList.addAll(this)
+                    }
                 }
-            }
-            Handler(Looper.getMainLooper()).post {
-                mCallback?.onReceiveDeviceAndCameraList(deviceList, cameraList)
+                Handler(Looper.getMainLooper()).post {
+                    mCallback?.onReceiveDeviceAndCameraList(deviceList, cameraList)
+                }
+            } catch (e:Exception) {
+                print(e.message)
             }
         }
     }

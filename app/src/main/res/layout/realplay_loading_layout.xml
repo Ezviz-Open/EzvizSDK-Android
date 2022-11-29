@@ -3,7 +3,7 @@
     android:id="@+id/realplay_loading_rl"
     android:layout_width="match_parent"
     android:layout_height="200dp"
-    android:background="@color/black_bg" >
+    android:background="@color/transparent" >
 
     <TextView
         android:id="@+id/realplay_tip_tv"

@@ -27,7 +27,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.videogo.EzvizApplication;
 import ezviz.ezopensdkcommon.common.RootActivity;
 import com.videogo.constant.Constant;
 import com.videogo.constant.IntentConsts;

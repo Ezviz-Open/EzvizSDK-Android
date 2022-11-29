@@ -6,7 +6,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.videogo.constant.Config;
 import com.videogo.util.LocalInfo;
 
 public class AddCameraGuideDialog extends Dialog implements android.view.View.OnClickListener {

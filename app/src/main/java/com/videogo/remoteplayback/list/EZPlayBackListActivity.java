@@ -87,6 +87,7 @@ import com.videogo.remoteplayback.list.querylist.StandardArrayAdapter;
 import com.videogo.remoteplayback.list.querylist.StandardArrayAdapter.ArrayAdapterChangeListener;
 import com.videogo.stream.EZCloudStreamDownload;
 import com.videogo.stream.EZDeviceStreamDownload;
+import com.videogo.ui.common.EZBusinessTool;
 import com.videogo.ui.common.ScreenOrientationHelper;
 import com.videogo.ui.util.AudioPlayUtil;
 import com.videogo.ui.util.DataManager;
@@ -675,7 +676,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             case ErrorCode.ERROR_INNER_VERIFYCODE_NEED:
             case ErrorCode.ERROR_INNER_VERIFYCODE_ERROR: {
                 showPlayEventTip("");
-                DataManager.getInstance().setDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial(), null);
+//                DataManager.getInstance().setDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial(), null);
                 VerifyCodeInput.VerifyCodeInputDialog(this, this).show();
             }
             break;
@@ -1366,7 +1367,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         sectionAdapter = null;
         hasShowListViewLine(false);
         queryCloudRecordFilesAsyncTask = new QueryCloudRecordFilesAsyncTask(mCameraInfo.getDeviceSerial(),
-mCameraInfo.getCameraNo(), EZPlayBackListActivity.this);
+                mCameraInfo.getCameraNo(), EZPlayBackListActivity.this);
         loadingBar.setVisibility(View.VISIBLE);
         showTab(R.id.loadingTextView);
         queryCloudRecordFilesAsyncTask.setSearchDate(queryDate);
@@ -1379,7 +1380,7 @@ mCameraInfo.getCameraNo(), EZPlayBackListActivity.this);
         mWaitDlg.show();
         stopQueryTask();
         queryDeviceRecordFilesAsyncTask = new QueryDeviceRecordFilesAsyncTask(mCameraInfo.getDeviceSerial(),
-         mCameraInfo.getCameraNo(), recordType, EZPlayBackListActivity.this);
+                mCameraInfo.getCameraNo(), recordType, EZPlayBackListActivity.this);
         queryDeviceRecordFilesAsyncTask.setQueryDate(queryDate);
         queryDeviceRecordFilesAsyncTask.setOnlyHasLocal(true);
         queryDeviceRecordFilesAsyncTask.execute(String.valueOf(cloudTotal));
@@ -2702,67 +2703,9 @@ mCameraInfo.getCameraNo(), EZPlayBackListActivity.this);
     };
 
     private void showStreamType(int streamType) {
-        String streamTypeMsg =
-         getApplicationContext().getString(R.string.stream_type) + changeIntTypeToStringType(streamType);
+        String streamTypeMsg = getApplicationContext().getString(R.string.stream_type) + EZBusinessTool.getStreamType(streamType);
         streamTypeTv.setText(streamTypeMsg);
         streamTypeTv.setVisibility(View.VISIBLE);
     }
 
-    private String changeIntTypeToStringType(int streamType) {
-        String strStreamType;
-        switch (streamType) {
-            /*
-              取流方式切换到私有流媒体转发模式
-             */
-            case 0:
-                strStreamType = "private_stream";
-                break;
-            /*
-              取流方式切换到P2P模式
-             */
-            case 1:
-                strStreamType = "p2p";
-                break;
-            /*
-              取流方式切换到内网直连模式
-             */
-            case 2:
-                strStreamType = "direct_inner";
-                break;
-            /*
-              取流方式切换到外网直连模式
-             */
-            case 3:
-                strStreamType = "direct_outer";
-                break;
-            /*
-              取流方式切换到云存储回放
-             */
-            case 4:
-                strStreamType = "cloud_playback";
-                break;
-            /*
-              取流方式切换到云存储留言
-             */
-            case 5:
-                strStreamType = "cloud_leave_msg";
-                break;
-            /*
-              取流方式切换到反向直连模式
-             */
-            case 6:
-                strStreamType = "direct_reverse";
-                break;
-            /*
-              取流方式切换到HCNETSDK
-             */
-            case 7:
-                strStreamType = "hcnetsdk";
-                break;
-            default:
-                strStreamType = "unknown(" + streamType + ")";
-                break;
-        }
-        return strStreamType;
-    }
 }

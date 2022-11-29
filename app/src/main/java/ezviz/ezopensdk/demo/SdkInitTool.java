@@ -11,16 +11,16 @@ import com.videogo.openapi.EZOpenSDK;
 public class SdkInitTool {
 
     public static void initSdk(@NonNull Application application, @NonNull SdkInitParams sdkInitParams) {
-        TestParams.setUse(true);
+//        TestParams.setUse(true);
         if (sdkInitParams.usingGlobalSDK) {
-            // sdk日志开关，正式发布需要去掉
+            // sdk日志开关，正式发布需要去掉，必须在initLib方法之前调用
             EZGlobalSDK.showSDKLog(true);
             // 设置是否支持P2P取流,详见api
             EZGlobalSDK.enableP2P(true);
             // APP_KEY请替换成自己申请的
             EZGlobalSDK.initLib(application, sdkInitParams.appKey);
         } else {
-            // sdk日志开关，正式发布需要去掉
+            // sdk日志开关，正式发布需要去掉，必须在initLib方法之前调用
             EZOpenSDK.showSDKLog(true);
             // 设置是否支持P2P取流,详见api
             EZOpenSDK.enableP2P(true);
