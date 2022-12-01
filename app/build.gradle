@@ -73,7 +73,7 @@ android {
 
 dependencies {
     /*萤石SDK核心模块，必须*/
-    implementation 'io.github.ezviz-open:ezviz-sdk:5.0'
+    implementation 'io.github.ezviz-open:ezviz-sdk:5.0.1'
     // 4.19.0版本之后需要自行依赖okhttp和gson库
     implementation 'com.squareup.okhttp3:okhttp:3.12.1'
     implementation 'com.google.code.gson:gson:2.8.5'

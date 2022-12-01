@@ -5,7 +5,7 @@ buildscript {
     ext.arrouter_api_version = '1.5.0'
     ext.arouter_compiler_version = '1.2.2'
 
-    ext.minSdk = 16
+    ext.minSdk = 21
     ext.targetSdk = 30
     ext.compileVersion = 30
     ext.buildToolsVersion = "30.0.3"
