@@ -96,6 +96,7 @@ import com.videogo.openapi.EZPlayer;
 import com.videogo.openapi.bean.EZCameraInfo;
 import com.videogo.openapi.bean.EZDeviceInfo;
 import com.videogo.openapi.bean.EZDevicePtzAngleInfo;
+import com.videogo.openapi.bean.EZPMPlayPrivateTokenInfo;
 import com.videogo.openapi.bean.EZVideoQualityInfo;
 import com.videogo.realplay.RealPlayStatus;
 import com.videogo.ui.cameralist.EZCameraListActivity;
@@ -134,6 +135,7 @@ import ezviz.ezopensdk.debug.VideoFileUtil;
 import ezviz.ezopensdk.demo.DemoConfig;
 import ezviz.ezopensdk.R;
 
+import static com.videogo.openapi.EZConstants.EZRealPlayConstants.MSG_PRIVATE_TOKEN_GET_SUCCESS;
 import static com.videogo.openapi.EZConstants.MSG_GOT_STREAM_TYPE;
 import static com.videogo.openapi.EZConstants.MSG_VIDEO_SIZE_CHANGED;
 
@@ -501,6 +503,10 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
                 break;
             case EZRealPlayConstants.MSG_PTZ_GET_SUCCESS:// 云台角度获取成功
                 handleDevicePtzAngleInfo(msg.obj);
+                break;
+            case MSG_PRIVATE_TOKEN_GET_SUCCESS:
+                EZPMPlayPrivateTokenInfo tokenInfo = (EZPMPlayPrivateTokenInfo)msg.obj;
+                LogUtil.e(TAG, "token--->" + tokenInfo.getToken());
                 break;
             case EZRealPlayConstants.MSG_PTZ_SET_FAIL:// 云台控制失败
                 handlePtzControlFail(msg);

@@ -97,7 +97,6 @@ import ezviz.ezopensdkcommon.common.RootActivity;
 import static com.ez.stream.EZError.EZ_OK;
 import static com.videogo.EzvizApplication.getOpenSDK;
 
-
 public class EZCameraListActivity extends RootActivity implements OnClickListener, SelectCameraDialog.CameraItemClick {
     protected static final String TAG = "CameraListActivity";
     public final static int REQUEST_CODE = 100;

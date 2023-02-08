@@ -108,6 +108,8 @@ public class QueryDeviceRecordFilesAsyncTask extends HikAsyncTask<String, Void, 
         dst.setStartTime(calendar2String(src.getStartTime()));
         dst.setEndTime(calendar2String(src.getStopTime()));
         dst.setPosition(pos);
+        dst.setBegin(src.getBegin());
+        dst.setEnd(src.getEnd());
     }
 
     public int searchLocalFile() {

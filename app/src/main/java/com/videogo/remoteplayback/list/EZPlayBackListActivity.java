@@ -13,6 +13,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
@@ -56,6 +57,9 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ez.jna.EZStreamSDKJNA;
+import com.ez.p2ptrans.RecordCoverCallback;
+import com.ez.p2ptrans.RecordCoverFetcher;
 import com.ezviz.demo.common.DataTimeUtil;
 import com.videogo.constant.Constant;
 import com.videogo.constant.IntentConsts;
@@ -75,6 +79,7 @@ import com.videogo.openapi.bean.EZCameraInfo;
 import com.videogo.openapi.bean.EZCloudRecordFile;
 import com.videogo.openapi.bean.EZDeviceRecordFile;
 import com.videogo.openapi.bean.resp.CloudPartInfoFile;
+import com.videogo.remoteplayback.RecordCoverFetcherManager;
 import com.videogo.remoteplayback.RemoteFileInfo;
 import com.videogo.remoteplayback.list.bean.ClickedListItem;
 import com.videogo.remoteplayback.list.bean.CloudPartInfoFileEx;
@@ -585,7 +590,18 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         initRemoteListPlayer();
         showDownPopup();
         fakePerformClickUI();
+        // 与设备建立链接，获取SD卡录像封面（页面退出的时候必须断开链接，释放资源，见onDestroy方法）
+        RecordCoverFetcherManager.getInstance().initFetcher(this, mCameraInfo.getDeviceSerial(), mCameraInfo.getCameraNo(), new RecordCoverFetcherManager.RecordCoverFetcherInitCallBack() {
+            @Override
+            public void onFetcherInitSuccess() {
 
+            }
+
+            @Override
+            public void onFetcherInitFailed() {
+
+            }
+        });
     }
 
     private void fakePerformClickUI() {
@@ -1082,6 +1098,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         if (mPlaybackPlayer != null) {
             getOpenSDK().releasePlayer(mPlaybackPlayer);
         }
+        RecordCoverFetcherManager.getInstance().stopFetcher();// 断开与设备的链接
         stopQueryTask();
         removeHandler(handler);
         removeHandler(playBackHandler);
@@ -1832,8 +1849,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
     }
 
     @Override
-    public void querySuccessFromDevice(List<CloudPartInfoFileEx> cloudPartInfoFileExs, int position,
-     List<CloudPartInfoFile> cloudPartInfoFile) {
+    public void querySuccessFromDevice(List<CloudPartInfoFileEx> cloudPartInfoFileExs, int position, List<CloudPartInfoFile> cloudPartInfoFile) {
         hasShowListViewLine(true);
         showTab(R.id.content_tab_device_root);
         mPinnedHeaderListViewForLocal.setVisibility(View.VISIBLE);
@@ -1846,8 +1862,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             if (getAndroidOSVersion() < 14) {
                 mPinnedHeaderListViewForLocal.setSelection(selPosition > 0 ? selPosition : 0);
             } else {
-                mPinnedHeaderListViewForLocal.smoothScrollToPositionFromTop(selPosition > 0 ? selPosition : 0, 100,
- 500);
+                mPinnedHeaderListViewForLocal.smoothScrollToPositionFromTop(selPosition > 0 ? selPosition : 0, 100, 500);
             }
         } else {
             mDeviceRecordsAdapter = new StandardArrayAdapter(this, R.id.layout, cloudPartInfoFileExs);
@@ -1861,6 +1876,59 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             mPinnedHeaderListViewForLocal.startAnimation();
             mSectionAdapterForLocal.setOnHikItemClickListener(EZPlayBackListActivity.this);
         }
+        // 去获取SD卡视频封面
+        List<EZDeviceRecordFile> recordFiles = new ArrayList<>();
+        for (int i = 0; i < cloudPartInfoFile.size(); i ++) {
+            CloudPartInfoFile file = cloudPartInfoFile.get(i);
+            EZDeviceRecordFile recordFile = new EZDeviceRecordFile();
+            recordFile.setBegin(file.getBegin());
+            recordFile.setEnd(file.getEnd());
+            recordFile.setSeq(i);// 设置索引，封面回调的时候知道对应哪一个录像
+            recordFiles.add(recordFile);
+        }
+        RecordCoverFetcherManager.getInstance().requestRecordCover(recordFiles, new RecordCoverFetcherManager.RecordCoverFetcherCallBack() {
+            @Override
+            public void onGetCoverSuccess(int seq, byte[] bytes) {
+                /**
+                 * 注意：图片是设备一张一张传回来的，接收到一张就需要局部刷新UI。
+                 */
+
+                // 此处将bytes转为bitmap。开发者也可自行将bytes转为文件，进行缓存管理。
+                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                // TODO 局部刷新UI
+
+                // 将获取到的图片赋值给列表中的对象
+                CloudPartInfoFile cloudFile = cloudPartInfoFile.get(seq);
+                cloudFile.setBitmap(bitmap);
+                for (int i = 0; i < cloudPartInfoFileExs.size(); i++) {
+                    CloudPartInfoFileEx cloudFileEx = cloudPartInfoFileExs.get(i);
+                    if (cloudFileEx.getDataOne() != null && cloudFile.getBegin().equals(cloudFileEx.getDataOne().getBegin()) && cloudFile.getEnd().equals(cloudFileEx.getDataOne().getEnd())) {
+                        cloudFileEx.getDataOne().setBitmap(bitmap);
+                        break;
+                    } else if (cloudFileEx.getDataTwo() != null && cloudFile.getBegin().equals(cloudFileEx.getDataTwo().getBegin()) && cloudFile.getEnd().equals(cloudFileEx.getDataTwo().getEnd())) {
+                        cloudFileEx.getDataTwo().setBitmap(bitmap);
+                        break;
+                    } else if (cloudFileEx.getDataThree() != null && cloudFile.getBegin().equals(cloudFileEx.getDataThree().getBegin()) && cloudFile.getEnd().equals(cloudFileEx.getDataThree().getEnd())) {
+                        cloudFileEx.getDataThree().setBitmap(bitmap);
+                        break;
+                    }
+                }
+            }
+
+            @Override
+            public void onGetCoverFailed(int errorCode) {
+                LogUtil.e(TAG, "onGetCoverFailed");
+            }
+        });
+        /**
+         * 本demo中使用的是ListView，无法局部刷新，只能延时5秒去刷新UI做个演示。建议使用RecycleView来实现
+         */
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mDeviceRecordsAdapter.notifyDataSetChanged();
+            }
+        },5 * 1000);  //延迟5秒执行
     }
 
 

@@ -19,12 +19,6 @@ public enum ServerAreasEnum {
             "26810f3acd794862b608b6cfbc32a6b8"),
 
     /**
-     * 温氏
-     */
-    WENSHI(5, "WENSHI", "https://ezcpcloudopen.wens.com.cn",
-            "https://ezcpcloudopenauth.wens.com.cn", false),
-
-    /**
      * 海外：俄罗斯
      */
     ASIA_Russia(5, "Asia-Russia", "https://irusopen.ezvizru.com",
@@ -104,7 +98,13 @@ public enum ServerAreasEnum {
 //            "https://testeuopenauth.ezvizlife.com", true),
 
     TEST_EU(125, "testeu", "https://ys-open.wens.com.cn",
-            "https://test2auth.ys7.com:8643", true);
+            "https://test2auth.ys7.com:8643", true),
+
+    /**
+     * 温氏
+     */
+    WENSHI(126, "WENSHI", "https://ezcpcloudopen.wens.com.cn",
+            "https://ezcpcloudopenauth.wens.com.cn", false);
 
 
 //    TEST_NEW(130,"testnew", "https://ys-open.wens.com.cn",
