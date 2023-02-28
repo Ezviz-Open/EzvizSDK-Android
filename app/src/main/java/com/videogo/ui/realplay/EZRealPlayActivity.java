@@ -436,7 +436,6 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             case R.id.realplay_full_talk_btn:// 对讲Click
                 //startVoiceTalk();
                 checkAndRequestPermission();
-                selectTalkbackItems();
                 break;
 
             case R.id.realplay_quality_btn:// 清晰度设置Click
@@ -1901,6 +1900,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
                 public void onSuccess(String filepath) {
                     LogUtil.i(TAG, "EZStreamDownloadCallback onSuccess " + filepath);
                     dialog("Record result", "saved to " + mCurrentRecordPath);
+                    // TODO 将录制的视频保存到相册，由开发者自行实现
                 }
 
                 @Override
@@ -3075,10 +3075,8 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
                     intent.setData(Uri.parse("package:" + getPackageName()));
                     startActivity(intent);
                 })
-                .setNegativeButton("退出应用", (dialog12, which) -> {
+                .setNegativeButton("取消", (dialog12, which) -> {
                     dialog12.dismiss();
-                    finish();
-                    System.exit(0);
                 }).create();
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
@@ -3092,7 +3090,8 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
     }
 
     private void afterHasPermission() {
-
+        // 有麦克风权限后，弹出对讲方式选择框
+        selectTalkbackItems();
     }
 
     private boolean hasAllPermissionsGranted(int[] grantResults) {

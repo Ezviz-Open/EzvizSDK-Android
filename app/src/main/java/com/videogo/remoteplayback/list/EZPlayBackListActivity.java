@@ -1,6 +1,8 @@
 package com.videogo.remoteplayback.list;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.app.DatePickerDialog;
@@ -11,6 +13,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -19,14 +22,19 @@ import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.Settings;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.TextureView;
@@ -36,6 +44,7 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
@@ -348,6 +357,9 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
     private Button rightButton;
     private EZConstants.EZVideoRecordType recordType = EZ_VIDEO_RECORD_TYPE_ALL;
 
+    private String downloadFilePath;
+    private boolean isFromPermissionSetting;// true为应用权限管理返回
+
     public static void launch(Context context, EZCameraInfo cameraInfo) {
         Intent intent = new Intent(context, EZPlayBackListActivity.class);
         intent.putExtra(RemoteListContant.QUERY_DATE_INTENT_KEY, DateTimeUtil.getNow());
@@ -568,6 +580,10 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         // 设置录像按钮为check状态
         videoRecordingBtn.setBackgroundResource(R.drawable.palyback_video_selector);
         updateCaptureUI();
+
+        // 录像存储到相册
+        downloadFilePath = mCurrentRecordPath;
+        checkAndRequestPermission();
     }
 
     @Override
@@ -590,18 +606,21 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         initRemoteListPlayer();
         showDownPopup();
         fakePerformClickUI();
-        // 与设备建立链接，获取SD卡录像封面（页面退出的时候必须断开链接，释放资源，见onDestroy方法）
-        RecordCoverFetcherManager.getInstance().initFetcher(this, mCameraInfo.getDeviceSerial(), mCameraInfo.getCameraNo(), new RecordCoverFetcherManager.RecordCoverFetcherInitCallBack() {
-            @Override
-            public void onFetcherInitSuccess() {
+        // 国内支持SD卡录像封面获取，海外不支持
+        if (!EzvizAPI.getInstance().isUsingGlobalSDK()) {
+            // 与设备建立链接，获取SD卡录像封面（页面退出的时候必须断开链接，释放资源，见onDestroy方法）
+            RecordCoverFetcherManager.getInstance().initFetcher(this, mCameraInfo.getDeviceSerial(), mCameraInfo.getCameraNo(), new RecordCoverFetcherManager.RecordCoverFetcherInitCallBack() {
+                @Override
+                public void onFetcherInitSuccess() {
 
-            }
+                }
 
-            @Override
-            public void onFetcherInitFailed() {
+                @Override
+                public void onFetcherInitFailed() {
 
-            }
-        });
+                }
+            });
+        }
     }
 
     private void fakePerformClickUI() {
@@ -1098,7 +1117,9 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         if (mPlaybackPlayer != null) {
             getOpenSDK().releasePlayer(mPlaybackPlayer);
         }
-        RecordCoverFetcherManager.getInstance().stopFetcher();// 断开与设备的链接
+        if (!EzvizAPI.getInstance().isUsingGlobalSDK()) {
+            RecordCoverFetcherManager.getInstance().stopFetcher();// 断开与设备的链接
+        }
         stopQueryTask();
         removeHandler(handler);
         removeHandler(playBackHandler);
@@ -1207,13 +1228,13 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
 
         @Override
         public void onSuccess(final String filepath) {
+            downloadFilePath = filepath;
             String successMsg = "saved video to " + filepath;
             LogUtil.d(TAG, successMsg);
             toast(successMsg);
             updateNotification(notificationId, successMsg);
-            // 将录像存储到相册，需要动态申请权限
-            File file = new File(filepath);
-            RemoteListUtil.saveVideo2Album(EZPlayBackListActivity.this, file);
+            // 申请动态权限将下载文件存储到相册
+            checkAndRequestPermission();
         }
 
         @Override
@@ -1657,6 +1678,10 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
     protected void onResume() {
         super.onResume();
         LogUtil.d(TAG, "onResume()");
+        if (isFromPermissionSetting) {
+            checkPermissions();
+            isFromPermissionSetting = false;
+        }
 
         new Handler().postDelayed(new Runnable() {
 
@@ -1876,59 +1901,61 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             mPinnedHeaderListViewForLocal.startAnimation();
             mSectionAdapterForLocal.setOnHikItemClickListener(EZPlayBackListActivity.this);
         }
-        // 去获取SD卡视频封面
-        List<EZDeviceRecordFile> recordFiles = new ArrayList<>();
-        for (int i = 0; i < cloudPartInfoFile.size(); i ++) {
-            CloudPartInfoFile file = cloudPartInfoFile.get(i);
-            EZDeviceRecordFile recordFile = new EZDeviceRecordFile();
-            recordFile.setBegin(file.getBegin());
-            recordFile.setEnd(file.getEnd());
-            recordFile.setSeq(i);// 设置索引，封面回调的时候知道对应哪一个录像
-            recordFiles.add(recordFile);
-        }
-        RecordCoverFetcherManager.getInstance().requestRecordCover(recordFiles, new RecordCoverFetcherManager.RecordCoverFetcherCallBack() {
-            @Override
-            public void onGetCoverSuccess(int seq, byte[] bytes) {
-                /**
-                 * 注意：图片是设备一张一张传回来的，接收到一张就需要局部刷新UI。
-                 */
+        if (!EzvizAPI.getInstance().isUsingGlobalSDK()) {
+            // 去获取SD卡视频封面
+            List<EZDeviceRecordFile> recordFiles = new ArrayList<>();
+            for (int i = 0; i < cloudPartInfoFile.size(); i ++) {
+                CloudPartInfoFile file = cloudPartInfoFile.get(i);
+                EZDeviceRecordFile recordFile = new EZDeviceRecordFile();
+                recordFile.setBegin(file.getBegin());
+                recordFile.setEnd(file.getEnd());
+                recordFile.setSeq(i);// 设置索引，封面回调的时候知道对应哪一个录像
+                recordFiles.add(recordFile);
+            }
+            RecordCoverFetcherManager.getInstance().requestRecordCover(recordFiles, new RecordCoverFetcherManager.RecordCoverFetcherCallBack() {
+                @Override
+                public void onGetCoverSuccess(int seq, byte[] bytes) {
+                    /**
+                     * 注意：图片是设备一张一张传回来的，接收到一张就需要局部刷新UI。
+                     */
 
-                // 此处将bytes转为bitmap。开发者也可自行将bytes转为文件，进行缓存管理。
-                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                // TODO 局部刷新UI
+                    // 此处将bytes转为bitmap。开发者也可自行将bytes转为文件，进行缓存管理。
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                    // TODO 局部刷新UI
 
-                // 将获取到的图片赋值给列表中的对象
-                CloudPartInfoFile cloudFile = cloudPartInfoFile.get(seq);
-                cloudFile.setBitmap(bitmap);
-                for (int i = 0; i < cloudPartInfoFileExs.size(); i++) {
-                    CloudPartInfoFileEx cloudFileEx = cloudPartInfoFileExs.get(i);
-                    if (cloudFileEx.getDataOne() != null && cloudFile.getBegin().equals(cloudFileEx.getDataOne().getBegin()) && cloudFile.getEnd().equals(cloudFileEx.getDataOne().getEnd())) {
-                        cloudFileEx.getDataOne().setBitmap(bitmap);
-                        break;
-                    } else if (cloudFileEx.getDataTwo() != null && cloudFile.getBegin().equals(cloudFileEx.getDataTwo().getBegin()) && cloudFile.getEnd().equals(cloudFileEx.getDataTwo().getEnd())) {
-                        cloudFileEx.getDataTwo().setBitmap(bitmap);
-                        break;
-                    } else if (cloudFileEx.getDataThree() != null && cloudFile.getBegin().equals(cloudFileEx.getDataThree().getBegin()) && cloudFile.getEnd().equals(cloudFileEx.getDataThree().getEnd())) {
-                        cloudFileEx.getDataThree().setBitmap(bitmap);
-                        break;
+                    // 将获取到的图片赋值给列表中的对象
+                    CloudPartInfoFile cloudFile = cloudPartInfoFile.get(seq);
+                    cloudFile.setBitmap(bitmap);
+                    for (int i = 0; i < cloudPartInfoFileExs.size(); i++) {
+                        CloudPartInfoFileEx cloudFileEx = cloudPartInfoFileExs.get(i);
+                        if (cloudFileEx.getDataOne() != null && cloudFile.getBegin().equals(cloudFileEx.getDataOne().getBegin()) && cloudFile.getEnd().equals(cloudFileEx.getDataOne().getEnd())) {
+                            cloudFileEx.getDataOne().setBitmap(bitmap);
+                            break;
+                        } else if (cloudFileEx.getDataTwo() != null && cloudFile.getBegin().equals(cloudFileEx.getDataTwo().getBegin()) && cloudFile.getEnd().equals(cloudFileEx.getDataTwo().getEnd())) {
+                            cloudFileEx.getDataTwo().setBitmap(bitmap);
+                            break;
+                        } else if (cloudFileEx.getDataThree() != null && cloudFile.getBegin().equals(cloudFileEx.getDataThree().getBegin()) && cloudFile.getEnd().equals(cloudFileEx.getDataThree().getEnd())) {
+                            cloudFileEx.getDataThree().setBitmap(bitmap);
+                            break;
+                        }
                     }
                 }
-            }
 
-            @Override
-            public void onGetCoverFailed(int errorCode) {
-                LogUtil.e(TAG, "onGetCoverFailed");
-            }
-        });
-        /**
-         * 本demo中使用的是ListView，无法局部刷新，只能延时5秒去刷新UI做个演示。建议使用RecycleView来实现
-         */
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mDeviceRecordsAdapter.notifyDataSetChanged();
-            }
-        },5 * 1000);  //延迟5秒执行
+                @Override
+                public void onGetCoverFailed(int errorCode) {
+                    LogUtil.e(TAG, "onGetCoverFailed");
+                }
+            });
+            /**
+             * 本demo中使用的是ListView，无法局部刷新，只能延时5秒去刷新UI做个演示。建议使用RecycleView来实现
+             */
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mDeviceRecordsAdapter.notifyDataSetChanged();
+                }
+            },5 * 1000);  //延迟5秒执行
+        }
     }
 
 
@@ -2774,6 +2801,89 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         String streamTypeMsg = getApplicationContext().getString(R.string.stream_type) + EZBusinessTool.getStreamType(streamType);
         streamTypeTv.setText(streamTypeMsg);
         streamTypeTv.setVisibility(View.VISIBLE);
+    }
+
+
+    public void checkPermissions() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            checkAndRequestPermission();
+        } else {
+            afterHasPermission();
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private void checkAndRequestPermission() {
+        List<String> lackedPermission = new ArrayList<>();
+        if (!(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)) {
+            lackedPermission.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+        // 权限都已经有了
+        if (lackedPermission.size() == 0) {
+            afterHasPermission();
+        } else {
+            // 请求所缺少的权限，在onRequestPermissionsResult中再看是否获得权限
+            String[] requestPermissions = new String[lackedPermission.size()];
+            lackedPermission.toArray(requestPermissions);
+            requestPermissions(requestPermissions, 1000);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1000 && hasAllPermissionsGranted(grantResults)) {
+            afterHasPermission();
+        } else {
+            try {
+                showPermissionDialog();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 权限设置
+     */
+    private void showPermissionDialog() {
+        android.support.v7.app.AlertDialog dialog = new android.support.v7.app.AlertDialog.Builder(this)
+                .setMessage("应用缺少必要的权限！请点击\"权限\"，打开所需要的权限。")
+                .setPositiveButton("去设置", (dialog1, which) -> {
+                    isFromPermissionSetting = true;
+                    dialog1.dismiss();
+                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                    intent.setData(Uri.parse("package:" + getPackageName()));
+                    startActivity(intent);
+                })
+                .setNegativeButton("取消", (dialog12, which) -> {
+                    dialog12.dismiss();
+                }).create();
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+        dialog.getButton(android.support.v7.app.AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(this, R.color.black));
+        // 设置居中，解决Android9.0 AlertDialog不居中问题
+        Window dialogWindow = dialog.getWindow();
+        WindowManager.LayoutParams p = dialogWindow.getAttributes();
+        p.width = (int) (LocalInfo.getInstance().getScreenWidth() * 0.9);
+        p.gravity = Gravity.CENTER;
+        dialogWindow.setAttributes(p);
+    }
+
+    private void afterHasPermission() {
+        // 将录像存储到相册，需要动态申请权限，由开发者自行实现。
+        File file = new File(downloadFilePath);
+        RemoteListUtil.saveVideo2Album(EZPlayBackListActivity.this, file);
+        // TODO downloadFilePath的录像可以自行删除，避免占用手机内存，可以在onDestroy的时候。不能立即调用file.delete();因为文件存储到相册是异步耗时操作。
+    }
+
+    private boolean hasAllPermissionsGranted(int[] grantResults) {
+        for (int grantResult : grantResults) {
+            if (grantResult == PackageManager.PERMISSION_DENIED) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

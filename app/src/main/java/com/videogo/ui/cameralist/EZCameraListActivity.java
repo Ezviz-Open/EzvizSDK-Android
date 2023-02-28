@@ -531,7 +531,9 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
                     return result;
                 }
                 if (mLoadType == LOAD_MY_DEVICE) {
-
+                    if (getOpenSDK() == null) {
+                        return null;
+                    }
                     if (mHeaderOrFooter) {
                         result = getOpenSDK().getDeviceList(0, 20);
                     } else {

@@ -61,9 +61,6 @@ public class MainActivity extends RootActivity {
     private final static String APPKEY_JC = "请输入你的appkey";
     private final static String TOKEN_JC = "请输入你的accessToken";
     // 开发者反馈问题提供的账号信息
-//    private final static String APPKEY_DEV = "请输入你的appkey";
-//    private final static String TOKEN_DEV = "请输入你的accessToken";
-//    private final static String DEVICE_DEV = "请输入你的设备序列号";
     private final static String APPKEY_DEV = "请输入你的appkey";
     private final static String TOKEN_DEV = "请输入你的accessToken";
     private final static String DEVICE_DEV = "请输入你的设备序列号";
