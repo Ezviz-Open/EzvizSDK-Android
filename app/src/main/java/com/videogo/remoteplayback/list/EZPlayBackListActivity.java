@@ -86,6 +86,7 @@ import com.videogo.openapi.EZPlayer;
 import com.videogo.openapi.EzvizAPI;
 import com.videogo.openapi.bean.EZCameraInfo;
 import com.videogo.openapi.bean.EZCloudRecordFile;
+import com.videogo.openapi.bean.EZDeviceInfo;
 import com.videogo.openapi.bean.EZDeviceRecordFile;
 import com.videogo.openapi.bean.resp.CloudPartInfoFile;
 import com.videogo.remoteplayback.RecordCoverFetcherManager;
@@ -141,6 +142,7 @@ import ezviz.ezopensdkcommon.common.RootActivity;
 
 import static com.videogo.EzvizApplication.getOpenSDK;
 import static com.videogo.openapi.EZConstants.EZPlaybackConstants.MSG_REMOTE_PLAYBACK_RATE_LOWER;
+import static com.videogo.openapi.EZConstants.EZPlaybackRate.EZ_PLAYBACK_RATE_32;
 import static com.videogo.openapi.EZConstants.EZVideoRecordType.EZ_VIDEO_RECORD_TYPE_ALL;
 import static com.videogo.openapi.EZConstants.EZVideoRecordType.EZ_VIDEO_RECORD_TYPE_CMR;
 import static com.videogo.openapi.EZConstants.EZVideoRecordType.EZ_VIDEO_RECORD_TYPE_Event;
@@ -348,6 +350,8 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
     private boolean isRecording = false;
     private ViewGroup mControlBarRL;
     private TitleBar mLandscapeTitleBar = null;
+
+    private EZDeviceInfo mDeviceInfo = null;
     private EZCameraInfo mCameraInfo = null;
     private EZDeviceRecordFile mDeviceRecordInfo = null;
     private EZCloudRecordFile mCloudRecordInfo = null;
@@ -360,10 +364,11 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
     private String downloadFilePath;
     private boolean isFromPermissionSetting;// true为应用权限管理返回
 
-    public static void launch(Context context, EZCameraInfo cameraInfo) {
+    public static void launch(Context context, EZDeviceInfo deviceInfo, EZCameraInfo cameraInfo) {
         Intent intent = new Intent(context, EZPlayBackListActivity.class);
         intent.putExtra(RemoteListContant.QUERY_DATE_INTENT_KEY, DateTimeUtil.getNow());
         intent.putExtra(IntentConsts.EXTRA_CAMERA_INFO, cameraInfo);
+        intent.putExtra(IntentConsts.EXTRA_DEVICE_INFO, deviceInfo);
         context.startActivity(intent);
     }
 
@@ -371,7 +376,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         EZCameraInfo cameraInfo = new EZCameraInfo();
         cameraInfo.setDeviceSerial(deviceSerial);
         cameraInfo.setCameraNo(cameraNo);
-        launch(context, cameraInfo);
+        launch(context, new EZDeviceInfo(), cameraInfo);
     }
 
     private Handler playBackHandler = new Handler() {
@@ -1476,6 +1481,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             public void onClick(View arg0) {
                 if (!mCheckBtnCloud.isChecked()) {
                     mCheckBtnCloud.setChecked(true);
+                    downloadBtn.setVisibility(View.VISIBLE);
                     rightButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.common_title_extension_selector));
                     rightButton.setVisibility(EzvizAPI.getInstance().isUsingGlobalSDK() ? View.VISIBLE : View.GONE);
                     if (mCloudRecordsAdapter == null) {
@@ -1489,6 +1495,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             public void onClick(View arg0) {
                 if (!mCheckBtnDevice.isChecked()) {
                     mCheckBtnDevice.setChecked(true);
+                    downloadBtn.setVisibility(mDeviceInfo.isSupportSDRecordDownload()?View.VISIBLE:View.GONE);
                     rightButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.common_title_recordtype_selector));
                     rightButton.setVisibility(View.VISIBLE);
                     if (mDeviceRecordsAdapter == null) {
@@ -1803,6 +1810,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         if (bundle != null) {
             queryDate = (Date) bundle.getSerializable(RemoteListContant.QUERY_DATE_INTENT_KEY);
             mCameraInfo = getIntent().getParcelableExtra(IntentConsts.EXTRA_CAMERA_INFO);
+            mDeviceInfo = getIntent().getParcelableExtra(IntentConsts.EXTRA_DEVICE_INFO);
         }
         Application application = getApplication();
         mAudioPlayUtil = AudioPlayUtil.getInstance(application);
@@ -2787,6 +2795,10 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                 }
                 // 切换到指定倍速
                 if (mPlaybackPlayer.setPlaybackRate(targetRateEnum/*, 2*/)) {
+                    if (targetRateEnum == EZ_PLAYBACK_RATE_32 && mCheckBtnDevice.isChecked()) {
+                        toast("32x playback does not support SD records" );
+                        return;
+                    }
                     if (popupWindow != null && popupWindow.getContentView() != null && popupWindow.getContentView().getTag() instanceof Button) {
                         ((Button) popupWindow.getContentView().getTag()).setText(targetRateWithX);
                     }

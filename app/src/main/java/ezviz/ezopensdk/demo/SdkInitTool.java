@@ -13,14 +13,14 @@ public class SdkInitTool {
     public static void initSdk(@NonNull Application application, @NonNull SdkInitParams sdkInitParams) {
 //        TestParams.setUse(true);
         if (sdkInitParams.usingGlobalSDK) {
-            // sdk日志开关，正式发布需要去掉，必须在initLib方法之前调用
+            // sdk日志开关，必须在initLib方法之前调用，正式发布时必须设置为false或者删除；否则本地会缓存大量的调试文件
             EZGlobalSDK.showSDKLog(true);
             // 设置是否支持P2P取流,详见api
             EZGlobalSDK.enableP2P(true);
             // APP_KEY请替换成自己申请的
             EZGlobalSDK.initLib(application, sdkInitParams.appKey);
         } else {
-            // sdk日志开关，正式发布需要去掉，必须在initLib方法之前调用
+            // sdk日志开关，必须在initLib方法之前调用，正式发布时必须设置为false或者删除；否则本地会缓存大量的调试文件
             EZOpenSDK.showSDKLog(true);
             // 设置是否支持P2P取流,详见api
             EZOpenSDK.enableP2P(true);

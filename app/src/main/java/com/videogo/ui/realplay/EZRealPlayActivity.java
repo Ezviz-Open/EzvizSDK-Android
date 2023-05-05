@@ -19,10 +19,8 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
-import android.app.Application;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
@@ -51,11 +49,9 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnKeyListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.Animation;
@@ -68,7 +64,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
-import android.widget.PopupWindow.OnDismissListener;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
@@ -135,7 +130,6 @@ import ezviz.ezopensdk.debug.VideoFileUtil;
 import ezviz.ezopensdk.demo.DemoConfig;
 import ezviz.ezopensdk.R;
 
-import static com.videogo.openapi.EZConstants.EZRealPlayConstants.MSG_PRIVATE_TOKEN_GET_SUCCESS;
 import static com.videogo.openapi.EZConstants.MSG_GOT_STREAM_TYPE;
 import static com.videogo.openapi.EZConstants.MSG_VIDEO_SIZE_CHANGED;
 
@@ -503,7 +497,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             case EZRealPlayConstants.MSG_PTZ_GET_SUCCESS:// 云台角度获取成功
                 handleDevicePtzAngleInfo(msg.obj);
                 break;
-            case MSG_PRIVATE_TOKEN_GET_SUCCESS:
+            case EZRealPlayConstants.MSG_PRIVATE_TOKEN_GET_SUCCESS:
                 EZPMPlayPrivateTokenInfo tokenInfo = (EZPMPlayPrivateTokenInfo)msg.obj;
                 LogUtil.e(TAG, "token--->" + tokenInfo.getToken());
                 break;

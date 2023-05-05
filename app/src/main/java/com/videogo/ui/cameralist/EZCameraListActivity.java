@@ -322,6 +322,7 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
                     Intent intent = new Intent(EZCameraListActivity.this, EZPlayBackListActivity.class);
                     intent.putExtra(RemoteListContant.QUERY_DATE_INTENT_KEY, DateTimeUtil.getNow());
                     intent.putExtra(IntentConsts.EXTRA_CAMERA_INFO, cameraInfo);
+                    intent.putExtra(IntentConsts.EXTRA_DEVICE_INFO, deviceInfo);
                     startActivity(intent);
                     return;
                 }
@@ -532,7 +533,7 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
                 }
                 if (mLoadType == LOAD_MY_DEVICE) {
                     if (getOpenSDK() == null) {
-                        return null;
+                        finish();
                     }
                     if (mHeaderOrFooter) {
                         result = getOpenSDK().getDeviceList(0, 20);
@@ -706,6 +707,10 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        if (getOpenSDK() == null) {
+                            finish();
+                            return;
+                        }
                         getOpenSDK().logout();
                     }
                 }).start();

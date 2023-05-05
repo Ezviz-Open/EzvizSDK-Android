@@ -320,6 +320,7 @@
     <string name="device_reset_title">重启设备</string>
     <string name="device_reset_tip">长按设备上的reset键10秒后松开，并等待大约30秒直到设备启动完成</string>
     <string name="device_unsupport_5g_wifi">如果你使用的是双频路由器，请不要让摄像机连接5G频段的Wi-Fi</string>
+    <string name="device_wifi_same_required">摄像机要连接的WiFi与手机当前连接的WiFi要一致</string>
     <string name="interface_call_demo_txt">接口调用demo</string>
     <string name="ui_call_demo_txt">UI界面demo</string>
     <string name="auto_wifi_cer_config_title1">网络连接(1/2)</string>

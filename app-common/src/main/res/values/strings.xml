@@ -303,6 +303,7 @@
     <string name="device_reset_title">Reboot</string>
     <string name="device_reset_tip">Make sure the device is powered-on and hold the RESET button for 10s. Wait for 30s or so. </string>
     <string name="device_unsupport_5g_wifi">If your router is dual band, please connect camera to 2.4GHz Wi-Fi.</string>
+    <string name="device_wifi_same_required">The WiFi to be connected to the camera should be consistent with the WiFi currently connected to the phone.</string>
     <string name="interface_call_demo_txt">Interface Calling demo</string>
     <string name="ui_call_demo_txt">UI demo</string>
     <string name="auto_wifi_cer_config_title1">Network Connection(1/2)</string>
