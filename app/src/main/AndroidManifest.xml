@@ -63,6 +63,7 @@
 
     <application
         android:name="com.videogo.EzvizApplication"
+        android:allowBackup="false"
         android:icon="@mipmap/videogo_icon"
         android:label="@string/app_name"
         android:requestLegacyExternalStorage="true"
