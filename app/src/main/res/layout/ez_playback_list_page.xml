@@ -401,7 +401,7 @@
         <ImageView
             android:id="@+id/img_active_cloud_video"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
+            android:layout_height="85dp"
             android:onClick="goToActiveCloudVideo"
             android:scaleType="fitXY"
             android:src="@drawable/cloud_ad" />

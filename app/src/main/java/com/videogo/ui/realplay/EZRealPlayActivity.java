@@ -2095,13 +2095,14 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         setRealPlayLoadingUI();
 
         if (mCameraInfo != null) {
-            mEZPlayer = EzvizApplication.getOpenSDK().createPlayer(mCameraInfo.getDeviceSerial(), mCameraInfo.getCameraNo());
+            if (mEZPlayer == null) {
+                mEZPlayer = EzvizApplication.getOpenSDK().createPlayer(mCameraInfo.getDeviceSerial(), mCameraInfo.getCameraNo());
+            }
             if (mEZPlayer == null)
                 return;
             if (mDeviceInfo == null) {
                 return;
             }
-
             mEZPlayer.setPlayVerifyCode(DataManager.getInstance().getDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial()));
 //            if (mDeviceInfo.getIsEncrypt() == 1) {
 //                mEZPlayer.setPlayVerifyCode(DataManager.getInstance().getDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial()));
@@ -2115,7 +2116,9 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             startRecordOriginVideo();
             mEZPlayer.startRealPlay();
         } else if (mRtspUrl != null) {
-            mEZPlayer = EzvizApplication.getOpenSDK().createPlayerWithUrl(mRtspUrl);
+            if (mEZPlayer == null) {
+                mEZPlayer = EzvizApplication.getOpenSDK().createPlayerWithUrl(mRtspUrl);
+            }
             if (mEZPlayer == null)
                 return;
             mEZPlayer.setHandler(mHandler);

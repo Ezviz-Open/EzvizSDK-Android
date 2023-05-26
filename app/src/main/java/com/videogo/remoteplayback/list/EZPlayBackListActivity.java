@@ -2752,7 +2752,14 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                 Button changeRateBtn = (Button) childView;
                 changeRateBtn.setOnClickListener(mChangePlaybackRateListener);
                 changeRateBtn.setTag(popupWindow);
-                if (view instanceof Button && ((Button) view).getText().toString().contains(((Button) childView).getText())) {
+
+                String selectRateText = ((Button) view).getText().toString();
+                String childRateText = ((Button) childView).getText().toString();
+                if (view instanceof Button && selectRateText.contains(childRateText)) {
+                    childView.setVisibility(View.GONE);
+                }
+                // SD卡回放不支持32倍速
+                if (mCheckBtnDevice.isChecked() && childRateText.contains("32x")) {
                     childView.setVisibility(View.GONE);
                 }
             }
@@ -2795,10 +2802,6 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                 }
                 // 切换到指定倍速
                 if (mPlaybackPlayer.setPlaybackRate(targetRateEnum/*, 2*/)) {
-                    if (targetRateEnum == EZ_PLAYBACK_RATE_32 && mCheckBtnDevice.isChecked()) {
-                        toast("32x playback does not support SD records" );
-                        return;
-                    }
                     if (popupWindow != null && popupWindow.getContentView() != null && popupWindow.getContentView().getTag() instanceof Button) {
                         ((Button) popupWindow.getContentView().getTag()).setText(targetRateWithX);
                     }

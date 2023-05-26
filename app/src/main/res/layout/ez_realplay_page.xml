@@ -94,7 +94,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:orientation="vertical"
-            android:padding="10dp">
+            android:gravity="right"
+            android:layout_marginRight="10dp">
 
             <TextView
                 android:id="@+id/tv_stream_type"
