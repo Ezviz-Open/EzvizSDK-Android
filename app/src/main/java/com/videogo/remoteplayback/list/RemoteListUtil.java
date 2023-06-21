@@ -147,30 +147,4 @@ public class RemoteListUtil {
         return null;
     }
 
-    /**
-     * 保存视频
-     * @param context
-     * @param file
-     */
-    public static void saveVideo2Album(Context context, File file) {
-        //是否添加到相册
-        ContentResolver localContentResolver = context.getContentResolver();
-        ContentValues localContentValues = getVideoContentValues(context, file, System.currentTimeMillis());
-        Uri localUri = localContentResolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, localContentValues);
-        context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, localUri));
-    }
-
-    public static ContentValues getVideoContentValues(Context paramContext, File paramFile, long paramLong) {
-        ContentValues localContentValues = new ContentValues();
-        localContentValues.put("title", paramFile.getName());
-        localContentValues.put("_display_name", paramFile.getName());
-        localContentValues.put("mime_type", "video/mp4");
-        localContentValues.put("datetaken", Long.valueOf(paramLong));
-        localContentValues.put("date_modified", Long.valueOf(paramLong));
-        localContentValues.put("date_added", Long.valueOf(paramLong));
-        localContentValues.put("_data", paramFile.getAbsolutePath());
-        localContentValues.put("_size", Long.valueOf(paramFile.length()));
-        return localContentValues;
-    }
-
 }

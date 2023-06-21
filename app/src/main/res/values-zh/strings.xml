@@ -438,6 +438,7 @@
     <string name="query_camera_fail_not_exit">设备未注册，请检查您的设备网络</string>
     <string name="calendar_setting_error">请先将日期设置到2012/01/01之后</string>
     <string name="already_saved_to_volume">已保存至相册</string>
+    <string name="already_saved_to">已保存至</string>
     <string name="tip_heard_voice">请将设备插上电后等待大约30秒，直到设备启动完成</string>
     <string name="autowifi_heard_voice">设备已启动好，且是第一次配置网络</string>
     <string name="autowifi_not_heard_voice">这台设备以前配过网络</string>

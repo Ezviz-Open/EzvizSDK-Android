@@ -6,37 +6,39 @@
     android:orientation="vertical">
 
     <!-- 标题栏 -->
-    <RelativeLayout android:id="@+id/title"
+    <RelativeLayout
+        android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="44dp">
 
         <View
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:onClick="onClickTryOpenTestPage"/>
+            android:onClick="onClickTryOpenTestPage" />
 
         <Button
             android:id="@+id/btn_user"
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:layout_centerVertical="true"
-            android:background="@drawable/user"
+            android:layout_marginStart="10dp"
             android:layout_marginLeft="10dp"
-            android:layout_marginStart="10dp" />
+            android:background="@drawable/user"
+            android:enabled="true" />
 
         <ImageView
             android:id="@+id/iv_more"
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:layout_centerVertical="true"
-            android:src="@drawable/more"
-            android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
+            android:layout_marginLeft="10dp"
             android:layout_toRightOf="@id/btn_user"
-            android:padding="5dp"
             android:clickable="true"
             android:focusable="true"
-            android:onClick="onClickMoreFeatures"/>
+            android:onClick="onClickMoreFeatures"
+            android:padding="5dp"
+            android:src="@drawable/more" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -51,7 +53,7 @@
                 android:layout_gravity="center_vertical"
                 android:text="@string/my_devices"
                 android:textColor="@color/orange_text"
-                android:textSize="20sp"/>
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/text_share"
@@ -61,7 +63,7 @@
                 android:layout_marginLeft="20dp"
                 android:text="@string/share_devices"
                 android:textColor="@color/black_text"
-                android:textSize="20sp"/>
+                android:textSize="20sp" />
 
         </LinearLayout>
 
@@ -70,22 +72,22 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_centerVertical="true"
-            android:background="@drawable/icon_multi_screen_preview"
-            android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
-            android:layout_toLeftOf="@id/btn_add"
+            android:layout_marginLeft="10dp"
+            android:layout_marginEnd="5dp"
             android:layout_marginRight="5dp"
-            android:layout_marginEnd="5dp" />
+            android:layout_toLeftOf="@id/btn_add"
+            android:background="@drawable/icon_multi_screen_preview" />
 
         <Button
             android:id="@+id/btn_add"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_centerVertical="true"
-            android:background="@drawable/my_add"
-            android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:layout_marginRight="10dp"/>
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/my_add" />
 
     </RelativeLayout>
 
@@ -103,7 +105,7 @@
         android:fastScrollEnabled="false"
         android:listSelector="@null"
         android:overScrollFooter="@null"
-        android:scrollingCache="true"/>
+        android:scrollingCache="true" />
 
     <LinearLayout
         android:id="@+id/no_camera_tip_ly"
@@ -111,21 +113,21 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/title_bar"
         android:layout_centerInParent="true"
+        android:gravity="center_horizontal"
         android:onClick="onClick"
         android:orientation="vertical"
-        android:visibility="visible"
-        android:gravity="center_horizontal">
+        android:visibility="visible">
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/my_no_video"/>
+            android:src="@drawable/my_no_video" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/not_find_any_devices"
-            android:layout_marginTop="10dp"/>
+            android:layout_marginTop="10dp"
+            android:text="@string/not_find_any_devices" />
 
     </LinearLayout>
 
@@ -144,7 +146,7 @@
             android:layout_marginBottom="20dp"
             android:gravity="center"
             android:text="@string/get_camera_list_fail"
-            android:textSize="@dimen/title_text_size"/>
+            android:textSize="@dimen/title_text_size" />
 
         <Button
             android:id="@+id/camera_list_refresh_btn"
@@ -154,9 +156,8 @@
             android:onClick="onClick"
             android:text="@string/refresh"
             android:textColor="@color/black_text"
-            android:textSize="@dimen/title_text_size"/>
+            android:textSize="@dimen/title_text_size" />
     </LinearLayout>
-
 
 
 </RelativeLayout>

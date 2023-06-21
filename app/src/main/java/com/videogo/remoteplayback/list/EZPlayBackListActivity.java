@@ -66,9 +66,6 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ez.jna.EZStreamSDKJNA;
-import com.ez.p2ptrans.RecordCoverCallback;
-import com.ez.p2ptrans.RecordCoverFetcher;
 import com.ezviz.demo.common.DataTimeUtil;
 import com.videogo.constant.Constant;
 import com.videogo.constant.IntentConsts;
@@ -111,7 +108,6 @@ import com.videogo.ui.util.VerifyCodeInput;
 import com.videogo.util.DateTimeUtil;
 import com.videogo.util.LocalInfo;
 import com.videogo.util.LogUtil;
-import com.videogo.util.MediaScanner;
 import com.videogo.util.Utils;
 import com.videogo.widget.CheckTextButton;
 import com.videogo.widget.CustomRect;
@@ -576,7 +572,8 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             return;
         }
         mAudioPlayUtil.playAudioFile(AudioPlayUtil.RECORD_SOUND);
-        dialog("Record result", "saved to " + mCurrentRecordPath);
+//        dialog("Record result", "saved to " + mCurrentRecordPath);
+        showToast("saved to " + mCurrentRecordPath);
         if (mPlaybackPlayer != null) {
             mPlaybackPlayer.stopLocalRecord();
         }
@@ -1225,7 +1222,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         }
 
         @Override
-        public void onDownloadingSize(int downloadSize) {
+        public void onDownloadingSize(long downloadSize) {
             if (cloudFile != null) {
                 LogUtil.d(TAG, "percent--->"+ downloadSize*100/ cloudFile.getFileSize());
             }
@@ -2562,10 +2559,8 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                             bmp = null;
                             return;
                         }
-                        EZUtils.saveCapturePictrue(path, bmp);
-
-                        MediaScanner mMediaScanner = new MediaScanner(EZPlayBackListActivity.this);
-                        mMediaScanner.scanFile(path, "jpg");
+//                        EZUtils.saveCapturePictrue(path, bmp);
+                        EZUtils.savePicture2Album(EZPlayBackListActivity.this, bmp);// 将文件保存至相册
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -2573,7 +2568,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                                         getResources().getString(R.string.already_saved_to_volume), Toast.LENGTH_SHORT).show();
                             }
                         });
-                    } catch (InnerException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     } finally {
                         if (bmp != null) {
@@ -2886,9 +2881,10 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
     }
 
     private void afterHasPermission() {
-        // 将录像存储到相册，需要动态申请权限，由开发者自行实现。
+        // 将录像存储到相册
         File file = new File(downloadFilePath);
-        RemoteListUtil.saveVideo2Album(EZPlayBackListActivity.this, file);
+        EZUtils.saveVideo2Album(EZPlayBackListActivity.this, file);
+        showToast(getResources().getString(R.string.already_saved_to_volume));
         // TODO downloadFilePath的录像可以自行删除，避免占用手机内存，可以在onDestroy的时候。不能立即调用file.delete();因为文件存储到相册是异步耗时操作。
     }
 

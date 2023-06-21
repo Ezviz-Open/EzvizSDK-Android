@@ -29,7 +29,7 @@ class JoinRoomActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_join_room)
 
-        edt_appid.setText(APPID_DEV)
+//        edt_appid.setText(APPID_DEV)
         edt_width.setText("$width")
         edt_height.setText("$height")
         edt_bitrate.setText("$bitrate")
@@ -46,6 +46,10 @@ class JoinRoomActivity : AppCompatActivity() {
 
     fun onClickJoin(view : View) {
         appId = edt_appid.text.toString()
+        if (TextUtils.isEmpty(appId)){
+            Toast.makeText(this, "请输入appid", Toast.LENGTH_SHORT).show()
+            return
+        }
         try {
             roomId = Integer.valueOf(edt_room.text.toString())
         }catch (e : Exception){

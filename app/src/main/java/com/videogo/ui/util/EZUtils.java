@@ -1,12 +1,20 @@
 package com.videogo.ui.util;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
+import android.os.Build;
+import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.ResourceDecoder;
@@ -23,13 +31,18 @@ import com.videogo.openapi.bean.EZCameraInfo;
 import com.videogo.openapi.bean.EZDeviceInfo;
 import com.videogo.util.LogUtil;
 
+import org.w3c.dom.Text;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
 
 import ezviz.ezopensdk.R;
 
@@ -238,5 +251,92 @@ public class EZUtils {
                     })
                     .into(imageView);
         }
+    }
+
+    /**
+     * 保存图片
+     * @param context
+     * @param file
+     */
+    public static void savePicture2Album(Context context, File file) {
+        // 是否添加到相册
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ContentResolver localContentResolver = context.getContentResolver();
+            ContentValues localContentValues = getPictureContentValues(file, System.currentTimeMillis());
+            Uri localUri = localContentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, localContentValues);
+        } else {
+            try {
+                Uri uri = Uri.fromFile(file);
+                MediaStore.Images.Media.insertImage(context.getContentResolver(), file.getAbsolutePath(), null, null);
+                context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 保存图片
+     * @param toBitmap
+     */
+    public static void savePicture2Album(Context context, Bitmap toBitmap) {
+        // 是否添加到相册
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            // 开始一个新的进程执行保存图片的操作
+            ContentResolver localContentResolver = context.getContentResolver();
+            Uri insertUri = localContentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new ContentValues());
+            // 使用use可以自动关闭流
+            try {
+                OutputStream outputStream = context.getContentResolver().openOutputStream(insertUri, "rw");
+                if (toBitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)) {
+                    LogUtil.d("EZUtils", "save picture success");
+                } else {
+                    Log.e("EZUtils", "save picture fail");
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        } else {
+           MediaStore.Images.Media.insertImage(context.getContentResolver(), toBitmap, null, null);
+        }
+    }
+
+    private static ContentValues getPictureContentValues(File paramFile, long paramLong) {
+        ContentValues localContentValues = new ContentValues();
+        localContentValues.put(MediaStore.MediaColumns.TITLE, paramFile.getName());
+        localContentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, paramFile.getName());
+        localContentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg");
+        localContentValues.put(MediaStore.MediaColumns.DATE_TAKEN, Long.valueOf(paramLong));
+        localContentValues.put(MediaStore.MediaColumns.DATE_MODIFIED, Long.valueOf(paramLong));
+        localContentValues.put(MediaStore.MediaColumns.DATE_ADDED, Long.valueOf(paramLong));
+        localContentValues.put(MediaStore.MediaColumns.DATA, paramFile.getAbsolutePath());
+        localContentValues.put(MediaStore.MediaColumns.SIZE, Long.valueOf(paramFile.length()));
+        return localContentValues;
+    }
+
+    /**
+     * 保存视频
+     * @param context
+     * @param file
+     */
+    public static void saveVideo2Album(Context context, File file) {
+        // 是否添加到相册
+        ContentResolver localContentResolver = context.getContentResolver();
+        ContentValues localContentValues = getVideoContentValues(file, System.currentTimeMillis());
+        Uri localUri = localContentResolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, localContentValues);
+        context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, localUri));
+    }
+
+    private static ContentValues getVideoContentValues(File paramFile, long paramLong) {
+        ContentValues localContentValues = new ContentValues();
+        localContentValues.put(MediaStore.MediaColumns.TITLE, paramFile.getName());
+        localContentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, paramFile.getName());
+        localContentValues.put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4");
+        localContentValues.put(MediaStore.MediaColumns.DATE_TAKEN, Long.valueOf(paramLong));
+        localContentValues.put(MediaStore.MediaColumns.DATE_MODIFIED, Long.valueOf(paramLong));
+        localContentValues.put(MediaStore.MediaColumns.DATE_ADDED, Long.valueOf(paramLong));
+        localContentValues.put(MediaStore.MediaColumns.DATA, paramFile.getAbsolutePath());
+        localContentValues.put(MediaStore.MediaColumns.SIZE, Long.valueOf(paramFile.length()));
+        return localContentValues;
     }
 }

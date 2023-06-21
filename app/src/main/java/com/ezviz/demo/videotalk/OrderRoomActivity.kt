@@ -32,7 +32,7 @@ class OrderRoomActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_order_room)
 
-        edt_appId.setText(APPID_DEV)
+//        edt_appId.setText(APPID_DEV)
         edt_width.setText("$width")
         edt_height.setText("$height")
         edt_bitrate.setText("$bitrate")
@@ -50,6 +50,11 @@ class OrderRoomActivity : AppCompatActivity() {
         appid = edt_appId.text.toString()
         password = edt_passwd.text.toString()
         customerId = edt_nick.text.toString()
+
+        if (TextUtils.isEmpty(appid)){
+            Toast.makeText(this, "请输入appid", Toast.LENGTH_SHORT).show()
+            return
+        }
         if (TextUtils.isEmpty(customerId)){
             Toast.makeText(this, "请输入customerId", Toast.LENGTH_SHORT).show()
             return

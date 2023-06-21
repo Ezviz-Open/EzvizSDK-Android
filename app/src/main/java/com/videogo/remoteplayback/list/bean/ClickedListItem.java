@@ -23,7 +23,7 @@ public class ClickedListItem {
 
     private int position;
     
-    private int fileSize;
+    private long fileSize;
 
     public int getIndex() {
         return index;
@@ -82,11 +82,11 @@ public class ClickedListItem {
         this.position = position;
     }
 
-    public int getFileSize() {
+    public long getFileSize() {
         return fileSize;
     }
 
-    public void setFileSize(int fileSize) {
+    public void setFileSize(long fileSize) {
         this.fileSize = fileSize;
     }
 

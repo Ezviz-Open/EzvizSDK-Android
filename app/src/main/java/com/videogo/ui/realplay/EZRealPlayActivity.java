@@ -119,6 +119,7 @@ import com.videogo.widget.loading.LoadingTextView;
 
 import org.MediaPlayer.PlayM4.Player;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -1894,7 +1895,8 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
                 public void onSuccess(String filepath) {
                     LogUtil.i(TAG, "EZStreamDownloadCallback onSuccess " + filepath);
                     dialog("Record result", "saved to " + mCurrentRecordPath);
-                    // TODO 将录制的视频保存到相册，由开发者自行实现
+                    // TODO 将录制的视频保存到相册，需要申请动态权限WRITE_EXTERNAL_STORAGE，由开发者自行实现
+                    // EZUtils.saveVideo2Album(EZRealPlayActivity.this, new File(filepath));
                 }
 
                 @Override
@@ -1970,7 +1972,6 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
 //        }
 
         if (mEZPlayer != null) {
-
             Thread thr = new Thread() {
                 @Override
                 public void run() {
@@ -1989,13 +1990,12 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
                             }
                             // 将截图bitmap保存至文件
                             EZUtils.saveCapturePictrue(strCaptureFile, bmp);
-                            // 将文件保存至相册
-                            MediaScanner mMediaScanner = new MediaScanner(EZRealPlayActivity.this);
-                            mMediaScanner.scanFile(strCaptureFile, "jpg");
+                            // TODO 将文件保存至相册，需要申请动态权限WRITE_EXTERNAL_STORAGE，由开发者自行实现
+                            // EZUtils.savePicture2Album(EZRealPlayActivity.this, bmp);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Toast.makeText(EZRealPlayActivity.this, getResources().getString(R.string.already_saved_to_volume) + strCaptureFile, Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(EZRealPlayActivity.this, getResources().getString(R.string.already_saved_to) + strCaptureFile, Toast.LENGTH_SHORT).show();
                                 }
                             });
                         } catch (InnerException e) {

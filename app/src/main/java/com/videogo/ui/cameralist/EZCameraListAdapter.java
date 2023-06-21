@@ -82,13 +82,6 @@ public class EZCameraListAdapter extends BaseAdapter {
         public ImageView offlineBgBtn;
         
         public ImageButton deleteBtn;
-        
-        public ImageButton devicePicBtn;
-        
-        public ImageButton deviceVideoBtn;
-        
-        public View deviceDefenceRl;
-        public ImageButton deviceDefenceBtn;
     }
     
     public EZCameraListAdapter(Context context) {
@@ -174,10 +167,6 @@ public class EZCameraListAdapter extends BaseAdapter {
             viewHolder.offlineBgBtn = (ImageView) convertView.findViewById(R.id.offline_bg);
             viewHolder.itemIconArea = convertView.findViewById(R.id.item_icon_area);
             viewHolder.deleteBtn = (ImageButton) convertView.findViewById(R.id.camera_del_btn);
-            viewHolder.devicePicBtn = (ImageButton) convertView.findViewById(R.id.tab_devicepicture_btn);
-            viewHolder.deviceVideoBtn = (ImageButton) convertView.findViewById(R.id.tab_devicevideo_btn);
-            viewHolder.deviceDefenceRl = convertView.findViewById(R.id.tab_devicedefence_rl);
-            viewHolder.deviceDefenceBtn = (ImageButton) convertView.findViewById(R.id.tab_devicedefence_btn);
             
             // 设置点击图标的监听响应函数
             viewHolder.playBtn.setOnClickListener(mOnClickListener);
@@ -199,12 +188,6 @@ public class EZCameraListAdapter extends BaseAdapter {
 
             viewHolder.deleteBtn.setOnClickListener(mOnClickListener);
             
-            viewHolder.devicePicBtn.setOnClickListener(mOnClickListener);
-            
-            viewHolder.deviceVideoBtn.setOnClickListener(mOnClickListener);
-            
-            viewHolder.deviceDefenceBtn.setOnClickListener(mOnClickListener);
-            
             // 设置控件集到convertView
             convertView.setTag(viewHolder);
         } else {
@@ -218,10 +201,6 @@ public class EZCameraListAdapter extends BaseAdapter {
         viewHolder.setDeviceBtn.setTag(position);
         viewHolder.videoTalkBtn.setTag(position);
         viewHolder.deleteBtn.setTag(position);
-        viewHolder.devicePicBtn.setTag(position);
-        viewHolder.deviceVideoBtn.setTag(position);
-        viewHolder.deviceDefenceBtn.setTag(position);
-
 
         final EZDeviceInfo deviceInfo = getItem(position);
         final EZCameraInfo cameraInfo = EZUtils.getCameraInfoFromDevice(deviceInfo,0);
@@ -230,29 +209,25 @@ public class EZCameraListAdapter extends BaseAdapter {
                 viewHolder.offlineBtn.setVisibility(View.VISIBLE);
                 viewHolder.offlineBgBtn.setVisibility(View.VISIBLE);
                 viewHolder.playBtn.setVisibility(View.GONE);
-                viewHolder.deviceDefenceRl.setVisibility(View.INVISIBLE);
             } else {
                 viewHolder.offlineBtn.setVisibility(View.GONE);
                 viewHolder.offlineBgBtn.setVisibility(View.GONE);
                 viewHolder.playBtn.setVisibility(View.VISIBLE);
-                viewHolder.deviceDefenceRl.setVisibility(View.VISIBLE);
             }
             viewHolder.cameraNameTv.setText(deviceInfo.getDeviceName());
             viewHolder.iconIv.setVisibility(View.VISIBLE);
             String imageUrl = deviceInfo.getDeviceCover();
-            if(!TextUtils.isEmpty(imageUrl)) {
-                Glide.with(mContext).load(imageUrl).placeholder(R.drawable.device_other).into(viewHolder.iconIv);
+            if (!TextUtils.isEmpty(imageUrl)) {
+                Glide.with(mContext).load(imageUrl).asBitmap().placeholder(R.drawable.device_other).into(viewHolder.iconIv);
             }
         }
-        if(cameraInfo != null) {
-            // 如果是分享设备，隐藏消息列表按钮和设置按钮
-            if(cameraInfo.getIsShared() != 0 && cameraInfo.getIsShared() != 1) {
-                viewHolder.alarmListBtn.setVisibility(View.GONE);
-                viewHolder.setDeviceBtn.setVisibility(View.GONE);
-            } else {
-                viewHolder.alarmListBtn.setVisibility(View.VISIBLE);
-                viewHolder.setDeviceBtn.setVisibility(View.VISIBLE);
-            }
+        // 如果是分享设备，隐藏消息列表按钮和设置按钮
+        if (cameraInfo != null && (cameraInfo.getIsShared() == 1 || cameraInfo.getIsShared() == 0)) {
+            viewHolder.alarmListBtn.setVisibility(View.VISIBLE);
+            viewHolder.setDeviceBtn.setVisibility(View.VISIBLE);
+        } else {
+            viewHolder.alarmListBtn.setVisibility(View.GONE);
+            viewHolder.setDeviceBtn.setVisibility(View.GONE);
         }
         /*手表设备视频通话功能按钮*/
         viewHolder.videoTalkBtn.setVisibility(View.VISIBLE);
@@ -300,18 +275,6 @@ public class EZCameraListAdapter extends BaseAdapter {
                         break;
                     case R.id.camera_del_btn: 
                         mListener.onDeleteClick(EZCameraListAdapter.this, v, position);
-                        break;
-                        
-                    case R.id.tab_devicepicture_btn: 
-                        mListener.onDevicePictureClick(EZCameraListAdapter.this, v, position);
-                        break;
-                        
-                    case R.id.tab_devicevideo_btn: 
-                        mListener.onDeviceVideoClick(EZCameraListAdapter.this, v, position);
-                        break;      
-                        
-                    case R.id.tab_devicedefence_btn: 
-                        mListener.onDeviceDefenceClick(EZCameraListAdapter.this, v, position);
                         break;
                 }
             }

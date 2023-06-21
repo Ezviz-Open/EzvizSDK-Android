@@ -63,7 +63,7 @@
     <dimen name="remoteplayback_ratio_text_size">24dp</dimen>
 
     <!-- 回放列表 -->
-    <dimen name="remotelist_time_text_size">9dp</dimen>
+    <dimen name="remotelist_time_text_size">12dp</dimen>
     <dimen name="remotelist_item_local_time_size">12dp</dimen>
     <dimen name="remotelist_item_more_text_size">15dp</dimen>
     <dimen name="remotelist_num_tip_size">12dp</dimen>

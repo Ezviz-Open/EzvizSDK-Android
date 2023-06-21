@@ -420,6 +420,7 @@
     <string name="query_camera_fail_not_exit">The device is not registered, check the device network.</string>
     <string name="calendar_setting_error">The system date should be later than 01/01/2012.</string>
     <string name="already_saved_to_volume">Saved to Album.</string>
+    <string name="already_saved_to">Saved to </string>
     <string name="tip_heard_voice">Make sure the device is powered-on and hold the RESET button for 10s. Wait for 30s or so.</string>
     <string name="autowifi_heard_voice">Started. First time to configure network.</string>
     <string name="autowifi_not_heard_voice">It has been configured network before. </string>

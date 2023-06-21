@@ -61,7 +61,6 @@ import com.videogo.constant.IntentConsts;
 import com.videogo.errorlayer.ErrorInfo;
 import com.videogo.exception.BaseException;
 import com.videogo.exception.ErrorCode;
-import com.videogo.exception.InnerException;
 import com.videogo.openapi.EZOpenSDKListener;
 import com.videogo.openapi.EZPlayer;
 import com.videogo.openapi.bean.EZAlarmInfo;
@@ -80,7 +79,6 @@ import com.videogo.ui.util.VerifyCodeInput;
 import com.videogo.util.ConnectionDetector;
 import com.videogo.util.LocalInfo;
 import com.videogo.util.LogUtil;
-import com.videogo.util.MediaScanner;
 import com.videogo.util.RotateViewUtil;
 import com.videogo.util.Utils;
 import com.videogo.widget.CheckTextButton;
@@ -98,8 +96,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import ezviz.ezopensdk.R;
-
-//import com.videogo.openapi.bean.resp.CameraInfo;
 
 public class EZRemotePlayBackActivity extends Activity implements OnClickListener, SurfaceHolder.Callback,
         Handler.Callback, TimeScrollBarScrollListener, VerifyCodeInput.VerifyCodeInputListener {
@@ -1425,16 +1421,15 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
                                 return;
                             }
                             EZUtils.saveCapturePictrue(path, bmp);
-
-                            MediaScanner mMediaScanner = new MediaScanner(EZRemotePlayBackActivity.this);
-                            mMediaScanner.scanFile(path, "jpg");
+                            // TODO 将文件保存至相册，需要申请动态权限WRITE_EXTERNAL_STORAGE，由开发者自行实现
+                            // EZUtils.savePicture2Album(EZRemotePlayBackActivity.this, bmp);// 将文件保存至相册
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Toast.makeText(EZRemotePlayBackActivity.this, getResources().getString(R.string.already_saved_to_volume)+path, Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(EZRemotePlayBackActivity.this, getResources().getString(R.string.already_saved_to)+path, Toast.LENGTH_SHORT).show();
                                 }
                             });
-                        } catch (InnerException e) {
+                        } catch (Exception e) {
                             e.printStackTrace();
                         } finally {
                             if (bmp != null) {
