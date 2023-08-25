@@ -15,7 +15,6 @@
  */
 package com.videogo;
 
-import android.os.Environment;
 import android.support.annotation.NonNull;
 
 import com.videogo.openapi.EZOpenSDK;
@@ -25,7 +24,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 
 import ezviz.ezopensdk.BuildConfig;
-import ezviz.ezopensdk.demo.SdkInitParams;
+import com.videogo.ui.login.SdkInitParams;
 import ezviz.ezopensdkcommon.common.BaseApplication;
 
 

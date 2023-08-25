@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:gravity="center_horizontal"
     android:padding="40dp"
-    tools:context="com.ezviz.demo.videotalk.JoinRoomActivity">
+    tools:context="com.videogo.ui.videotalk.JoinRoomActivity">
 
 
     <LinearLayout

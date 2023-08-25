@@ -16,12 +16,10 @@
 package com.videogo.ui.cameralist;
 
 import android.app.AlertDialog.Builder;
-import android.app.Dialog;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.BitmapFactory;
@@ -31,40 +29,35 @@ import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ez.stream.EZStreamClientManager;
-import com.ezviz.demo.common.CollectDeviceInfoActivity;
-import com.ezviz.demo.common.MoreFeaturesEntranceActivity;
-import com.ezviz.demo.videotalk.WatchVideoTalkActivity;
+import com.videogo.ui.common.EZBusinessTool;
+import com.videogo.ui.others.CollectDeviceInfoActivity;
+import com.videogo.ui.others.MoreFeaturesEntranceActivity;
+import com.videogo.ui.videotalk.WatchVideoTalkActivity;
 import com.google.gson.Gson;
 import com.videogo.constant.Constant;
 import com.videogo.constant.IntentConsts;
-import com.videogo.constants.ReceiverKeys;
-import com.videogo.devicemgt.EZDeviceSettingActivity;
-import com.videogo.download.DownLoadTaskRecordAbstract;
+import com.videogo.ui.setting.EZDeviceSettingActivity;
+import com.videogo.ui.playback.download.DownLoadTaskRecordAbstract;
 import com.videogo.errorlayer.ErrorInfo;
 import com.videogo.exception.BaseException;
 import com.videogo.exception.ErrorCode;
 import com.videogo.openapi.bean.EZCameraInfo;
 import com.videogo.openapi.bean.EZDeviceInfo;
-import com.videogo.remoteplayback.list.EZPlayBackListActivity;
-import com.videogo.remoteplayback.list.RemoteListContant;
-import com.videogo.scan.main.CaptureActivity;
+import com.videogo.ui.playback.EZPlayBackListActivity;
+import com.videogo.ui.playback.RemoteListContant;
+import com.videogo.ui.adddevice.CaptureActivity;
 import com.videogo.ui.message.EZMessageActivity2;
 import com.videogo.ui.realplay.EZRealPlayActivity;
-import com.videogo.ui.util.ActivityUtils;
-import com.videogo.ui.util.EZUtils;
+import com.videogo.util.ActivityUtils;
+import com.videogo.util.EZUtils;
 import com.videogo.util.ConnectionDetector;
 import com.videogo.util.DateTimeUtil;
 import com.videogo.util.LogUtil;
@@ -73,9 +66,7 @@ import com.videogo.widget.PullToRefreshFooter;
 import com.videogo.widget.PullToRefreshFooter.Style;
 import com.videogo.widget.PullToRefreshHeader;
 import com.videogo.widget.pulltorefresh.IPullToRefresh.Mode;
-import com.videogo.widget.pulltorefresh.IPullToRefresh.OnRefreshListener;
 import com.videogo.widget.pulltorefresh.LoadingLayout;
-import com.videogo.widget.pulltorefresh.PullToRefreshBase;
 import com.videogo.widget.pulltorefresh.PullToRefreshBase.LoadingLayoutCreator;
 import com.videogo.widget.pulltorefresh.PullToRefreshBase.Orientation;
 import com.videogo.widget.pulltorefresh.PullToRefreshListView;
@@ -85,23 +76,27 @@ import java.util.Date;
 import java.util.List;
 
 import ezviz.ezopensdk.R;
-import ezviz.ezopensdk.debug.TestActivityForFullSdk;
-import ezviz.ezopensdk.demo.DemoConfig;
-import ezviz.ezopensdk.demo.SdkInitParams;
-import ezviz.ezopensdk.demo.SpTool;
-import ezviz.ezopensdk.demo.ValueKeys;
-import ezviz.ezopensdk.preview.MultiScreenPreviewActivity;
+
+import com.videogo.ui.others.TestActivityForFullSdk;
+import com.videogo.global.DemoConfig;
+import com.videogo.ui.login.SdkInitParams;
+import com.videogo.util.SpTool;
+import com.videogo.global.ValueKeys;
+import com.videogo.ui.realplay.preview.MultiScreenPreviewActivity;
+
 import ezviz.ezopensdkcommon.common.BaseApplication;
 import ezviz.ezopensdkcommon.common.RootActivity;
 
 import static com.ez.stream.EZError.EZ_OK;
 import static com.videogo.EzvizApplication.getOpenSDK;
 
-public class EZCameraListActivity extends RootActivity implements OnClickListener, SelectCameraDialog.CameraItemClick {
+public class EZCameraListActivity extends RootActivity implements OnClickListener,
+        EZCameraListAdapter.OnItemClickListener, SelectCameraDialog.CameraItemClick {
     protected static final String TAG = "CameraListActivity";
+
+    public final static String NOTIFICATION_ID = "notification_id";
     public final static int REQUEST_CODE = 100;
     public final static int RESULT_CODE = 101;
-    private final static int SHOW_DIALOG_DEL_DEVICE = 1;
 
     private BroadcastReceiver mReceiver = null;
 
@@ -112,8 +107,6 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
     private LinearLayout mNoCameraTipLy = null;
     private LinearLayout mGetCameraFailTipLy = null;
     private TextView mCameraFailTipTv = null;
-    private Button mAddBtn;
-    private Button mUserBtn;
     private TextView mMyDevice;
     private TextView mShareDevice;
 
@@ -132,53 +125,15 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
 
     private String mSingleDeviceSerial = "";
 
-    @Override
-    public void onCameraItemClick(EZDeviceInfo deviceInfo, int camera_index) {
-        EZCameraInfo cameraInfo = null;
-        Intent intent = null;
-        switch (mClickType) {
-            case TAG_CLICK_PLAY:
-                cameraInfo = EZUtils.getCameraInfoFromDevice(deviceInfo, camera_index);
-                if (cameraInfo == null) {
-                    return;
-                }
-                int ret = EZStreamClientManager.create(getApplication().getApplicationContext()).clearTokens();
-                if (EZ_OK == ret) {
-                    Log.i(TAG, "clearTokens: ok");
-                } else {
-                    Log.e(TAG, "clearTokens: faile");
-                }
-                intent = new Intent(EZCameraListActivity.this, EZRealPlayActivity.class);
-                intent.putExtra(IntentConsts.EXTRA_CAMERA_INFO, cameraInfo);
-                intent.putExtra(IntentConsts.EXTRA_DEVICE_INFO, deviceInfo);
-                startActivityForResult(intent, REQUEST_CODE);
-                break;
-            case TAG_CLICK_REMOTE_PLAY_BACK:
-                cameraInfo = EZUtils.getCameraInfoFromDevice(deviceInfo, camera_index);
-                if (cameraInfo == null) {
-                    return;
-                }
-                intent = new Intent(EZCameraListActivity.this, EZPlayBackListActivity.class);
-                intent.putExtra(RemoteListContant.QUERY_DATE_INTENT_KEY, DateTimeUtil.getNow());
-                intent.putExtra(IntentConsts.EXTRA_DEVICE_INFO, deviceInfo);
-                intent.putExtra(IntentConsts.EXTRA_CAMERA_INFO, cameraInfo);
-                startActivity(intent);
-                break;
-            default:
-                break;
-        }
-    }
+    /***************** 生命周期|life cycle *******************/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         if (DemoConfig.isNeedJumpToTestPage) {
             startActivity(new Intent(mContext, TestActivityForFullSdk.class));
         }
-
         setContentView(R.layout.cameralist_page);
-
         // 只展示单个设备
         String sdkInitParamStr = SpTool.obtainValue(ValueKeys.SDK_INIT_PARAMS);
         if (sdkInitParamStr != null) {
@@ -193,232 +148,8 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
         initView();
     }
 
-    private void initView() {
-        mMyDevice = (TextView) findViewById(R.id.text_my);
-        mShareDevice = (TextView) findViewById(R.id.text_share);
-        mAddBtn = (Button) findViewById(R.id.btn_add);
-        mUserBtn = (Button) findViewById(R.id.btn_user);
-        mUserBtn.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popLogoutDialog();
-            }
-        });
-
-        findViewById(R.id.btn_multi_screen_preview).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MultiScreenPreviewActivity.Companion.launch(v.getContext());
-            }
-        });
-
-        mAddBtn.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(EZCameraListActivity.this, CaptureActivity.class);
-                startActivity(intent);
-
-            }
-        });
-
-        mShareDevice.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mShareDevice.setTextColor(getResources().getColor(R.color.orange_text));
-                mMyDevice.setTextColor(getResources().getColor(R.color.black_text));
-                mAdapter.clearAll();
-                mLoadType = LOAD_SHARE_DEVICE;
-                getCameraInfoList(true);
-            }
-        });
-
-        mMyDevice.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mShareDevice.setTextColor(getResources().getColor(R.color.black_text));
-                mMyDevice.setTextColor(getResources().getColor(R.color.orange_text));
-                mAdapter.clearAll();
-                mLoadType = LOAD_MY_DEVICE;
-                getCameraInfoList(true);
-            }
-        });
-        mNoMoreView = getLayoutInflater().inflate(R.layout.no_device_more_footer, null);
-        mAdapter = new EZCameraListAdapter(this);
-        mAdapter.setOnClickListener(new EZCameraListAdapter.OnClickListener() {
-
-            /**
-             * 根据设备型号判断是否是HUB设备
-             */
-            private boolean isHubDevice(String deviceType) {
-                if (TextUtils.isEmpty(deviceType)) {
-                    return false;
-                }
-                switch (deviceType) {
-                    case "CASTT":
-                    case "CAS_HUB_NEW":
-                        return true;
-                    default:
-                        return deviceType.startsWith("CAS_WG_TEST");
-                }
-            }
-
-            @Override
-            public void onPlayClick(BaseAdapter adapter, View view, int position) {
-                mClickType = TAG_CLICK_PLAY;
-                final EZDeviceInfo deviceInfo = mAdapter.getItem(position);
-                if (isHubDevice(deviceInfo.getDeviceType())) {
-                    jumpToDeviceInfoInputPage();
-                    return;
-                }
-                if (deviceInfo.getCameraNum() <= 0 || deviceInfo.getCameraInfoList() == null || deviceInfo.getCameraInfoList().size() <= 0) {
-                    LogUtil.d(TAG, "cameralist is null or cameralist size is 0");
-                    return;
-                }
-                /*单通道设备*/
-                if (deviceInfo.getCameraNum() == 1 && deviceInfo.getCameraInfoList() != null && deviceInfo.getCameraInfoList().size() == 1) {
-                    LogUtil.d(TAG, "cameralist have one camera");
-                    final EZCameraInfo cameraInfo = EZUtils.getCameraInfoFromDevice(deviceInfo, 0);
-                    if (cameraInfo == null) {
-                        return;
-                    }
-                    int ret = EZStreamClientManager.create(getApplication().getApplicationContext()).clearTokens();
-                    if (EZ_OK == ret) {
-                        Log.i(TAG, "clearTokens: ok");
-                    } else {
-                        Log.e(TAG, "clearTokens: fail");
-                    }
-                    Intent intent = new Intent(EZCameraListActivity.this, EZRealPlayActivity.class);
-                    intent.putExtra(IntentConsts.EXTRA_CAMERA_INFO, cameraInfo);
-                    intent.putExtra(IntentConsts.EXTRA_DEVICE_INFO, deviceInfo);
-                    startActivityForResult(intent, REQUEST_CODE);
-                    return;
-                }
-                /*多通道设备*/
-                SelectCameraDialog selectCameraDialog = new SelectCameraDialog();
-                selectCameraDialog.setEZDeviceInfo(deviceInfo);
-                selectCameraDialog.setCameraItemClick(EZCameraListActivity.this);
-                selectCameraDialog.show(getFragmentManager(), "onPlayClick");
-            }
-
-            @Override
-            public void onRemotePlayBackClick(BaseAdapter adapter, View view, int position) {
-                mClickType = TAG_CLICK_REMOTE_PLAY_BACK;
-                EZDeviceInfo deviceInfo = mAdapter.getItem(position);
-                if (isHubDevice(deviceInfo.getDeviceType())) {
-                    jumpToDeviceInfoInputPage();
-                    return;
-                }
-                if (deviceInfo.getCameraNum() <= 0 || deviceInfo.getCameraInfoList() == null || deviceInfo.getCameraInfoList().size() <= 0) {
-                    LogUtil.d(TAG, "cameralist is null or cameralist size is 0");
-                    return;
-                }
-                /*单通道设备*/
-                if (deviceInfo.getCameraNum() == 1 && deviceInfo.getCameraInfoList() != null && deviceInfo.getCameraInfoList().size() == 1) {
-                    LogUtil.d(TAG, "cameralist have one camera");
-                    EZCameraInfo cameraInfo = EZUtils.getCameraInfoFromDevice(deviceInfo, 0);
-                    if (cameraInfo == null) {
-                        return;
-                    }
-                    Intent intent = new Intent(EZCameraListActivity.this, EZPlayBackListActivity.class);
-                    intent.putExtra(RemoteListContant.QUERY_DATE_INTENT_KEY, DateTimeUtil.getNow());
-                    intent.putExtra(IntentConsts.EXTRA_CAMERA_INFO, cameraInfo);
-                    intent.putExtra(IntentConsts.EXTRA_DEVICE_INFO, deviceInfo);
-                    startActivity(intent);
-                    return;
-                }
-                /*多通道设备*/
-                SelectCameraDialog selectCameraDialog = new SelectCameraDialog();
-                selectCameraDialog.setEZDeviceInfo(deviceInfo);
-                selectCameraDialog.setCameraItemClick(EZCameraListActivity.this);
-                selectCameraDialog.show(getFragmentManager(), "RemotePlayBackClick");
-            }
-
-            /**
-             * 如果是HUB设备，则需要手动输入相应HUB设备和子设备序列号组合后的序列号才能进行取流操作
-             */
-            private void jumpToDeviceInfoInputPage() {
-                startActivity(new Intent(mContext, CollectDeviceInfoActivity.class));
-            }
-
-            @Override
-            public void onSetDeviceClick(BaseAdapter adapter, View view, int position) {
-                mClickType = TAG_CLICK_SET_DEVICE;
-                EZDeviceInfo deviceInfo = mAdapter.getItem(position);
-                Intent intent = new Intent(EZCameraListActivity.this, EZDeviceSettingActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putParcelable(IntentConsts.EXTRA_DEVICE_INFO, deviceInfo);
-                intent.putExtra("Bundle", bundle);
-                startActivity(intent);
-                bIsFromSetting = true;
-            }
-
-            @Override
-            public void onDeleteClick(BaseAdapter adapter, View view, int position) {
-                showDialog(SHOW_DIALOG_DEL_DEVICE);
-            }
-
-            @Override
-            public void onVideoClickClick(BaseAdapter adapter, View view, int position) {
-                LogUtil.d(TAG, "this is a kid watch");
-                mClickType = TAG_CLICK_REMOTE_PLAY_BACK;
-                EZDeviceInfo deviceInfo = mAdapter.getItem(position);
-                Intent intent = new Intent(EZCameraListActivity.this, WatchVideoTalkActivity.class);
-                intent.putExtra(WatchVideoTalkActivity.InIntentKeysAndValues.KEY_DEVICE_SERIAL, deviceInfo.getDeviceSerial());
-                startActivity(intent);
-            }
-
-            @Override
-            public void onAlarmListClick(BaseAdapter adapter, View view, int position) {
-                mClickType = TAG_CLICK_ALARM_LIST;
-                final EZDeviceInfo deviceInfo = mAdapter.getItem(position);
-                LogUtil.d(TAG, "cameralist is null or cameralist size is 0");
-                Intent intent = new Intent(EZCameraListActivity.this, EZMessageActivity2.class);
-                intent.putExtra(IntentConsts.EXTRA_DEVICE_ID, deviceInfo.getDeviceSerial());
-                startActivity(intent);
-            }
-
-            @Override
-            public void onDevicePictureClick(BaseAdapter adapter, View view, int position) {
-            }
-
-            @Override
-            public void onDeviceVideoClick(BaseAdapter adapter, View view, int position) {
-            }
-
-            @Override
-            public void onDeviceDefenceClick(BaseAdapter adapter, View view, int position) {
-            }
-
-        });
-        mListView = (PullToRefreshListView) findViewById(R.id.camera_listview);
-        mListView.setLoadingLayoutCreator(new LoadingLayoutCreator() {
-
-            @Override
-            public LoadingLayout create(Context context, boolean headerOrFooter, Orientation orientation) {
-                if (headerOrFooter)
-                    return new PullToRefreshHeader(context);
-                else
-                    return new PullToRefreshFooter(context, Style.EMPTY_NO_MORE);
-            }
-        });
-        mListView.setMode(Mode.BOTH);
-        mListView.setOnRefreshListener(new OnRefreshListener<ListView>() {
-
-            @Override
-            public void onRefresh(PullToRefreshBase<ListView> refreshView, boolean headerOrFooter) {
-                getCameraInfoList(headerOrFooter);
-            }
-        });
-        mListView.getRefreshableView().addFooterView(mNoMoreView);
-        mListView.setAdapter(mAdapter);
-        mListView.getRefreshableView().removeFooterView(mNoMoreView);
-
-        mNoCameraTipLy = (LinearLayout) findViewById(R.id.no_camera_tip_ly);
-        mGetCameraFailTipLy = (LinearLayout) findViewById(R.id.get_camera_fail_tip_ly);
-        mCameraFailTipTv = (TextView) findViewById(R.id.get_camera_list_fail_tv);
-    }
-
     private void initData() {
+        // 设备添加成功后广播监听，刷新设备列表|After the device is successfully added, broadcast listening and refresh the device list
         mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -434,7 +165,31 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
         registerReceiver(mReceiver, filter);
     }
 
-    int count = 100;
+    private void initView() {
+        mMyDevice = findViewById(R.id.text_my);
+        mShareDevice = findViewById(R.id.text_share);
+        mNoMoreView = getLayoutInflater().inflate(R.layout.no_device_more_footer, null);
+        mAdapter = new EZCameraListAdapter(this);
+        mAdapter.setOnItemClickListener(this);
+        mListView = findViewById(R.id.camera_listview);
+        mListView.setLoadingLayoutCreator(new LoadingLayoutCreator() {
+
+            @Override
+            public LoadingLayout create(Context context, boolean headerOrFooter, Orientation orientation) {
+                if (headerOrFooter) return new PullToRefreshHeader(context);
+                else return new PullToRefreshFooter(context, Style.EMPTY_NO_MORE);
+            }
+        });
+        mListView.setMode(Mode.BOTH);
+        mListView.setOnRefreshListener((refreshView, headerOrFooter) -> getCameraInfoList(headerOrFooter));
+        mListView.getRefreshableView().addFooterView(mNoMoreView);
+        mListView.setAdapter(mAdapter);
+        mListView.getRefreshableView().removeFooterView(mNoMoreView);
+
+        mNoCameraTipLy = findViewById(R.id.no_camera_tip_ly);
+        mGetCameraFailTipLy = findViewById(R.id.get_camera_fail_tip_ly);
+        mCameraFailTipTv = findViewById(R.id.get_camera_list_fail_tv);
+    }
 
     @Override
     protected void onResume() {
@@ -453,13 +208,198 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mReceiver != null) {
+            unregisterReceiver(mReceiver);
+        }
+        stopAllDownloadTasks();
+    }
+
     private void getCameraInfoList(boolean headerOrFooter) {
         if (this.isFinishing()) {
             return;
         }
         new GetCamersInfoListTask(headerOrFooter).execute();
+    }
+
+    /***************** NVR设备多通道选择回调|NVR device multi-channel selection callback *******************/
+
+    @Override
+    public void onCameraItemClick(EZDeviceInfo deviceInfo, int camera_index) {
+        switch (mClickType) {
+            case TAG_CLICK_PLAY:
+                jumpToRealPlayActivity(deviceInfo, camera_index);
+                break;
+            case TAG_CLICK_REMOTE_PLAY_BACK:
+                jumpToPlaybackActivity(deviceInfo, camera_index);
+                break;
+            default:
+                break;
+        }
+    }
+
+    /***************** 预览、回放、消息、设置、视频通话回调|preview, replay, message, settings, video call callback *******************/
+
+    @Override
+    public void onPlayClick(BaseAdapter adapter, View view, int position) {
+        mClickType = TAG_CLICK_PLAY;
+        final EZDeviceInfo deviceInfo = mAdapter.getItem(position);
+        // HUB设备，手动输入信息进行预览
+        if (EZBusinessTool.isHubDevice(deviceInfo.getDeviceType())) {
+            jumpToDeviceInfoInputPage();
+            return;
+        }
+        // 设备没有通道号，拦截
+        if (deviceInfo.getCameraNum() <= 0 || deviceInfo.getCameraInfoList() == null || deviceInfo.getCameraInfoList().size() <= 0) {
+            LogUtil.d(TAG, "cameralist is null or cameralist size is 0");
+            return;
+        }
+        // 单通道设备
+        if (deviceInfo.getCameraNum() == 1 && deviceInfo.getCameraInfoList() != null && deviceInfo.getCameraInfoList().size() == 1) {
+            LogUtil.d(TAG, "cameralist have one camera");
+            jumpToRealPlayActivity(deviceInfo, 0);
+        } else {// 多通道设备
+            SelectCameraDialog selectCameraDialog = new SelectCameraDialog();
+            selectCameraDialog.setEZDeviceInfo(deviceInfo);
+            selectCameraDialog.setCameraItemClick(EZCameraListActivity.this);
+            selectCameraDialog.show(getFragmentManager(), "onPlayClick");
+        }
+    }
+
+    @Override
+    public void onPlayBackClick(BaseAdapter adapter, View view, int position) {
+        mClickType = TAG_CLICK_REMOTE_PLAY_BACK;
+        EZDeviceInfo deviceInfo = mAdapter.getItem(position);
+        if (EZBusinessTool.isHubDevice(deviceInfo.getDeviceType())) {
+            jumpToDeviceInfoInputPage();
+            return;
+        }
+        if (deviceInfo.getCameraNum() <= 0 || deviceInfo.getCameraInfoList() == null || deviceInfo.getCameraInfoList().size() <= 0) {
+            LogUtil.d(TAG, "cameralist is null or cameralist size is 0");
+            return;
+        }
+        // 单通道设备
+        if (deviceInfo.getCameraNum() == 1 && deviceInfo.getCameraInfoList() != null && deviceInfo.getCameraInfoList().size() == 1) {
+            LogUtil.d(TAG, "cameralist have one camera");
+            jumpToPlaybackActivity(deviceInfo, 0);
+        } else {// 多通道设备
+            SelectCameraDialog selectCameraDialog = new SelectCameraDialog();
+            selectCameraDialog.setEZDeviceInfo(deviceInfo);
+            selectCameraDialog.setCameraItemClick(EZCameraListActivity.this);
+            selectCameraDialog.show(getFragmentManager(), "RemotePlayBackClick");
+        }
+    }
+
+    @Override
+    public void onAlarmListClick(BaseAdapter adapter, View view, int position) {
+        mClickType = TAG_CLICK_ALARM_LIST;
+        final EZDeviceInfo deviceInfo = mAdapter.getItem(position);
+        LogUtil.d(TAG, "cameralist is null or cameralist size is 0");
+        Intent intent = new Intent(EZCameraListActivity.this, EZMessageActivity2.class);
+        intent.putExtra(IntentConsts.EXTRA_DEVICE_ID, deviceInfo.getDeviceSerial());
+        startActivity(intent);
+    }
+
+    @Override
+    public void onSetDeviceClick(BaseAdapter adapter, View view, int position) {
+        mClickType = TAG_CLICK_SET_DEVICE;
+        EZDeviceInfo deviceInfo = mAdapter.getItem(position);
+        Intent intent = new Intent(EZCameraListActivity.this, EZDeviceSettingActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(IntentConsts.EXTRA_DEVICE_INFO, deviceInfo);
+        intent.putExtra("Bundle", bundle);
+        startActivity(intent);
+        bIsFromSetting = true;
+    }
+
+    @Override
+    public void onVideoTalkClick(BaseAdapter adapter, View view, int position) {
+        LogUtil.d(TAG, "this is a kid watch");
+        mClickType = TAG_CLICK_REMOTE_PLAY_BACK;
+        EZDeviceInfo deviceInfo = mAdapter.getItem(position);
+        Intent intent = new Intent(EZCameraListActivity.this, WatchVideoTalkActivity.class);
+        intent.putExtra(WatchVideoTalkActivity.InIntentKeysAndValues.KEY_DEVICE_SERIAL, deviceInfo.getDeviceSerial());
+        startActivity(intent);
+    }
+
+    @Override
+    public void onDeleteClick(BaseAdapter adapter, View view, int position) {
+
+    }
+
+    /***************** 私有方法|private methods *******************/
+
+    /**
+     * 跳转预览页面|jump to realplay page
+     */
+    private void jumpToRealPlayActivity(EZDeviceInfo deviceInfo, int cameraIndex) {
+        final EZCameraInfo cameraInfo = EZUtils.getCameraInfoFromDevice(deviceInfo, cameraIndex);
+        if (cameraInfo == null) {
+            return;
+        }
+        int ret = EZStreamClientManager.create(getApplication().getApplicationContext()).clearTokens();
+        if (EZ_OK == ret) {
+            Log.i(TAG, "clearTokens: ok");
+        } else {
+            Log.e(TAG, "clearTokens: fail");
+        }
+        Intent intent = new Intent(EZCameraListActivity.this, EZRealPlayActivity.class);
+        intent.putExtra(IntentConsts.EXTRA_CAMERA_INFO, cameraInfo);
+        intent.putExtra(IntentConsts.EXTRA_DEVICE_INFO, deviceInfo);
+        startActivityForResult(intent, REQUEST_CODE);
+    }
+
+    /**
+     * 跳转回放页面|jump to playback page
+     */
+    private void jumpToPlaybackActivity(EZDeviceInfo deviceInfo, int cameraIndex) {
+        EZCameraInfo cameraInfo = EZUtils.getCameraInfoFromDevice(deviceInfo, cameraIndex);
+        if (cameraInfo == null) {
+            return;
+        }
+        Intent intent = new Intent(EZCameraListActivity.this, EZPlayBackListActivity.class);
+        intent.putExtra(RemoteListContant.QUERY_DATE_INTENT_KEY, DateTimeUtil.getNow());
+        intent.putExtra(IntentConsts.EXTRA_CAMERA_INFO, cameraInfo);
+        intent.putExtra(IntentConsts.EXTRA_DEVICE_INFO, deviceInfo);
+        startActivity(intent);
+    }
+
+    /**
+     * 如果是HUB设备，则需要手动输入相应HUB设备和子设备序列号组合后的序列号才能进行取流操作
+     */
+    private void jumpToDeviceInfoInputPage() {
+        startActivity(new Intent(mContext, CollectDeviceInfoActivity.class));
+    }
 
 
+    /***************** Click点击事件|Click Actions *******************/
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.camera_list_refresh_btn:
+            case R.id.no_camera_tip_ly:
+                refreshButtonClicked();
+                break;
+            case R.id.text_share:// "分享"按钮
+                mShareDevice.setTextColor(getResources().getColor(R.color.orange_text));
+                mMyDevice.setTextColor(getResources().getColor(R.color.black_text));
+                mAdapter.clearAll();
+                mLoadType = LOAD_SHARE_DEVICE;
+                getCameraInfoList(true);
+                break;
+            case R.id.text_my:// "我的"按钮
+                mShareDevice.setTextColor(getResources().getColor(R.color.black_text));
+                mMyDevice.setTextColor(getResources().getColor(R.color.orange_text));
+                mAdapter.clearAll();
+                mLoadType = LOAD_MY_DEVICE;
+                getCameraInfoList(true);
+                break;
+            default:
+                break;
+        }
     }
 
     /**
@@ -484,9 +424,40 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
     private int mValidCount = 0;
     private long mLastClickTime = 0;
 
+    /**
+     * 退出账号|exit account
+     */
+    public void onClickLogout(View view) {
+        // 自动化测试的时候不响应。
+        if (SpTool.obtainBooleanValue(ValueKeys.AUTO_TEST)) {
+            return;
+        }
+        popLogoutDialog();
+    }
+
+    /**
+     * 更多|more
+     */
     public void onClickMoreFeatures(View view) {
         startActivity(new Intent(this, MoreFeaturesEntranceActivity.class));
     }
+
+    /**
+     * 多画面预览|multi screen preview
+     */
+    public void onClickMultiScreenPreview(View view) {
+        MultiScreenPreviewActivity.Companion.launch(view.getContext());
+    }
+
+    /**
+     * 添加设备|add device
+     */
+    public void onClickAddDevice(View view) {
+        Intent intent = new Intent(EZCameraListActivity.this, CaptureActivity.class);
+        startActivity(intent);
+    }
+
+    /***************** GetCamersInfoListTask *******************/
 
     private class GetCamersInfoListTask extends AsyncTask<Void, Void, List<EZDeviceInfo>> {
         private boolean mHeaderOrFooter;
@@ -538,13 +509,15 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
                     if (mHeaderOrFooter) {
                         result = getOpenSDK().getDeviceList(0, 20);
                     } else {
-                        result = getOpenSDK().getDeviceList((mAdapter.getCount() / 20) + (mAdapter.getCount() % 20 > 0 ? 1 : 0), 20);
+                        result =
+                                getOpenSDK().getDeviceList((mAdapter.getCount() / 20) + (mAdapter.getCount() % 20 > 0 ? 1 : 0), 20);
                     }
                 } else if (mLoadType == LOAD_SHARE_DEVICE) {
                     if (mHeaderOrFooter) {
                         result = getOpenSDK().getSharedDeviceList(0, 20);
                     } else {
-                        result = getOpenSDK().getSharedDeviceList((mAdapter.getCount() / 20) + (mAdapter.getCount() % 20 > 0 ? 1 : 0), 20);
+                        result =
+                                getOpenSDK().getSharedDeviceList((mAdapter.getCount() / 20) + (mAdapter.getCount() % 20 > 0 ? 1 : 0), 20);
                     }
                 }
                 return result;
@@ -605,7 +578,8 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
                     if (mAdapter.getCount() == 0) {
                         mListView.setVisibility(View.GONE);
                         mNoCameraTipLy.setVisibility(View.GONE);
-                        mCameraFailTipTv.setText(Utils.getErrorTip(EZCameraListActivity.this, R.string.get_camera_list_fail, errorCode));
+                        mCameraFailTipTv.setText(Utils.getErrorTip(EZCameraListActivity.this,
+                                R.string.get_camera_list_fail, errorCode));
                         mGetCameraFailTipLy.setVisibility(View.VISIBLE);
                     } else {
                         Utils.showToast(EZCameraListActivity.this, R.string.get_camera_list_fail, errorCode);
@@ -624,33 +598,6 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        if (mReceiver != null) {
-            unregisterReceiver(mReceiver);
-        }
-
-        stopAllDownloadTasks();
-    }
-
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.camera_list_refresh_btn:
-            case R.id.no_camera_tip_ly:
-                refreshButtonClicked();
-                break;
-            case R.id.camera_list_gc_ly:
-//                Intent intent = new Intent(EZCameraListActivity.this, SquareColumnActivity.class);
-//                startActivity(intent);
-                break;
-            default:
-                break;
-        }
-    }
-
     private void refreshButtonClicked() {
         mListView.setVisibility(View.VISIBLE);
         mNoCameraTipLy.setVisibility(View.GONE);
@@ -659,69 +606,23 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
         mListView.setRefreshing();
     }
 
-    @Override
-    protected Dialog onCreateDialog(int id) {
-        Dialog dialog = null;
-        switch (id) {
-            case SHOW_DIALOG_DEL_DEVICE:
-                break;
-        }
-        return dialog;
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(0, 1, 1, R.string.update_exit).setIcon(R.drawable.exit_selector);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    protected void onPrepareDialog(int id, Dialog dialog) {
-        if (dialog != null) {
-            removeDialog(id);
-            TextView tv = (TextView) dialog.findViewById(android.R.id.message);
-            tv.setGravity(Gravity.CENTER);
-        }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {// 得到被点击的item的itemId
-            case 1:// 对应的ID就是在add方法中所设定的Id
-                popLogoutDialog();
-                break;
-            default:
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     private void popLogoutDialog() {
         Builder exitDialog = new Builder(EZCameraListActivity.this);
         exitDialog.setTitle(R.string.exit);
         exitDialog.setMessage(R.string.exit_tip);
-        exitDialog.setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(getApplicationContext(), getString(R.string.tip_login_out), Toast.LENGTH_LONG).show();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (getOpenSDK() == null) {
-                            finish();
-                            return;
-                        }
-                        getOpenSDK().logout();
-                    }
-                }).start();
-                finish();
-            }
+        exitDialog.setPositiveButton(R.string.confirm, (dialog, which) -> {
+            Toast.makeText(getApplicationContext(), getString(R.string.tip_login_out), Toast.LENGTH_LONG).show();
+            new Thread(() -> {
+                if (getOpenSDK() == null) {
+                    finish();
+                    return;
+                }
+                getOpenSDK().logout();
+            }).start();
+            finish();
         });
-        exitDialog.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // doNothing
-            }
+        exitDialog.setNegativeButton(R.string.cancel, (dialog, which) -> {
+            // doNothing
         });
         exitDialog.show();
     }
@@ -773,10 +674,12 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
             }
         }
         if (isExist) {
-            Toast.makeText(getApplicationContext(), getApplicationContext().getString(R.string.app_closed), Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), getApplicationContext().getString(R.string.app_closed),
+                    Toast.LENGTH_LONG).show();
             exitApp();
         } else {
-            Toast.makeText(getApplicationContext(), getApplicationContext().getString(R.string.press_again_to_exit), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), getApplicationContext().getString(R.string.press_again_to_exit),
+                    Toast.LENGTH_SHORT).show();
             mLastPressTimeMs = System.currentTimeMillis();
         }
     }
@@ -792,20 +695,17 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
      * @param content
      * @param clickToCancel
      */
-    public static void showSimpleNotification(Context context, int notificationId, String title, String content, boolean clickToCancel) {
+    public static void showSimpleNotification(Context context, int notificationId, String title, String content,
+                                              boolean clickToCancel) {
         LogUtil.d(TAG, "show notification " + notificationId);
-        Intent intent = new Intent(BaseApplication.mInstance, NotificationReceiver.class)
-                .putExtra(ReceiverKeys.NOTIFICATION_ID, notificationId);
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(mContext)
-                .setContentTitle(title)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(content))
-                .setWhen(System.currentTimeMillis())
-                .setSmallIcon(ezviz.ezopensdkcommon.R.mipmap.videogo_icon)
-                .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), ezviz.ezopensdkcommon.R.mipmap.videogo_icon))
-                .setPriority(NotificationCompat.PRIORITY_MAX);
+        Intent intent = new Intent(BaseApplication.mInstance, NotificationReceiver.class).putExtra(NOTIFICATION_ID,
+                notificationId);
+        NotificationCompat.Builder notificationBuilder =
+                new NotificationCompat.Builder(mContext).setContentTitle(title).setStyle(new NotificationCompat.BigTextStyle().bigText(content)).setWhen(System.currentTimeMillis()).setSmallIcon(ezviz.ezopensdkcommon.R.mipmap.videogo_icon).setLargeIcon(BitmapFactory.decodeResource(context.getResources(), ezviz.ezopensdkcommon.R.mipmap.videogo_icon)).setPriority(NotificationCompat.PRIORITY_MAX);
         // 点击发送通知到NotificationReceiver
         if (clickToCancel) {
-            notificationBuilder.setContentIntent(PendingIntent.getBroadcast(mContext, notificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT));
+            notificationBuilder.setContentIntent(PendingIntent.getBroadcast(mContext, notificationId, intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT));
         }
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         if (notificationManager != null) {
@@ -816,7 +716,7 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
     public static class NotificationReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            int notificationId = intent.getIntExtra(ReceiverKeys.NOTIFICATION_ID, -1);
+            int notificationId = intent.getIntExtra(NOTIFICATION_ID, -1);
             LogUtil.d(TAG, "onClick, notificationId is " + notificationId);
             DownLoadTaskRecordAbstract downLoadTaskRecord = null;
             for (DownLoadTaskRecordAbstract downLoadTaskRecordAbstract : mDownloadTaskRecordListAbstract) {
@@ -829,7 +729,8 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
             if (downLoadTaskRecord != null) {
                 mDownloadTaskRecordListAbstract.remove(downLoadTaskRecord);
             }
-            NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+            NotificationManager notificationManager =
+                    (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
             if (notificationManager != null) {
                 notificationManager.cancel(notificationId);
                 RootActivity.toastMsg("canceled to downloaded!");

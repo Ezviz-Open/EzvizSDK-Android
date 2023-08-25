@@ -507,6 +507,7 @@
     <string name="string_device_network_mode">Network Configuration</string>
     <string name="string_wired_connection">Wired Connection</string>
     <string name="string_ap_connection">AP Config Mode</string>
+    <string name="string_aplink_connection">Link Config Mode</string>
     <string name="string_smart_connection">Smart Config Mode</string>
     <string name="string_sound_wave_connection">Sound Wave Config Mode</string>
     <string name="string_smart_and_sound_wave_connection">Sound Wave + Wireless Connection</string>

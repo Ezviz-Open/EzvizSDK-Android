@@ -570,6 +570,8 @@
     <string name="give_up_adding">放弃</string>
     <string name="app_add_device_success">已添加设备到账号！</string>
     <string name="tip_playback_again">回放完成，点击再次回放！</string>
+    <string name="device_directinner_playbackrate_not_support">该设备内网直连下不支持回放倍率设置</string>
+    <string name="device_playbackrate_not_support">该设备不支持回放倍率设置</string>
 
     <string name="please_operate_after_select_any_record">请在选择任意录像后操作！</string>
     <!--    <String name="device_no_support_talkback">该设备不支持对讲</String>-->

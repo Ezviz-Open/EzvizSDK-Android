@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    tools:context="com.ezviz.demo.videotalk.ConfluenceTestEntranceActivity">
+    tools:context="com.videogo.ui.videotalk.ConfluenceTestEntranceActivity">
 
 
     <Button

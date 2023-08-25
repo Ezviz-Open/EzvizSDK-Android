@@ -566,6 +566,8 @@
     <string name="give_up_adding">Give Up</string>
     <string name="app_add_device_success">Added device to account!</string>
     <string name="tip_playback_again">Finished to playback, click to playback again!</string>
+    <string name="device_directinner_playbackrate_not_support">This device does not support playback rate setting when directly connected to the internal network</string>
+    <string name="device_playbackrate_not_support">This device does not support playback rate setting</string>
     <string name="please_operate_after_select_any_record">Please operate after select any record!</string>
     <!--    <String name="device_no_support_talkback">the device does not support talkback</String>-->
     <!--儿童手表-视频通话-->

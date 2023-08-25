@@ -17,9 +17,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.videogo.openapi.bean.EZAlarmInfo;
-import com.videogo.ui.util.DataManager;
-import com.videogo.ui.util.EZUtils;
-import com.videogo.ui.util.VerifyCodeInput;
+import com.videogo.util.DataManager;
+import com.videogo.util.EZUtils;
+import com.videogo.util.VerifyCodeInput;
 import com.videogo.widget.PinnedSectionListView.PinnedSectionListAdapter;
 
 import java.text.DateFormat;

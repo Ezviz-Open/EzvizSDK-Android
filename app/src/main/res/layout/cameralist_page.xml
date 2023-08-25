@@ -16,15 +16,17 @@
             android:layout_height="match_parent"
             android:onClick="onClickTryOpenTestPage" />
 
-        <Button
-            android:id="@+id/btn_user"
+        <ImageView
+            android:id="@+id/iv_logout"
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:layout_centerVertical="true"
             android:layout_marginStart="10dp"
             android:layout_marginLeft="10dp"
-            android:background="@drawable/user"
-            android:enabled="true" />
+            android:enabled="true"
+            android:onClick="onClickLogout"
+            android:padding="5dp"
+            android:src="@drawable/user_exit" />
 
         <ImageView
             android:id="@+id/iv_more"
@@ -33,7 +35,7 @@
             android:layout_centerVertical="true"
             android:layout_marginStart="10dp"
             android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@id/btn_user"
+            android:layout_toRightOf="@id/iv_logout"
             android:clickable="true"
             android:focusable="true"
             android:onClick="onClickMoreFeatures"
@@ -51,6 +53,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
+                android:onClick="onClick"
                 android:text="@string/my_devices"
                 android:textColor="@color/orange_text"
                 android:textSize="20sp" />
@@ -61,6 +64,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="20dp"
+                android:onClick="onClick"
                 android:text="@string/share_devices"
                 android:textColor="@color/black_text"
                 android:textSize="20sp" />
@@ -77,7 +81,8 @@
             android:layout_marginEnd="5dp"
             android:layout_marginRight="5dp"
             android:layout_toLeftOf="@id/btn_add"
-            android:background="@drawable/icon_multi_screen_preview" />
+            android:background="@drawable/icon_multi_screen_preview"
+            android:onClick="onClickMultiScreenPreview" />
 
         <Button
             android:id="@+id/btn_add"
@@ -87,7 +92,8 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="10dp"
-            android:background="@drawable/my_add" />
+            android:background="@drawable/my_add"
+            android:onClick="onClickAddDevice" />
 
     </RelativeLayout>
 
@@ -95,7 +101,6 @@
         android:id="@+id/camera_listview"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_above="@+id/camera_list_gc_ly"
         android:layout_below="@+id/title"
         android:layout_marginBottom="3dp"
         android:cacheColorHint="@color/transparent"
@@ -111,7 +116,6 @@
         android:id="@+id/no_camera_tip_ly"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/title_bar"
         android:layout_centerInParent="true"
         android:gravity="center_horizontal"
         android:onClick="onClick"

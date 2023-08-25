@@ -170,7 +170,9 @@ public class ConfigWifiExecutingActivity extends RootActivity implements ConfigW
         stopConfig();
         switch (mPresenter.getType()){
             case ConfigWifiTypeConstants.CONFIG_WIFI_SDK_AP:
+            case ConfigWifiTypeConstants.CONFIG_WIFI_SDK_APLINK:
             case ConfigWifiTypeConstants.FULL_SDK_AP:
+            case ConfigWifiTypeConstants.FULL_SDK_APLINK:
                 ManualConnectDeviceHotspotActivity.Companion.launch(this, getIntent());
                 break;
             default:

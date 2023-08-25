@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.ezviz.demo.common.EZP2pTestActivity">
+    tools:context="com.videogo.ui.others.EZP2pTestActivity">
 
     <com.videogo.widget.TitleBar
         android:id="@+id/title_bar"

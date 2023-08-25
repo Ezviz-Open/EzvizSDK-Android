@@ -69,7 +69,7 @@ import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ezviz.demo.common.DataTimeUtil;
+import com.videogo.util.EZDateTimeUtil;
 import com.videogo.EzvizApplication;
 
 import ezviz.ezopensdkcommon.common.RootActivity;
@@ -97,15 +97,14 @@ import com.videogo.realplay.RealPlayStatus;
 import com.videogo.ui.cameralist.EZCameraListActivity;
 import com.videogo.ui.common.EZBusinessTool;
 import com.videogo.ui.common.ScreenOrientationHelper;
-import com.videogo.ui.util.ActivityUtils;
-import com.videogo.ui.util.AudioPlayUtil;
-import com.videogo.ui.util.DataManager;
-import com.videogo.ui.util.EZUtils;
-import com.videogo.ui.util.VerifyCodeInput;
+import com.videogo.util.ActivityUtils;
+import com.videogo.util.AudioPlayUtil;
+import com.videogo.util.DataManager;
+import com.videogo.util.EZUtils;
+import com.videogo.util.VerifyCodeInput;
 import com.videogo.util.ConnectionDetector;
 import com.videogo.util.LocalInfo;
 import com.videogo.util.LogUtil;
-import com.videogo.util.MediaScanner;
 import com.videogo.util.RotateViewUtil;
 import com.videogo.util.Utils;
 import com.videogo.widget.CheckTextButton;
@@ -119,7 +118,6 @@ import com.videogo.widget.loading.LoadingTextView;
 
 import org.MediaPlayer.PlayM4.Player;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -127,8 +125,8 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import ezviz.ezopensdk.debug.VideoFileUtil;
-import ezviz.ezopensdk.demo.DemoConfig;
+import com.videogo.util.VideoFileUtil;
+import com.videogo.global.DemoConfig;
 import ezviz.ezopensdk.R;
 
 import static com.videogo.openapi.EZConstants.MSG_GOT_STREAM_TYPE;
@@ -258,6 +256,10 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
     private ImageButton mRealPlayFullTalkAnimBtn;
     // 对讲模式 Talkback mode
     private boolean mIsOnTalk = false;
+    // 是否在启动对讲，开启预览的时候需要设置为false
+    private boolean mIsStartingTalk = false;
+    // 选择的是NVR设备对讲还是ipc设备对讲。true:nvr设备对讲 false:ipc设备对讲
+    private boolean mIsDeviceTalkBack;
 
     private EZPlayer mEZPlayer = null;
     private CheckTextButton mFullScreenTitleBarBackBtn;// 全屏返回
@@ -429,10 +431,8 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             case R.id.realplay_talk_btn:
             case R.id.realplay_talk_btn2:
             case R.id.realplay_full_talk_btn:// 对讲Click
-                //startVoiceTalk();
                 checkAndRequestPermission();
                 break;
-
             case R.id.realplay_quality_btn:// 清晰度设置Click
                 openQualityPopupWindow(mRealPlayQualityBtn);
                 break;
@@ -1361,19 +1361,22 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
     }
 
     /**
-     * 与ipc设备进行对讲
+     * 发起对讲
+     * @param isDeviceTalkBack true:nvr设备对讲 false:ipc设备对讲
      */
     private void startVoiceTalk(boolean isDeviceTalkBack) {
-
         LogUtil.d(TAG, "startVoiceTalk");
-        if (mEZPlayer == null) {
-            LogUtil.d(TAG, "EZPlayer is null");
+        if (mCameraInfo == null) {
+            LogUtil.d(TAG, "mCameraInfo is null");
             return;
         }
-        if (mCameraInfo == null) {
-            return;
+        if (mEZPlayer == null) {
+            mEZPlayer = EzvizApplication.getOpenSDK().createPlayer(mCameraInfo.getDeviceSerial(), mCameraInfo.getCameraNo());
+            mEZPlayer.setHandler(mHandler);
         }
         mIsOnTalk = true;
+        mIsStartingTalk = true;
+        mIsDeviceTalkBack = isDeviceTalkBack;
 
         updateOrientation();
 
@@ -1410,62 +1413,8 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         if (mEZPlayer != null) {
             mEZPlayer.closeSound();
         }
+        mEZPlayer.setPlayVerifyCode(DataManager.getInstance().getDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial()));
         mEZPlayer.startVoiceTalk(isDeviceTalkBack);
-    }
-
-    /**
-     * 与当前设备进行对讲
-     */
-    private void startVoiceTalk() {
-        LogUtil.d(TAG, "startVoiceTalk");
-        if (mEZPlayer == null) {
-            LogUtil.d(TAG, "EZPlayer is null");
-            return;
-        }
-        if (mCameraInfo == null) {
-            return;
-        }
-        mIsOnTalk = true;
-
-        updateOrientation();
-
-        Utils.showToast(this, R.string.start_voice_talk);
-        mRealPlayTalkBtn.setEnabled(false);
-        mRealPlayFullTalkBtn.setEnabled(false);
-        mRealPlayFullTalkAnimBtn.setEnabled(false);
-        if (mOrientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mRealPlayFullAnimBtn.setBackgroundResource(R.drawable.speech_1);
-            mRealPlayFullTalkBtn.getLocationInWindow(mStartXy);
-            mEndXy[0] = Utils.dip2px(this, 20);
-            mEndXy[1] = mStartXy[1];
-            startFullBtnAnim(mRealPlayFullAnimBtn, mStartXy, mEndXy, new AnimationListener() {
-
-                @Override
-                public void onAnimationStart(Animation animation) {
-                }
-
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-                }
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    Utils.showToast(EZRealPlayActivity.this, R.string.realplay_full_talk_start_tip);
-                    mRealPlayFullTalkAnimBtn.setVisibility(View.VISIBLE);
-                    mRealPlayFullAnimBtn.setVisibility(View.GONE);
-                    onRealPlaySvClick();
-                    //                    mFullscreenFullButton.setVisibility(View.VISIBLE);
-                }
-            });
-        }
-
-        if (mEZPlayer != null) {
-            mEZPlayer.closeSound();
-        }
-
-        //boolean isDeviceTalkBack = true;
-        mEZPlayer.startVoiceTalk(true);
-        //mEZPlayer.startVoiceTalk();
     }
 
     /**
@@ -1495,7 +1444,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         dialog.show();
         //dialog.getWindow().setLayout(800, 350);
         nvr_talkback.setOnClickListener(v -> {
-            startVoiceTalk();
+            startVoiceTalk(true);
             dialog.dismiss();
         });
 
@@ -2079,6 +2028,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
      * 开始播放
      */
     private void startRealPlay() {
+        mIsStartingTalk = false;
         // 增加手机客户端操作信息记录 | Increase the mobile client operation information record
         LogUtil.d(TAG, "startRealPlay");
         if (mStatus == RealPlayStatus.STATUS_START || mStatus == RealPlayStatus.STATUS_PLAY) {
@@ -2097,18 +2047,12 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         if (mCameraInfo != null) {
             if (mEZPlayer == null) {
                 mEZPlayer = EzvizApplication.getOpenSDK().createPlayer(mCameraInfo.getDeviceSerial(), mCameraInfo.getCameraNo());
-            }
-            if (mEZPlayer == null)
-                return;
-            if (mDeviceInfo == null) {
-                return;
+                mEZPlayer.setHandler(mHandler);
             }
             mEZPlayer.setPlayVerifyCode(DataManager.getInstance().getDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial()));
 //            if (mDeviceInfo.getIsEncrypt() == 1) {
 //                mEZPlayer.setPlayVerifyCode(DataManager.getInstance().getDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial()));
 //            }
-
-            mEZPlayer.setHandler(mHandler);
             mEZPlayer.setSurfaceHold(mRealPlaySh);
 
             // 不建议使用，会导致抓图功能失效
@@ -2118,10 +2062,8 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         } else if (mRtspUrl != null) {
             if (mEZPlayer == null) {
                 mEZPlayer = EzvizApplication.getOpenSDK().createPlayerWithUrl(mRtspUrl);
+                mEZPlayer.setHandler(mHandler);
             }
-            if (mEZPlayer == null)
-                return;
-            mEZPlayer.setHandler(mHandler);
             mEZPlayer.setSurfaceHold(mRealPlaySh);
 
             // 不建议使用，会导致抓图功能失效
@@ -2134,11 +2076,12 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
 
     /**
      * 保存预览原始码流，调试用
+     * 此方法废弃。SDK开启debug模式，取流原始码流默认保存。
      */
     private void startRecordOriginVideo() {
-        String fileName = DemoConfig.getStreamsFolder() + "/origin_video_real_play_"
-                + DataTimeUtil.INSTANCE.getSimpleTimeInfoForTmpFile() + ".ps";
-        VideoFileUtil.startRecordOriginVideo(mEZPlayer, fileName);
+//        String fileName = DemoConfig.getStreamsFolder() + "/origin_video_real_play_"
+//                + EZDateTimeUtil.INSTANCE.getSimpleTimeInfoForTmpFile() + ".ps";
+//        VideoFileUtil.startRecordOriginVideo(mEZPlayer, fileName);
     }
 
     /**
@@ -2537,6 +2480,12 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             case ErrorCode.ERROR_CHANNEL_NO_SUPPORT_TALKBACK:
                 Utils.showToast(EZRealPlayActivity.this, R.string.device_no_support_talkback, errorInfo.errorCode);
                 break;
+            // 收到这两个错误码，可以弹出对话框，让用户输入密码后，重新取流预览
+            case ErrorCode.ERROR_INNER_VERIFYCODE_NEED:
+            case ErrorCode.ERROR_INNER_VERIFYCODE_ERROR: {
+                DataManager.getInstance().setDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial(), null);
+                VerifyCodeInput.VerifyCodeInputDialog(this, this).show();
+            }
             default:
                 Utils.showToast(EZRealPlayActivity.this, R.string.realplay_play_talkback_fail, errorInfo.errorCode);
                 break;
@@ -3011,7 +2960,11 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         LogUtil.d(TAG, "verify code is " + verifyCode);
         DataManager.getInstance().setDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial(), verifyCode);
         if (mEZPlayer != null) {
-            startRealPlay();
+            if (mIsStartingTalk) {
+                startVoiceTalk(mIsDeviceTalkBack);
+            } else {
+                startRealPlay();
+            }
         }
     }
 

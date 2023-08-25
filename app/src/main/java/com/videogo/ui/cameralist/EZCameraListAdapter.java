@@ -28,7 +28,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.videogo.openapi.bean.EZCameraInfo;
 import com.videogo.openapi.bean.EZDeviceInfo;
-import com.videogo.ui.util.EZUtils;
+import com.videogo.util.EZUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,7 +43,7 @@ public class EZCameraListAdapter extends BaseAdapter {
 
     private Context mContext = null;
     private List<EZDeviceInfo> mCameraInfoList = null;
-    private OnClickListener mListener;
+    private OnItemClickListener mListener;
     private ExecutorService mExecutorService = null;// 线程池
     public Map<String, EZDeviceInfo> mExecuteItemMap = null;
 
@@ -90,7 +90,7 @@ public class EZCameraListAdapter extends BaseAdapter {
         mExecuteItemMap = new HashMap<String, EZDeviceInfo>();
     }
     
-    public void setOnClickListener(OnClickListener l) {
+    public void setOnItemClickListener(OnItemClickListener l) {
         mListener = l;
     }
     
@@ -258,20 +258,17 @@ public class EZCameraListAdapter extends BaseAdapter {
                     case R.id.item_play_btn:
                         mListener.onPlayClick(EZCameraListAdapter.this, v, position);
                         break;
-
                     case R.id.tab_remoteplayback_btn:
-                        mListener.onRemotePlayBackClick(EZCameraListAdapter.this, v, position);
+                        mListener.onPlayBackClick(EZCameraListAdapter.this, v, position);
                         break;
-
                     case R.id.tab_alarmlist_btn:
                         mListener.onAlarmListClick(EZCameraListAdapter.this, v, position);
                         break;
-                        
                     case R.id.tab_setdevice_btn:
                         mListener.onSetDeviceClick(EZCameraListAdapter.this, v, position);
                         break;
                     case R.id.tab_video_talk_btn:
-                        mListener.onVideoClickClick(EZCameraListAdapter.this, v, position);
+                        mListener.onVideoTalkClick(EZCameraListAdapter.this, v, position);
                         break;
                     case R.id.camera_del_btn: 
                         mListener.onDeleteClick(EZCameraListAdapter.this, v, position);
@@ -281,24 +278,12 @@ public class EZCameraListAdapter extends BaseAdapter {
         }
     };
     
-    public interface OnClickListener {
-
+    public interface OnItemClickListener {
         public void onPlayClick(BaseAdapter adapter, View view, int position);
-
-        public void onDeleteClick(BaseAdapter adapter, View view, int position);
-        
+        public void onPlayBackClick(BaseAdapter adapter, View view, int position);
         public void onAlarmListClick(BaseAdapter adapter, View view, int position);
-        
-        public void onRemotePlayBackClick(BaseAdapter adapter, View view, int position);
-        
         public void onSetDeviceClick(BaseAdapter adapter, View view, int position);
-        
-        public void onDevicePictureClick(BaseAdapter adapter, View view, int position);
-        
-        public void onDeviceVideoClick(BaseAdapter adapter, View view, int position);
-        
-        public void onDeviceDefenceClick(BaseAdapter adapter, View view, int position);
-
-        public void onVideoClickClick(BaseAdapter adapter, View view, int position);
+        public void onVideoTalkClick(BaseAdapter adapter, View view, int position);
+        public void onDeleteClick(BaseAdapter adapter, View view, int position);
     }
 }

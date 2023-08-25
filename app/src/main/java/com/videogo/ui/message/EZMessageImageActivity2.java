@@ -23,10 +23,10 @@ import ezviz.ezopensdkcommon.common.RootActivity;
 import com.videogo.alarm.AlarmLogInfoManager;
 import com.videogo.constant.IntentConsts;
 import com.videogo.openapi.bean.EZAlarmInfo;
-import com.videogo.ui.remoteplayback.EZRemotePlayBackActivity;
-import com.videogo.ui.util.DataManager;
-import com.videogo.ui.util.EZUtils;
-import com.videogo.ui.util.VerifyCodeInput;
+import com.videogo.ui.message.remoteplayback.EZRemotePlayBackActivity;
+import com.videogo.util.DataManager;
+import com.videogo.util.EZUtils;
+import com.videogo.util.VerifyCodeInput;
 import com.videogo.util.LocalInfo;
 import com.videogo.util.LogUtil;
 import com.videogo.util.Utils;
@@ -410,7 +410,7 @@ public class EZMessageImageActivity2 extends RootActivity implements VerifyCodeI
 
     /*
      * (non-Javadoc)
-     * @see com.videogo.devicemgt.GetDeviceOpSmsCodeTask.GetDeviceOpSmsCodeListener#
+     * @see com.videogo.ui.devicemgt.GetDeviceOpSmsCodeTask.GetDeviceOpSmsCodeListener#
      * onGetDeviceOpSmsCodeSuccess()
      */
 //    @Override
@@ -430,7 +430,7 @@ public class EZMessageImageActivity2 extends RootActivity implements VerifyCodeI
     /*
      * (non-Javadoc)
      * @see
-     * com.videogo.devicemgt.GetDeviceOpSmsCodeTask.GetDeviceOpSmsCodeListener#onGetDeviceOpSmsCodeFail
+     * com.videogo.ui.devicemgt.GetDeviceOpSmsCodeTask.GetDeviceOpSmsCodeListener#onGetDeviceOpSmsCodeFail
      * (int)
      */
 //    @Override

@@ -529,6 +529,7 @@
     <string name="string_device_network_mode">设备网络配置方式</string>
     <string name="string_wired_connection">有线连接模式</string>
     <string name="string_ap_connection">AP配网</string>
+    <string name="string_aplink_connection">Link配网</string>
     <string name="string_smart_connection">SmartConfig配网</string>
     <string name="string_sound_wave_connection">声波配网</string>
     <string name="string_smart_and_sound_wave_connection">声波 + 无线连接</string>

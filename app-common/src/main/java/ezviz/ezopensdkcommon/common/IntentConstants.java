@@ -12,7 +12,8 @@ public class IntentConstants {
      */
     public static final String USING_FULL_EZVIZ_SDK = "using_full_ezviz_sdk";
 
-    public static final String EXTRA_SUPPORT_AP= "support_Ap";
+    public static final String EXTRA_SUPPORT_AP = "support_Ap";
+    public static final String EXTRA_SUPPORT_APLINK = "support_ApLink";
     public static final String EXTRA_SUPPORT_SMART_CONFIG = "support_Wifi";
     public static final String EXTRA_SUPPORT_SOUND_WAVE = "support_sound_wave";
     public static final String SELECTED_PRESENTER_TYPE = "selected_presenter_type";

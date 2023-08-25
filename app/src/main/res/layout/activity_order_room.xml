@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:padding="40dp"
     android:gravity="center_horizontal"
-    tools:context="com.ezviz.demo.videotalk.OrderRoomActivity">
+    tools:context="com.videogo.ui.videotalk.OrderRoomActivity">
 
 
     <LinearLayout

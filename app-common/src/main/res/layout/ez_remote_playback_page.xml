@@ -510,7 +510,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" >
 
-                <com.videogo.ui.remoteplayback.RemoteFileTimeBar
+                <com.videogo.ui.message.remoteplayback.RemoteFileTimeBar
                     android:id="@+id/remoteplayback_file_time_bar"
                     android:layout_width="match_parent"
                     android:layout_height="77dp"

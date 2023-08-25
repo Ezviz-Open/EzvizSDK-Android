@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.ezviz.demo.common.MoreFeaturesEntranceActivity">
+    tools:context="com.videogo.ui.others.MoreFeaturesEntranceActivity">
 
     <TextView
         android:layout_width="wrap_content"
@@ -36,14 +36,6 @@
             android:layout_marginTop="10dp"
             android:paddingBottom="10dp"
             android:onClick="onClickGetOriginStream"/>
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="手表视频通话"
-            android:layout_marginTop="10dp"
-            android:paddingBottom="10dp"
-            android:onClick="onClickWatchVideoTalk"/>
 
         <Button
             android:layout_width="wrap_content"
@@ -84,6 +76,14 @@
             android:layout_marginTop="10dp"
             android:paddingBottom="10dp"
             android:onClick="onClickP2pTest"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="自动化测试"
+            android:layout_marginTop="10dp"
+            android:paddingBottom="10dp"
+            android:onClick="onClickAutoTest"/>
 
     </LinearLayout>
 

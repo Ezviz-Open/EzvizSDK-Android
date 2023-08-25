@@ -1,5 +1,7 @@
 package com.videogo.ui.common;
 
+import android.text.TextUtils;
+
 /**
  * Copyright (C) 2022 HIKVISION Inc.
  * Comments:
@@ -70,5 +72,21 @@ public class EZBusinessTool {
                 break;
         }
         return strStreamType;
+    }
+
+    /**
+     * 根据设备型号判断是否是HUB设备
+     */
+    public static boolean isHubDevice(String deviceType) {
+        if (TextUtils.isEmpty(deviceType)) {
+            return false;
+        }
+        switch (deviceType) {
+            case "CASTT":
+            case "CAS_HUB_NEW":
+                return true;
+            default:
+                return deviceType.startsWith("CAS_WG_TEST");
+        }
     }
 }

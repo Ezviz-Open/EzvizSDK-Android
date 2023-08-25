@@ -18,7 +18,7 @@ import com.videogo.errorlayer.ErrorInfo;
 import com.videogo.exception.BaseException;
 import com.videogo.exception.ErrorCode;
 import com.videogo.openapi.bean.EZDeviceInfo;
-import com.videogo.ui.util.ActivityUtils;
+import com.videogo.util.ActivityUtils;
 import com.videogo.util.ConnectionDetector;
 import com.videogo.util.LogUtil;
 import com.videogo.util.Utils;

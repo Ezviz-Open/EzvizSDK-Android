@@ -26,6 +26,13 @@
             android:text="@string/string_ap_connection"/>
 
         <Button
+            android:id="@+id/btn_to_aplink"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/string_aplink_connection"
+            android:layout_marginTop="20dp"/>
+
+        <Button
             android:id="@+id/btn_to_smart_config"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

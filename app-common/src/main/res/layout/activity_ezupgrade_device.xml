@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:background="@color/common_bg"
-    tools:context="com.videogo.devicemgt.EZUpgradeDeviceActivity">
+    tools:context="com.videogo.ui.setting.EZUpgradeDeviceActivity">
 
     <LinearLayout
         android:orientation="vertical"

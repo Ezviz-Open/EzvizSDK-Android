@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.ezviz.demo.common.CollectDeviceInfoActivity"
+    tools:context="com.videogo.ui.others.CollectDeviceInfoActivity"
     android:orientation="vertical"
     android:padding="10dp"
     android:background="@color/white"

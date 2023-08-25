@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:background="@color/opensdk_cameralist_bg"
-                android:orientation="vertical">
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/opensdk_cameralist_bg"
+    android:orientation="vertical">
 
     <!-- 标题栏 -->
-    <RelativeLayout android:id="@+id/title"
-                    android:layout_width="match_parent"
-                    android:layout_height="44dp">
+    <RelativeLayout
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="44dp">
 
         <Button
             android:id="@+id/btn_user"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:layout_centerVertical="true"
             android:layout_marginLeft="10dp"
-            android:background="@drawable/user"/>
+            android:background="@drawable/user_exit" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -31,7 +32,7 @@
                 android:layout_gravity="center_vertical"
                 android:text="我的"
                 android:textColor="@color/orange_text"
-                android:textSize="20sp"/>
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/text_share"
@@ -41,17 +42,17 @@
                 android:layout_marginLeft="20dp"
                 android:text="分享"
                 android:textColor="@color/black_text"
-                android:textSize="20sp"/>
+                android:textSize="20sp" />
 
         </LinearLayout>
 
         <Button
             android:id="@+id/btn_add"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:background="@drawable/my_add"/>
+            android:background="@drawable/my_add" />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -74,7 +75,7 @@
         android:fastScrollEnabled="false"
         android:listSelector="@null"
         android:overScrollFooter="@null"
-        android:scrollingCache="true"/>
+        android:scrollingCache="true" />
 
     <LinearLayout
         android:id="@+id/no_camera_tip_ly"
@@ -89,12 +90,12 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/my_no_video"/>
+            android:src="@drawable/my_no_video" />
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/my_shoping"/>
+            android:src="@drawable/my_shoping" />
     </LinearLayout>
 
     <LinearLayout
@@ -112,7 +113,7 @@
             android:layout_marginBottom="20dp"
             android:gravity="center"
             android:text="@string/get_camera_list_fail"
-            android:textSize="@dimen/title_text_size"/>
+            android:textSize="@dimen/title_text_size" />
 
         <Button
             android:id="@+id/camera_list_refresh_btn"
@@ -122,7 +123,7 @@
             android:onClick="onClick"
             android:text="@string/refresh"
             android:textColor="@color/black_text"
-            android:textSize="@dimen/title_text_size"/>
+            android:textSize="@dimen/title_text_size" />
     </LinearLayout>
 
 </RelativeLayout>

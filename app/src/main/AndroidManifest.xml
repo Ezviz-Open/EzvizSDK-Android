@@ -71,55 +71,37 @@
         android:testOnly="false"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning, LockedOrientationActivity">
-        <activity android:name="com.videogo.remoteplayback.list.EZAbroadCloudServiceExAct"></activity>
-        <activity android:name="com.ezviz.demo.videotalk.JoinRoomActivity" />
-        <activity android:name="com.ezviz.demo.videotalk.OrderRoomActivity" />
-        <activity android:name="com.ezviz.demo.videotalk.ConfluenceTestEntranceActivity" />
-        <activity android:name="com.ezviz.demo.common.CollectDeviceInfoActivity" />
-        <activity android:name="com.ezviz.demo.streamctrl.RtpStreamPlayActivity" />
-        <activity android:name="com.ezviz.demo.common.MoreFeaturesEntranceActivity" />
-        <activity android:name=".preview.MultiScreenPreviewActivity" />
+
         <activity
-            android:name="com.ezviz.demo.streamctrl.OriginStreamControlActivity"
-            android:label="测试码流">
-
-            <!-- <intent-filter> -->
-            <!-- <action android:name="android.intent.action.MAIN" /> -->
-
-
-            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-            <!-- </intent-filter> -->
-        </activity>
-        <activity
-            android:name="com.videogo.MainActivity"
+            android:name="com.videogo.ui.login.MainActivity"
             android:configChanges="orientation|keyboardHidden"
             android:screenOrientation="portrait"
             android:theme="@style/FullAppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".debug.TestActivityForFullSdk"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".add.AddDeviceToAccountActivity"
-            android:screenOrientation="portrait" />
         <activity
             android:name="com.videogo.main.EzvizWebViewActivity"
             android:configChanges="orientation|keyboardHidden"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.videogo.remoteplayback.list.EZPlayBackListActivity"
+            android:name="com.videogo.ui.playback.EZPlayBackListActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="nosensor" />
+        <activity
+            android:name="com.videogo.ui.playback.EZAbroadCloudServiceExAct"
+            android:screenOrientation="portrait"/>
         <activity
             android:name="com.videogo.ui.cameralist.EZCameraListActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name="com.videogo.ui.realplay.EZRealPlayActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.videogo.ui.realplay.preview.MultiScreenPreviewActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="portrait" />
         <activity
@@ -129,29 +111,32 @@
             android:name="com.videogo.ui.message.EZMessageActivity2"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.videogo.ui.remoteplayback.EZRemotePlayBackActivity"
+            android:name="com.videogo.ui.message.remoteplayback.EZRemotePlayBackActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.videogo.devicemgt.EZDeviceSettingActivity"
+            android:name="com.videogo.ui.setting.EZDeviceSettingActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.videogo.devicemgt.ModifyDeviceNameActivity"
+            android:name="com.videogo.ui.setting.EZUpgradeDeviceActivity"
+            android:label="@string/title_activity_ezupgrade_device" />
+        <activity
+            android:name="com.videogo.ui.setting.ModifyDeviceNameActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.videogo.scan.main.CaptureActivity"
+            android:name="com.videogo.ui.adddevice.CaptureActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.videogo.ui.devicelist.SeriesNumSearchActivity"
+            android:name="com.videogo.ui.adddevice.SeriesNumSearchActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name="com.videogo.ui.devicelist.AutoWifiConnectingActivity"
+            android:name="com.videogo.ui.adddevice.AutoWifiConnectingActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.videogo.devicemgt.EZUpgradeDeviceActivity"
-            android:label="@string/title_activity_ezupgrade_device" />
+            android:name="com.videogo.ui.adddevice.AddDeviceToAccountActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name="com.videogo.ui.LanDevice.LanDeviceActivity"
             android:screenOrientation="portrait" />
@@ -162,42 +147,39 @@
             android:name="com.videogo.ui.LanDevice.LanDeviceActivateActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.videogo.SelectDeviceList"
-            android:screenOrientation="portrait" />
-        <activity
             android:name="com.videogo.ui.ddns.EZDDNSListActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.videogo.OptionActivity"
+            android:name="com.videogo.ui.videotalk.SafetyHatTalkActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.videogo.SupportActivity"
+            android:name="com.videogo.ui.videotalk.WatchVideoTalkActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.ezviz.demo.videotalk.SafetyHatTalkActivity"
-            android:screenOrientation="portrait" /> <!-- receiver -->
-        <activity
-            android:name="com.ezviz.demo.videotalk.WatchVideoTalkActivity"
-            android:screenOrientation="portrait" /> <!-- receiver -->
-        <activity
-            android:name="com.ezviz.demo.videotalk.MultiTestActivity"
+            android:name="com.videogo.ui.videotalk.MultiTestActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.ezviz.demo.videotalk.MultiVideoTalkActivity"
+            android:name="com.videogo.ui.videotalk.MultiVideoTalkActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.ezviz.demo.videotalk.EZRtcTestActivity"
+            android:name="com.videogo.ui.videotalk.EZRtcTestActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
-        <activity
-            android:name="com.ezviz.demo.common.EZP2pTestActivity"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait" />
+        <activity android:name="com.videogo.ui.videotalk.JoinRoomActivity" />
+        <activity android:name="com.videogo.ui.videotalk.OrderRoomActivity" />
+        <activity android:name="com.videogo.ui.others.streamctrl.RtpStreamPlayActivity" />
+
+        <activity android:name="com.videogo.ui.others.MoreFeaturesEntranceActivity" />
+        <activity android:name="com.videogo.ui.others.TestActivityForFullSdk" />
+        <activity android:name="com.videogo.ui.others.streamctrl.OriginStreamControlActivity" />
+        <activity android:name="com.videogo.ui.others.CollectDeviceInfoActivity" />
+        <activity android:name="com.videogo.ui.videotalk.ConfluenceTestEntranceActivity" />
+        <activity android:name="com.videogo.ui.others.EZP2pTestActivity" />
 
         <receiver android:name="com.videogo.ui.cameralist.EZCameraListActivity$NotificationReceiver" />
 
         <service
-            android:name="com.ezviz.demo.videotalk.EZVideoMeetingService"
+            android:name="com.videogo.ui.videotalk.EZVideoMeetingService"
             android:enabled="true"
             android:foregroundServiceType="mediaProjection" />
     </application>
