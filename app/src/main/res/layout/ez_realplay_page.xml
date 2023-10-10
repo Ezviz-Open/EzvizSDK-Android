@@ -24,11 +24,56 @@
             android:layout_width="match_parent"
             android:layout_height="200dp">
 
+            <!-- 主窗口-->
             <SurfaceView
                 android:id="@+id/realplay_sv"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@android:color/transparent" />
+
+            <!-- 鱼眼设备子窗口-->
+            <RelativeLayout
+                android:id="@+id/play_ptz_rl"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <SurfaceView
+                    android:id="@+id/realplay_sv1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent" />
+
+                <SurfaceView
+                    android:id="@+id/realplay_sv2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent" />
+
+                <SurfaceView
+                    android:id="@+id/realplay_sv3"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent" />
+
+                <SurfaceView
+                    android:id="@+id/realplay_sv4"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent" />
+
+                <SurfaceView
+                    android:id="@+id/realplay_sv5"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent" />
+
+                <SurfaceView
+                    android:id="@+id/realplay_sv6"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent" />
+
+            </RelativeLayout>
 
             <!-- 封面 -->
             <ImageView
@@ -44,8 +89,7 @@
                 android:layout_height="match_parent" />
 
             <!-- 云台垂直比例尺 -->
-            <com.videogo.widget.PtzControlAngleView
-                xmlns:angle="http://schemas.android.com/apk/res-auto"
+            <com.videogo.widget.PtzControlAngleView xmlns:angle="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/vertical_angle"
                 android:layout_width="40dp"
                 android:layout_height="80dp"
@@ -54,8 +98,7 @@
                 angle:liveplay_angle_style="left" />
 
             <!-- 云台水平比例尺 -->
-            <com.videogo.widget.PtzControlAngleView
-                xmlns:angle="http://schemas.android.com/apk/res-auto"
+            <com.videogo.widget.PtzControlAngleView xmlns:angle="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/horizontal_angle"
                 android:layout_width="80dp"
                 android:layout_height="40dp"
@@ -93,9 +136,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:orientation="vertical"
+            android:layout_marginRight="10dp"
             android:gravity="right"
-            android:layout_marginRight="10dp">
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/tv_stream_type"

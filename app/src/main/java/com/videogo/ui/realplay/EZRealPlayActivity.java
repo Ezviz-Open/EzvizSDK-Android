@@ -69,7 +69,6 @@ import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.videogo.util.EZDateTimeUtil;
 import com.videogo.EzvizApplication;
 
 import ezviz.ezopensdkcommon.common.RootActivity;
@@ -86,6 +85,8 @@ import com.videogo.openapi.EZConstants.EZPTZAction;
 import com.videogo.openapi.EZConstants.EZPTZCommand;
 import com.videogo.openapi.EZConstants.EZRealPlayConstants;
 import com.videogo.openapi.EZConstants.EZVideoLevel;
+import com.videogo.openapi.EZConstants.EZFecPlaceType;
+import com.videogo.openapi.EZConstants.EZFecCorrectType;
 import com.videogo.openapi.EZOpenSDKListener;
 import com.videogo.openapi.EZPlayer;
 import com.videogo.openapi.bean.EZCameraInfo;
@@ -118,6 +119,7 @@ import com.videogo.widget.loading.LoadingTextView;
 
 import org.MediaPlayer.PlayM4.Player;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -161,6 +163,14 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
     private RelativeLayout mRealPlayPlayRl;// 预览UI父视图
 
     private SurfaceView mRealPlaySv;
+    // 矫正模式分屏
+    private RelativeLayout realPlayPtzRL;
+    private SurfaceView mRealPlaySv1;
+    private SurfaceView mRealPlaySv2;
+    private SurfaceView mRealPlaySv3;
+    private SurfaceView mRealPlaySv4;
+    private SurfaceView mRealPlaySv5;
+    private SurfaceView mRealPlaySv6;
     private SurfaceHolder mRealPlaySh;
     private ImageView mCoverImage;// 封面
     private PtzControlAngleView mPtzControlAngleViewVer;// 云台垂直比例尺
@@ -234,6 +244,12 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
     private RingView mTalkRingView;// 对讲效果视图
     private Button mTalkBackControlBtn;// 半双工对讲按钮
 
+    private PopupWindow mFecPopupWindow;// 鱼眼矫正模式pop
+    private Button[] fecCorrectTypeButtons;// 鱼眼设备矫正模式按钮数组
+    private EZFecPlaceType fecPlaceType;// 鱼眼安装模式
+    private EZFecCorrectType fecCorrectType;// 鱼眼矫正模式
+    private FecViewLayoutHelper fecViewLayoutHelper;// 鱼眼辅助类
+
     private WaitDialog mWaitDialog;// 设置清晰度dialog
 
     private RealPlayBroadcastReceiver mBroadcastReceiver;// 监听手机息屏广播
@@ -294,6 +310,10 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         super.onCreate(savedInstanceState);
         initData();
         initView();
+        initPlayer();
+        /// 鱼眼设备专用设置，如果没有鱼眼设备，不需要如下代码
+        initFecView();
+        /// 鱼眼设备专用设置，如果没有鱼眼设备，不需要如上代码
     }
 
     @Override
@@ -806,7 +826,6 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         mRealPlayFlowTv = (TextView) findViewById(R.id.realplay_flow_tv);
         mRealPlayFlowTv.setText("0k/s");
         mFullscreenButton = (CheckTextButton) findViewById(R.id.fullscreen_button);
-
         mRealPlayRecordLy = (LinearLayout) findViewById(R.id.realplay_record_ly);
         mRealPlayRecordIv = (ImageView) findViewById(R.id.realplay_record_iv);
         mRealPlayRecordTv = (TextView) findViewById(R.id.realplay_record_tv);
@@ -838,6 +857,54 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
 
         mWaitDialog = new WaitDialog(this, android.R.style.Theme_Translucent_NoTitleBar);
         mWaitDialog.setCancelable(false);
+    }
+
+    private void initPlayer() {
+        if (mCameraInfo != null) {
+            mEZPlayer = EzvizApplication.getOpenSDK().createPlayer(mCameraInfo.getDeviceSerial(), mCameraInfo.getCameraNo());
+            mEZPlayer.setHandler(mHandler);
+//            mEZPlayer.setPlayVerifyCode(DataManager.getInstance().getDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial()));
+            if (mDeviceInfo.getIsEncrypt() == 1) {
+                mEZPlayer.setPlayVerifyCode(DataManager.getInstance().getDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial()));
+            }
+            mEZPlayer.setSurfaceHold(mRealPlaySh);
+        } else if (mRtspUrl != null) {
+            mEZPlayer = EzvizApplication.getOpenSDK().createPlayerWithUrl(mRtspUrl);
+            mEZPlayer.setHandler(mHandler);
+            mEZPlayer.setSurfaceHold(mRealPlaySh);
+        }
+    }
+
+    /** 鱼眼设备专用设置 */
+    private void initFecView() {
+        if (FecViewLayoutHelper.isFecDevice(mDeviceInfo)) {
+            // 鱼眼设备显示"查看模式" & 调整画面比例为1:1
+            mFullscreenButton.setVisibility(View.GONE);// 鱼眼设备不支持全屏，隐藏全屏按钮
+            ImageButton viewTypeBtn = (ImageButton) findViewById(R.id.realplay_viewtype_btn);
+            viewTypeBtn.setVisibility(View.VISIBLE);
+            viewTypeBtn.setOnClickListener(v -> openFecViewModePopupWindow(mRealPlayPlayRl));
+
+            fecPlaceType = EZFecPlaceType.EZ_FEC_PLACE_CEILING;// demo中默认顶装
+            fecCorrectType = EZFecCorrectType.EZ_FEC_CORRECT_FISH;// demo中默认鱼眼（原始码流）
+            mRealRatio = 1;
+
+            realPlayPtzRL = findViewById(R.id.play_ptz_rl);
+            mRealPlaySv1 = (SurfaceView) findViewById(R.id.realplay_sv1);
+            mRealPlaySv2 = (SurfaceView) findViewById(R.id.realplay_sv2);
+            mRealPlaySv3 = (SurfaceView) findViewById(R.id.realplay_sv3);
+            mRealPlaySv4 = (SurfaceView) findViewById(R.id.realplay_sv4);
+            mRealPlaySv5 = (SurfaceView) findViewById(R.id.realplay_sv5);
+            mRealPlaySv6 = (SurfaceView) findViewById(R.id.realplay_sv6);
+            ViewGroup playWindowVg = (ViewGroup) findViewById(R.id.vg_play_window);
+
+            fecViewLayoutHelper = new FecViewLayoutHelper(this);
+            fecViewLayoutHelper.playerView = mRealPlaySv;
+            fecViewLayoutHelper.playWindowVg = playWindowVg;
+            fecViewLayoutHelper.player = mEZPlayer;
+            fecViewLayoutHelper.playPtzRL = realPlayPtzRL;
+            fecViewLayoutHelper.setSurfaceViews(new SurfaceView[]{mRealPlaySv1, mRealPlaySv2, mRealPlaySv3, mRealPlaySv4, mRealPlaySv5, mRealPlaySv6});
+            playWindowVg.post(() -> fecViewLayoutHelper.setPlayViewAspectRadioWith1V1());
+        }
     }
 
     public void startDrag(int direction, float distance, float rate) {
@@ -1370,10 +1437,6 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             LogUtil.d(TAG, "mCameraInfo is null");
             return;
         }
-        if (mEZPlayer == null) {
-            mEZPlayer = EzvizApplication.getOpenSDK().createPlayer(mCameraInfo.getDeviceSerial(), mCameraInfo.getCameraNo());
-            mEZPlayer.setHandler(mHandler);
-        }
         mIsOnTalk = true;
         mIsStartingTalk = true;
         mIsDeviceTalkBack = isDeviceTalkBack;
@@ -1413,7 +1476,6 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         if (mEZPlayer != null) {
             mEZPlayer.closeSound();
         }
-        mEZPlayer.setPlayVerifyCode(DataManager.getInstance().getDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial()));
         mEZPlayer.startVoiceTalk(isDeviceTalkBack);
     }
 
@@ -1477,33 +1539,55 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             case R.id.talkback_close_btn:// 对讲-关闭
                 closeTalkPopupWindow(true, false);
                 break;
+            case R.id.fec_close_btn:// 鱼眼矫正-关闭
+                closeFecViewModePopupWindow();
+                break;
             default:
                 break;
         }
     };
 
     /**
-     * 云台操作请求
-     * @param command 方向
-     * @param action 开始or停止
+     * 根据安装模式和能力集设置哪些矫正模式可用
      */
-    private void ptzOption(final EZPTZCommand command, final EZPTZAction action) {
-        new Thread(() -> {
-            boolean ptz_result = false;
-            try {
-                ptz_result = EzvizApplication.getOpenSDK().controlPTZ(mCameraInfo.getDeviceSerial(), mCameraInfo.getCameraNo(), command,
-                        action, EZConstants.PTZ_SPEED_DEFAULT);
-                if (action == EZPTZAction.EZPTZActionSTOP) {
-                    Message msg = Message.obtain();
-                    msg.what = MSG_HIDE_PTZ_ANGLE;
-                    mHandler.sendMessage(msg);
-                }
-            } catch (BaseException e) {
-                e.printStackTrace();
-            }
-            LogUtil.i(TAG, "controlPTZ ptzCtrl result: " + ptz_result);
-        }).start();
+    private void setFecCorrectTypeBtnsEnable(EZFecPlaceType fecPlaceType) {
+        int supportValue = FecViewLayoutHelper.getSupportInt(fecPlaceType, mDeviceInfo);
+        FecViewLayoutHelper.setFecCorrectButtonsState(fecCorrectTypeButtons, supportValue);
     }
+
+    /**
+     * 鱼眼矫正模式的点击事件
+     */
+    private OnClickListener mOnFecWndClickListener = v -> {
+        // 没有在播放，拦截
+        if (mStatus != RealPlayStatus.STATUS_PLAY) {
+            return;
+        }
+        switch (v.getId()) {
+            case R.id.fec_place_wall:// 壁装
+            case R.id.fec_place_floor:// 底装
+            case R.id.fec_place_ceiling:// 顶装
+                fecPlaceType = EZFecPlaceType.values()[Integer.parseInt(String.valueOf(v.getTag()))];
+                setFecCorrectTypeBtnsEnable(fecPlaceType);
+                break;
+            case R.id.fec_correct_fish:// 默认鱼眼
+            case R.id.fec_correct_4ptz:// 4分屏
+            case R.id.fec_correct_5ptz:// 5分屏
+            case R.id.fec_correct_full5ptz:// 全景5分屏
+            case R.id.fec_correct_lat:// 维度拉伸
+            case R.id.fec_correct_arc_hor:// ARC
+            case R.id.fec_correct_arc_ver:// ARCV
+            case R.id.fec_correct_wide_angle:// 广角
+            case R.id.fec_correct_180:// 180°全景
+            case R.id.fec_correct_360:// 360°全景
+            case R.id.fec_correct_cyc:// 柱状
+                fecCorrectType = FecViewLayoutHelper.getFecCorrectTypeFromTag(Integer.parseInt(String.valueOf(v.getTag())));
+                fecViewLayoutHelper.openFecCorrect(fecCorrectType, fecPlaceType);
+                break;
+            default:
+                break;
+        }
+    };
 
     private OnTouchListener mOnTouchListener = new OnTouchListener() {
 
@@ -1613,6 +1697,29 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             });
             thr.start();
         }
+    }
+
+    /**
+     * 云台操作请求
+     * @param command 方向
+     * @param action 开始or停止
+     */
+    private void ptzOption(final EZPTZCommand command, final EZPTZAction action) {
+        new Thread(() -> {
+            boolean ptz_result = false;
+            try {
+                ptz_result = EzvizApplication.getOpenSDK().controlPTZ(mCameraInfo.getDeviceSerial(), mCameraInfo.getCameraNo(), command,
+                        action, EZConstants.PTZ_SPEED_DEFAULT);
+                if (action == EZPTZAction.EZPTZActionSTOP) {
+                    Message msg = Message.obtain();
+                    msg.what = MSG_HIDE_PTZ_ANGLE;
+                    mHandler.sendMessage(msg);
+                }
+            } catch (BaseException e) {
+                e.printStackTrace();
+            }
+            LogUtil.i(TAG, "controlPTZ ptzCtrl result: " + ptz_result);
+        }).start();
     }
 
     /**
@@ -1730,6 +1837,85 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             dismissPopWindow(mPtzPopupWindow);
             mPtzPopupWindow = null;
             mPtzControlLy = null;
+        }
+    }
+
+    /**
+     * 打开鱼眼矫正模式操作弹出框
+     * @param parent
+     */
+    private void openFecViewModePopupWindow(View parent) {
+        closeFecViewModePopupWindow();
+
+        LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        ViewGroup layoutView = (ViewGroup) layoutInflater.inflate(R.layout.realplay_fec_wnd, null, true);
+        layoutView.findViewById(R.id.fec_close_btn).setOnClickListener(mOnPopWndClickListener);
+
+        Button placeWallBtn = layoutView.findViewById(R.id.fec_place_wall);
+        Button placeFloorBtn = layoutView.findViewById(R.id.fec_place_floor);
+        Button placeCeilingBtn = layoutView.findViewById(R.id.fec_place_ceiling);
+        Button correctFishBtn = layoutView.findViewById(R.id.fec_correct_fish);
+        Button correct4PtzBtn = layoutView.findViewById(R.id.fec_correct_4ptz);
+        Button correct5PtzBtn = layoutView.findViewById(R.id.fec_correct_5ptz);
+        Button correctFull5PtzBtn = layoutView.findViewById(R.id.fec_correct_full5ptz);
+        Button correctLatBtn = layoutView.findViewById(R.id.fec_correct_lat);
+        Button correctARCHorBtn = layoutView.findViewById(R.id.fec_correct_arc_hor);
+        Button correctARCVerBtn = layoutView.findViewById(R.id.fec_correct_arc_ver);
+        Button correctWideAngleBtn = layoutView.findViewById(R.id.fec_correct_wide_angle);
+        Button correct180Btn = layoutView.findViewById(R.id.fec_correct_180);
+        Button correct360Btn = layoutView.findViewById(R.id.fec_correct_360);
+        Button correctCycBtn = layoutView.findViewById(R.id.fec_correct_cyc);
+        fecCorrectTypeButtons = new Button[] {
+                correct4PtzBtn, correct5PtzBtn, correctFull5PtzBtn,
+                correctLatBtn, correctARCHorBtn, correctARCVerBtn,
+                correctWideAngleBtn, correct180Btn, correct360Btn,
+                correctCycBtn
+        };
+
+        placeWallBtn.setOnClickListener(mOnFecWndClickListener);
+        placeFloorBtn.setOnClickListener(mOnFecWndClickListener);
+        placeCeilingBtn.setOnClickListener(mOnFecWndClickListener);
+        correctFishBtn.setOnClickListener(mOnFecWndClickListener);
+        correct4PtzBtn.setOnClickListener(mOnFecWndClickListener);
+        correct5PtzBtn.setOnClickListener(mOnFecWndClickListener);
+        correctFull5PtzBtn.setOnClickListener(mOnFecWndClickListener);
+        correctLatBtn.setOnClickListener(mOnFecWndClickListener);
+        correctARCHorBtn.setOnClickListener(mOnFecWndClickListener);
+        correctARCVerBtn.setOnClickListener(mOnFecWndClickListener);
+        correctWideAngleBtn.setOnClickListener(mOnFecWndClickListener);
+        correct180Btn.setOnClickListener(mOnFecWndClickListener);
+        correct360Btn.setOnClickListener(mOnFecWndClickListener);
+        correctCycBtn.setOnClickListener(mOnFecWndClickListener);
+        // 设置按钮的可见和可用状态
+        int wallTypeValue = FecViewLayoutHelper.getSupportInt(EZFecPlaceType.EZ_FEC_PLACE_WALL, mDeviceInfo);
+        int floorTypeValue = FecViewLayoutHelper.getSupportInt(EZFecPlaceType.EZ_FEC_PLACE_FLOOR, mDeviceInfo);
+        int ceilingTypeValue = FecViewLayoutHelper.getSupportInt(EZFecPlaceType.EZ_FEC_PLACE_CEILING, mDeviceInfo);
+        placeWallBtn.setVisibility(wallTypeValue > 0 ? View.VISIBLE : View.GONE);
+        placeFloorBtn.setVisibility(floorTypeValue > 0 ? View.VISIBLE : View.GONE);
+        placeCeilingBtn.setVisibility(ceilingTypeValue > 0 ? View.VISIBLE : View.GONE);
+        setFecCorrectTypeBtnsEnable(fecPlaceType);
+
+        int height = mLocalInfo.getScreenHeight() - mPortraitTitleBar.getHeight() - mRealPlayPlayRl.getHeight()
+                - (mRealPlayRect != null ? mRealPlayRect.top : mLocalInfo.getNavigationBarHeight());
+        mFecPopupWindow = new PopupWindow(layoutView, LayoutParams.MATCH_PARENT, height, true);
+        mFecPopupWindow.setBackgroundDrawable(new BitmapDrawable());
+        mFecPopupWindow.setAnimationStyle(R.style.popwindowUpAnim);
+        mFecPopupWindow.setFocusable(false);
+        mFecPopupWindow.setOutsideTouchable(false);
+        mFecPopupWindow.showAsDropDown(parent);
+        mFecPopupWindow.update();
+
+        fecViewLayoutHelper.fecPopupWindow = mFecPopupWindow;
+    }
+
+    /**
+     * 关闭鱼眼查看模式操作弹出框
+     */
+    private void closeFecViewModePopupWindow() {
+        if (mFecPopupWindow != null) {
+            dismissPopWindow(mFecPopupWindow);
+            mFecPopupWindow = null;
+            fecViewLayoutHelper.fecPopupWindow = null;// fecViewLayoutHelper中的窗口对象置空，必须
             setForceOrientation(0);
         }
     }
@@ -2043,35 +2229,10 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
 
         mStatus = RealPlayStatus.STATUS_START;
         setRealPlayLoadingUI();
-
-        if (mCameraInfo != null) {
-            if (mEZPlayer == null) {
-                mEZPlayer = EzvizApplication.getOpenSDK().createPlayer(mCameraInfo.getDeviceSerial(), mCameraInfo.getCameraNo());
-                mEZPlayer.setHandler(mHandler);
-            }
-            mEZPlayer.setPlayVerifyCode(DataManager.getInstance().getDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial()));
-//            if (mDeviceInfo.getIsEncrypt() == 1) {
-//                mEZPlayer.setPlayVerifyCode(DataManager.getInstance().getDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial()));
-//            }
-            mEZPlayer.setSurfaceHold(mRealPlaySh);
-
-            // 不建议使用，会导致抓图功能失效
-//            mEZPlayer.setHardDecode(true);
-            startRecordOriginVideo();
-            mEZPlayer.startRealPlay();
-        } else if (mRtspUrl != null) {
-            if (mEZPlayer == null) {
-                mEZPlayer = EzvizApplication.getOpenSDK().createPlayerWithUrl(mRtspUrl);
-                mEZPlayer.setHandler(mHandler);
-            }
-            mEZPlayer.setSurfaceHold(mRealPlaySh);
-
-            // 不建议使用，会导致抓图功能失效
-//            mEZPlayer.setHardDecode(true);
-            startRecordOriginVideo();
-            mEZPlayer.startRealPlay();
-        }
         updateLoadingProgress(0);
+
+        mRealPlaySv.setVisibility(View.VISIBLE);
+        mEZPlayer.startRealPlay();
     }
 
     /**
@@ -2108,10 +2269,10 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         mRealPlayBtn.setBackgroundResource(R.drawable.play_stop_selector);
 
         if (mCameraInfo != null && mDeviceInfo != null) {
-            mRealPlayCaptureBtn.setEnabled(false);
-            mRealPlayRecordBtn.setEnabled(false);
             mRealPlayQualityBtn.setEnabled(mDeviceInfo.getStatus() == 1);
             mRealPlayPtzBtn.setEnabled(false);
+            mRealPlayCaptureBtn.setEnabled(false);
+            mRealPlayRecordBtn.setEnabled(false);
 
             mRealPlayFullPlayBtn.setBackgroundResource(R.drawable.play_full_stop_selector);
             mRealPlayFullCaptureBtn.setEnabled(false);
@@ -2157,15 +2318,21 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         if (mCameraInfo != null && mDeviceInfo != null) {
             closePtzPopupWindow();
             setFullPtzStopUI(false);
+            mRealPlayQualityBtn.setEnabled(mDeviceInfo.getStatus() == 1 && mEZPlayer != null);
+            mRealPlayPtzBtn.setEnabled(false);
             mRealPlayCaptureBtn.setEnabled(false);
             mRealPlayRecordBtn.setEnabled(false);
-            mRealPlayQualityBtn.setEnabled(mDeviceInfo.getStatus() == 1 && mEZPlayer != null);
-            mRealPlayFullPtzBtn.setEnabled(false);
+            /// 鱼眼设备专用设置，如果没有鱼眼设备，不需要如下代码
+            if (fecViewLayoutHelper != null) {
+                fecViewLayoutHelper.resetFecType();
+                closeFecViewModePopupWindow();
+            }
+            /// 鱼眼设备专用设置，如果没有鱼眼设备，不需要如上代码
 
             mRealPlayFullPlayBtn.setBackgroundResource(R.drawable.play_full_play_selector);
+            mRealPlayFullPtzBtn.setEnabled(false);
             mRealPlayFullCaptureBtn.setEnabled(false);
             mRealPlayFullRecordBtn.setEnabled(false);
-            mRealPlayPtzBtn.setEnabled(false);
         }
     }
 
@@ -2186,15 +2353,15 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         if (mCameraInfo != null && mDeviceInfo != null) {
             closePtzPopupWindow();
             setFullPtzStopUI(false);
-            mRealPlayCaptureBtn.setEnabled(false);
-            mRealPlayRecordBtn.setEnabled(false);
             mRealPlayQualityBtn.setEnabled(mDeviceInfo.getStatus() == 1 && mEZPlayer != null);
             mRealPlayPtzBtn.setEnabled(false);
+            mRealPlayCaptureBtn.setEnabled(false);
+            mRealPlayRecordBtn.setEnabled(false);
 
             mRealPlayFullPlayBtn.setBackgroundResource(R.drawable.play_full_play_selector);
+            mRealPlayFullPtzBtn.setEnabled(false);
             mRealPlayFullCaptureBtn.setEnabled(false);
             mRealPlayFullRecordBtn.setEnabled(false);
-            mRealPlayFullPtzBtn.setEnabled(false);
         }
     }
 
@@ -2213,15 +2380,15 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         mRealPlayBtn.setBackgroundResource(R.drawable.play_stop_selector);
 
         if (mCameraInfo != null && mDeviceInfo != null) {
-            mRealPlayCaptureBtn.setEnabled(true);
-            mRealPlayRecordBtn.setEnabled(true);
             mRealPlayQualityBtn.setEnabled(mDeviceInfo.getStatus() == 1);
             mRealPlayPtzBtn.setEnabled(getSupportPtz() == 1);
+            mRealPlayCaptureBtn.setEnabled(true);
+            mRealPlayRecordBtn.setEnabled(true);
 
             mRealPlayFullPlayBtn.setBackgroundResource(R.drawable.play_full_stop_selector);
+            mRealPlayFullPtzBtn.setEnabled(true);
             mRealPlayFullCaptureBtn.setEnabled(true);
             mRealPlayFullRecordBtn.setEnabled(true);
-            mRealPlayFullPtzBtn.setEnabled(true);
         }
 
 //        setRealPlaySound();
@@ -2711,7 +2878,6 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         //        } else {
         //            mRealRatio = Constant.LIVE_VIEW_RATIO;
         //        }
-        mRealRatio = Constant.LIVE_VIEW_RATIO;
 
         boolean bSupport = true;//(float) mLocalInfo.getScreenHeight() / mLocalInfo.getScreenWidth() >= BIG_SCREEN_RATIO;
         if (bSupport) {
@@ -2729,6 +2895,11 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         if (mEZPlayer != null) {
             mStreamFlow = mEZPlayer.getStreamFlow();
         }
+        /// 鱼眼设备专用设置，如果没有鱼眼设备，不需要如下代码
+        if (fecViewLayoutHelper != null) {
+            fecViewLayoutHelper.openFecCorrect(fecCorrectType, fecPlaceType);
+        }
+        /// 鱼眼设备专用设置，如果没有鱼眼设备，不需要如上代码
     }
 
     /**
@@ -2881,16 +3052,6 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         }
     }
 
-    private void dismissPopWindow(PopupWindow popupWindow) {
-        if (popupWindow != null && !isFinishing()) {
-            try {
-                popupWindow.dismiss();
-            } catch (Exception e) {
-                // TODO: handle exception
-            }
-        }
-    }
-
     /**
      * 发起预览到结束耗时
      */
@@ -2960,6 +3121,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         LogUtil.d(TAG, "verify code is " + verifyCode);
         DataManager.getInstance().setDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial(), verifyCode);
         if (mEZPlayer != null) {
+            mEZPlayer.setPlayVerifyCode(verifyCode);
             if (mIsStartingTalk) {
                 startVoiceTalk(mIsDeviceTalkBack);
             } else {

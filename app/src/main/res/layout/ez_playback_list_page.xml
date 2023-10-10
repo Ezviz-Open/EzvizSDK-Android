@@ -37,6 +37,7 @@
 
     </LinearLayout>
 
+    <!--播放器-->
     <RelativeLayout
         android:id="@+id/remote_playback_area"
         android:layout_width="match_parent"
@@ -59,6 +60,51 @@
                 android:id="@+id/remote_playback_wnd_sv"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
+
+            <!-- 鱼眼设备子窗口-->
+            <RelativeLayout
+                android:id="@+id/play_ptz_rl"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone">
+
+                <SurfaceView
+                    android:id="@+id/playback_sv1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent" />
+
+                <SurfaceView
+                    android:id="@+id/playback_sv2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent" />
+
+                <SurfaceView
+                    android:id="@+id/playback_sv3"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent" />
+
+                <SurfaceView
+                    android:id="@+id/playback_sv4"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent" />
+
+                <SurfaceView
+                    android:id="@+id/playback_sv5"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent" />
+
+                <SurfaceView
+                    android:id="@+id/playback_sv6"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent" />
+
+            </RelativeLayout>
 
             <LinearLayout
                 android:id="@+id/vg_error_tips"
@@ -248,6 +294,7 @@
             android:visibility="gone" />
     </RelativeLayout>
 
+    <!-- 播放控制工具类-->
     <LinearLayout
         android:id="@+id/control_area"
         android:layout_width="match_parent"
@@ -388,6 +435,16 @@
                 android:layout_centerVertical="true"
                 android:background="@drawable/fullscreen_button_selector" />
 
+            <ImageButton
+                android:id="@+id/remote_playback_viewtype_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="15dp"
+                android:layout_centerVertical="true"
+                android:background="@drawable/view_type"
+                android:visibility="gone" />
+
         </RelativeLayout>
     </LinearLayout>
 
@@ -422,7 +479,7 @@
                 android:gravity="center"
                 android:text="@string/ez_cloud_video"
                 android:textColor="@color/ez_playback_tab_color_selector"
-                android:textSize="16sp"></com.videogo.widget.CheckTextButton>
+                android:textSize="16sp" />
 
             <View
                 android:layout_width="0.5dp"

@@ -58,10 +58,10 @@ public class MainActivity extends RootActivity {
     
     // JuneCheng's AppKey
     private final static String APPKEY_JC = "fd82f9a6f0154aa2aa9284ae7af25a5b";
-    private final static String TOKEN_JC = "at.5ocqur8t6bbv7sh42tp56bng36vgdlxf-8s2uagvs5u-1y6plub-g02on3zzs";
-    // 开发者反馈问题提供的账号信息
+    private final static String TOKEN_JC = "at.18j8qb8t59ua2qy00mrwo4n0a9efwoqr-8kzo6pju2z-04i01pt-lkqfwjcf3";
+    // 开发者账号信息
     private final static String APPKEY_DEV = "26810f3acd794862b608b6cfbc32a6b8";
-    private final static String TOKEN_DEV = "at.d334kwk4choi7rmo3dj3dn0ec7ty6olm-7p34wdjf3j-03w68bj-r8asjethl";
+    private final static String TOKEN_DEV = "at.daz914gk2emtho68a66xcfy68dpsaubu-2ob42kfr0r-1knpqr6-xpu3ymjlj";
     private final static String DEVICE_DEV = "";
 
     @Override

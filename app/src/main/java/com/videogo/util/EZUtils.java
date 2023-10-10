@@ -9,6 +9,7 @@ import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
@@ -36,6 +37,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
 
 import ezviz.ezopensdk.R;
 
@@ -304,6 +306,7 @@ public class EZUtils {
         localContentValues.put(MediaStore.MediaColumns.DATE_ADDED, Long.valueOf(paramLong));
         localContentValues.put(MediaStore.MediaColumns.DATA, paramFile.getAbsolutePath());
         localContentValues.put(MediaStore.MediaColumns.SIZE, Long.valueOf(paramFile.length()));
+        
         return localContentValues;
     }
 
@@ -313,14 +316,24 @@ public class EZUtils {
      * @param file
      */
     public static void saveVideo2Album(Context context, File file) {
-        // 是否添加到相册
-        ContentResolver localContentResolver = context.getContentResolver();
-        ContentValues localContentValues = getVideoContentValues(file, System.currentTimeMillis());
-        Uri localUri = localContentResolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, localContentValues);
-        context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, localUri));
+        new Thread(() -> {
+            // 是否添加到相册
+            ContentResolver localContentResolver = context.getContentResolver();
+            ContentValues localContentValues = getVideoContentValues(context, file, System.currentTimeMillis());
+            Uri localUri = localContentResolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, localContentValues);
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    OutputStream outputStream = localContentResolver.openOutputStream(localUri);
+                    Files.copy(file.toPath(), outputStream);
+                }
+                context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, localUri));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
-    private static ContentValues getVideoContentValues(File paramFile, long paramLong) {
+    private static ContentValues getVideoContentValues(Context context, File paramFile, long paramLong) {
         ContentValues localContentValues = new ContentValues();
         localContentValues.put(MediaStore.MediaColumns.TITLE, paramFile.getName());
         localContentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, paramFile.getName());
@@ -328,8 +341,15 @@ public class EZUtils {
         localContentValues.put(MediaStore.MediaColumns.DATE_TAKEN, Long.valueOf(paramLong));
         localContentValues.put(MediaStore.MediaColumns.DATE_MODIFIED, Long.valueOf(paramLong));
         localContentValues.put(MediaStore.MediaColumns.DATE_ADDED, Long.valueOf(paramLong));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            localContentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DCIM + File.separator + context.getPackageName());
+        } else {
+            localContentValues.put(MediaStore.MediaColumns.DATA, paramFile.getAbsolutePath());
+        }
         localContentValues.put(MediaStore.MediaColumns.DATA, paramFile.getAbsolutePath());
         localContentValues.put(MediaStore.MediaColumns.SIZE, Long.valueOf(paramFile.length()));
+
         return localContentValues;
     }
+
 }

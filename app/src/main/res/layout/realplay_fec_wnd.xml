@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="300dp"
+    android:background="@color/common_bg">
+
+    <ImageButton
+        android:id="@+id/fec_close_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/play_close_selector"
+        android:onClick="onClick" />
+
+
+    <LinearLayout
+        android:id="@+id/ll_placetype"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/fec_place_wall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/fec_viewmode_left_margin"
+            android:tag="1"
+            android:text="壁装" />
+
+        <Button
+            android:id="@+id/fec_place_floor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:tag="2"
+            android:text="底装" />
+
+        <Button
+            android:id="@+id/fec_place_ceiling"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:tag="3"
+            android:text="顶装" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_correcttype1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/ll_placetype"
+        android:layout_marginTop="3dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/fec_correct_fish"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/fec_viewmode_left_margin"
+            android:tag="8"
+            android:text="默认鱼眼" />
+
+        <Button
+            android:id="@+id/fec_correct_4ptz"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:tag="1"
+            android:text="4分屏" />
+
+        <Button
+            android:id="@+id/fec_correct_5ptz"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:tag="512"
+            android:text="5分屏" />
+
+        <Button
+            android:id="@+id/fec_correct_full5ptz"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:tag="256"
+            android:text="全景5分屏" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_correcttype2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/ll_correcttype1"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/fec_correct_lat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/fec_viewmode_left_margin"
+            android:tag="16"
+            android:text="维度拉伸" />
+
+        <Button
+            android:id="@+id/fec_correct_arc_hor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:tag="32"
+            android:text="ARC" />
+
+        <Button
+            android:id="@+id/fec_correct_arc_ver"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:tag="64"
+            android:text="ARCV" />
+
+        <Button
+            android:id="@+id/fec_correct_wide_angle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:tag="2048"
+            android:text="广角" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_correcttype3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/ll_correcttype2"
+        android:layout_marginTop="@dimen/fec_viewmode_top_margin"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/fec_correct_180"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/fec_viewmode_left_margin"
+            android:tag="2"
+            android:text="180°全景" />
+
+        <Button
+            android:id="@+id/fec_correct_360"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:tag="4"
+            android:text="360°全景" />
+
+        <Button
+            android:id="@+id/fec_correct_cyc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:tag="1024"
+            android:text="柱状" />
+
+        <Button
+            android:id="@+id/fec_correct_picinpic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:tag="128"
+            android:text="画中画" />
+
+    </LinearLayout>
+
+
+</RelativeLayout>

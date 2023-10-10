@@ -75,7 +75,15 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:background="@drawable/preview_enlarge_selector" />    
+        android:background="@drawable/preview_enlarge_selector" />
+
+    <ImageButton
+        android:id="@+id/realplay_viewtype_btn"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@drawable/view_type"
+        android:visibility="gone" />
 <!--
     <Button
         android:id="@+id/play_btn"

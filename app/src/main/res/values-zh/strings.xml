@@ -250,6 +250,7 @@
     <string name="talk">对讲</string>
     <string name="capture">截图</string>
     <string name="record">录像</string>
+    <string name="viewmode">查看模式</string>
     <string name="close_camera_lens">镜头遮蔽</string>
     <string name="open_camera_lens">镜头开启</string>
     <string name="camera_lens_closed">镜头遮蔽中</string>

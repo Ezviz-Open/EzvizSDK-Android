@@ -19,6 +19,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -358,5 +359,15 @@ public class RootActivity extends Activity {
     }
 
     protected void initPresenter(){}
+
+    protected void dismissPopWindow(PopupWindow popupWindow) {
+        if (popupWindow != null && !isFinishing()) {
+            try {
+                popupWindow.dismiss();
+            } catch (Exception e) {
+                // TODO: handle exception
+            }
+        }
+    }
 
 }

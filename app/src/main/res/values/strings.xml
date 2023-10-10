@@ -237,6 +237,7 @@
     <string name="talk">Two-way Audio</string>
     <string name="capture">Snapshot</string>
     <string name="record">Video</string>
+    <string name="viewmode">View Mode</string>
     <string name="close_camera_lens">Privacy Mode</string>
     <string name="open_camera_lens">Privacy Mode</string>
     <string name="camera_lens_closed">The Privacy Mask is on.</string>

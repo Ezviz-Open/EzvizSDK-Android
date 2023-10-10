@@ -37,6 +37,7 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -61,6 +62,7 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.RelativeLayout.LayoutParams;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
@@ -68,13 +70,15 @@ import android.widget.Toast;
 
 import com.videogo.constant.Constant;
 import com.videogo.constant.IntentConsts;
+import com.videogo.openapi.EZConstants;
 import com.videogo.ui.playback.download.DownloadTaskRecordOfCloud;
 import com.videogo.ui.playback.download.DownloadTaskRecordOfDevice;
 import com.videogo.errorlayer.ErrorInfo;
 import com.videogo.exception.BaseException;
 import com.videogo.exception.ErrorCode;
 import com.videogo.exception.InnerException;
-import com.videogo.openapi.EZConstants;
+import com.videogo.openapi.EZConstants.EZFecPlaceType;
+import com.videogo.openapi.EZConstants.EZFecCorrectType;
 import com.videogo.openapi.EZConstants.EZPlaybackConstants;
 import com.videogo.openapi.EZOpenSDKListener;
 import com.videogo.openapi.EZPlaybackStreamParam;
@@ -100,6 +104,7 @@ import com.videogo.stream.EZCloudStreamDownload;
 import com.videogo.stream.EZDeviceStreamDownload;
 import com.videogo.ui.common.EZBusinessTool;
 import com.videogo.ui.common.ScreenOrientationHelper;
+import com.videogo.ui.realplay.FecViewLayoutHelper;
 import com.videogo.util.AudioPlayUtil;
 import com.videogo.util.DataManager;
 import com.videogo.util.EZUtils;
@@ -148,7 +153,6 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         OnHikItemClickListener, /*Callback*/ TextureView.SurfaceTextureListener, OnClickListener, OnTouchListener,
   ArrayAdapterChangeListener, VerifyCodeInput.VerifyCodeInputListener {
 
-
     // TAG
     private static final String TAG = EZPlayBackListActivity.class.getSimpleName();
 
@@ -189,11 +193,21 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
 
     // 加载进度圈
     private LoadingTextView loadingBar;
+    // 预览UI父视图
+     private RelativeLayout mPlayBackPlayRl;
     // 播放区域
     private RelativeLayout remotePlayBackArea;
     // 关闭播放区域按钮
     private ImageButton exitBtn;
     private TextureView mTextureView = null;
+    // 矫正模式分屏
+    private RelativeLayout playBackPtzRL;
+    private SurfaceView mPlayBackSv1;
+    private SurfaceView mPlayBackSv2;
+    private SurfaceView mPlayBackSv3;
+    private SurfaceView mPlayBackSv4;
+    private SurfaceView mPlayBackSv5;
+    private SurfaceView mPlayBackSv6;
     private CustomTouchListener mRemotePlayBackTouchListener = null;
     // 播放比例
     private float mPlayScale = 1;
@@ -335,6 +349,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
     private EZPlayer mPlaybackPlayer = null;
     private RelativeLayout mContentTabCloudRl;
     private RelativeLayout mContentTabDeviceRl;
+    private ImageView mCloudVideoImg;
     private CheckTextButton mCheckBtnCloud;
     private CheckTextButton mCheckBtnDevice;
     private FrameLayout mTabContentMainFrame;
@@ -353,6 +368,12 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
     private List<EZMenuItem> menuItems;
     private Button rightButton;
     private EZConstants.EZVideoRecordType recordType = EZ_VIDEO_RECORD_TYPE_ALL;
+
+    private PopupWindow mFecPopupWindow;// 鱼眼矫正模式pop
+    private Button[] fecCorrectTypeButtons;// 鱼眼设备矫正模式按钮数组
+    private EZFecPlaceType fecPlaceType;// 鱼眼安装模式
+    private EZFecCorrectType fecCorrectType;// 鱼眼矫正模式
+    private FecViewLayoutHelper fecViewLayoutHelper;// 鱼眼辅助类
 
     private String downloadFilePath;
     private boolean isFromPermissionSetting;// true为应用权限管理返回
@@ -620,6 +641,9 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                 }
             });
         }
+        /// 鱼眼设备专用设置，如果没有鱼眼设备，不需要如下代码
+        initFecView();
+        /// 鱼眼设备专用设置，如果没有鱼眼设备，不需要如上代码
     }
 
     private void fakePerformClickUI() {
@@ -787,11 +811,22 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
 //        }
         progressSeekbar.setVisibility(View.VISIBLE);
         mPlaybackRateBtn.setEnabled(true);
+        /// 鱼眼设备专用设置，如果没有鱼眼设备，不需要如下代码
+        if (fecViewLayoutHelper != null) {
+            fecViewLayoutHelper.openFecCorrect(fecCorrectType, fecPlaceType);
+        }
+        /// 鱼眼设备专用设置，如果没有鱼眼设备，不需要如上代码
     }
 
     // 收到停止回放成功的消息后处理
     private void handleStopPlayback() {
         LogUtil.d(TAG, "stop playback success");
+        /// 鱼眼设备专用设置，如果没有鱼眼设备，不需要如下代码
+        if (fecViewLayoutHelper != null) {
+            fecViewLayoutHelper.resetFecType();
+            closeFecViewModePopupWindow();
+        }
+        /// 鱼眼设备专用设置，如果没有鱼眼设备，不需要如上代码
     }
 
     private void setRemoteListSvLayout() {
@@ -846,6 +881,11 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         } else {
             mPlaybackPlayer = getOpenSDK().createPlayer(mCameraInfo.getDeviceSerial(), mCameraInfo.getCameraNo());
             mPlaybackPlayer.setPlayVerifyCode(DataManager.getInstance().getDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial()));
+            /// 鱼眼设备专用设置，如果没有鱼眼设备，不需要如下代码
+            if (FecViewLayoutHelper.isFecDevice(mDeviceInfo)) {
+                fecViewLayoutHelper.player = mPlaybackPlayer;
+            }
+            /// 鱼眼设备专用设置，如果没有鱼眼设备，不需要如上代码
         }
     }
 
@@ -1014,6 +1054,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                         Calendar seekTime = Calendar.getInstance();
                         seekTime.setTime(new Date(trackTime));
                         mPlaybackPlayer.seekPlayback(seekTime);
+                        mPlaybackRateBtn.setText("1x");
                     }
                 }
             }
@@ -1442,6 +1483,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
     public void initUi() {
         mContentTabCloudRl = (RelativeLayout) findViewById(R.id.content_tab_cloud_root);
         mContentTabDeviceRl = (RelativeLayout) findViewById(R.id.content_tab_device_root);
+        mCloudVideoImg = (ImageView) findViewById(R.id.img_active_cloud_video);
         mCheckBtnCloud = (CheckTextButton) findViewById(R.id.pb_search_tab_btn_cloud);
         mCheckBtnDevice = (CheckTextButton) findViewById(R.id.pb_search_tab_btn_device);
         mTabContentMainFrame = (FrameLayout) findViewById(R.id.ez_tab_content_frame);
@@ -1519,6 +1561,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         remotePlayBackArea = (RelativeLayout) findViewById(R.id.remote_playback_area);
         endTimeTV = (TextView) findViewById(R.id.end_time_tv);
         exitBtn = (ImageButton) findViewById(R.id.exit_btn);
+        playBackPtzRL = findViewById(R.id.play_ptz_rl);
         mTextureView = findViewById(R.id.remote_playback_wnd_sv);
         mTextureView.setSurfaceTextureListener(this);
         mRemotePlayBackRatioTv = (TextView) findViewById(R.id.remoteplayback_ratio_tv);
@@ -1627,14 +1670,39 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         if (mCameraInfo != null) {
             mLandscapeTitleBar.setTitle(mCameraInfo.getCameraName());
         }
-        mLandscapeTitleBar.addBackButton(new OnClickListener() {
+        mLandscapeTitleBar.addBackButton(v -> onBackPressed());
+    }
 
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+    /** 鱼眼设备专用设置 */
+    private void initFecView() {
+        if (FecViewLayoutHelper.isFecDevice(mDeviceInfo)) {
+            // 鱼眼设备显示"查看模式" & 调整画面比例为1:1
+            mFullscreenButton.setVisibility(View.GONE);// 鱼眼设备不支持全屏，隐藏全屏按钮
+            mCloudVideoImg.setVisibility(View.GONE);// 页面太挤，图片不显示
+            ImageButton viewTypeBtn = (ImageButton) findViewById(R.id.remote_playback_viewtype_btn);
+            viewTypeBtn.setVisibility(View.VISIBLE);
+            viewTypeBtn.setOnClickListener(v -> openFecViewModePopupWindow(controlArea));
 
+            fecPlaceType = EZFecPlaceType.EZ_FEC_PLACE_CEILING;// demo中默认顶装
+            fecCorrectType = EZFecCorrectType.EZ_FEC_CORRECT_FISH;// demo中默认鱼眼（原始码流）
+            mRealRatio = 1;
+
+            mPlayBackSv1 = (SurfaceView) findViewById(R.id.playback_sv1);
+            mPlayBackSv2 = (SurfaceView) findViewById(R.id.playback_sv2);
+            mPlayBackSv3 = (SurfaceView) findViewById(R.id.playback_sv3);
+            mPlayBackSv4 = (SurfaceView) findViewById(R.id.playback_sv4);
+            mPlayBackSv5 = (SurfaceView) findViewById(R.id.playback_sv5);
+            mPlayBackSv6 = (SurfaceView) findViewById(R.id.playback_sv6);
+            ViewGroup playWindowVg = (ViewGroup) findViewById(R.id.vg_play_window);
+
+            // fecViewLayoutHelper中的.player & .fecPopupWindow 需要延后设置，全局搜索查看
+            fecViewLayoutHelper = new FecViewLayoutHelper(this);
+            fecViewLayoutHelper.playerView = mTextureView;
+            fecViewLayoutHelper.playWindowVg = playWindowVg;
+            fecViewLayoutHelper.playPtzRL = playBackPtzRL;
+            fecViewLayoutHelper.setSurfaceViews(new SurfaceView[]{mPlayBackSv1, mPlayBackSv2, mPlayBackSv3, mPlayBackSv4, mPlayBackSv5, mPlayBackSv6});
+            playWindowVg.post(() -> fecViewLayoutHelper.setPlayViewAspectRadioWith1V1());
+        }
     }
 
     private void startGifAnimation() {
@@ -2825,6 +2893,130 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         } else {
             toast("failed to change to " + targetRateWithX);
         }
+    }
+
+    /**
+     * 打开鱼眼矫正模式操作弹出框
+     * @param parent
+     */
+    private void openFecViewModePopupWindow(View parent) {
+        closeFecViewModePopupWindow();
+
+        LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        ViewGroup layoutView = (ViewGroup) layoutInflater.inflate(R.layout.realplay_fec_wnd, null, true);
+        layoutView.findViewById(R.id.fec_close_btn).setOnClickListener(mOnFecWndClickListener);
+
+        Button placeWallBtn = layoutView.findViewById(R.id.fec_place_wall);
+        Button placeFloorBtn = layoutView.findViewById(R.id.fec_place_floor);
+        Button placeCeilingBtn = layoutView.findViewById(R.id.fec_place_ceiling);
+        Button correctFishBtn = layoutView.findViewById(R.id.fec_correct_fish);
+        Button correct4PtzBtn = layoutView.findViewById(R.id.fec_correct_4ptz);
+        Button correct5PtzBtn = layoutView.findViewById(R.id.fec_correct_5ptz);
+        Button correctFull5PtzBtn = layoutView.findViewById(R.id.fec_correct_full5ptz);
+        Button correctLatBtn = layoutView.findViewById(R.id.fec_correct_lat);
+        Button correctARCHorBtn = layoutView.findViewById(R.id.fec_correct_arc_hor);
+        Button correctARCVerBtn = layoutView.findViewById(R.id.fec_correct_arc_ver);
+        Button correctWideAngleBtn = layoutView.findViewById(R.id.fec_correct_wide_angle);
+        Button correct180Btn = layoutView.findViewById(R.id.fec_correct_180);
+        Button correct360Btn = layoutView.findViewById(R.id.fec_correct_360);
+        Button correctCycBtn = layoutView.findViewById(R.id.fec_correct_cyc);
+        fecCorrectTypeButtons = new Button[] {
+                correct4PtzBtn, correct5PtzBtn, correctFull5PtzBtn,
+                correctLatBtn, correctARCHorBtn, correctARCVerBtn,
+                correctWideAngleBtn, correct180Btn, correct360Btn,
+                correctCycBtn
+        };
+
+        placeWallBtn.setOnClickListener(mOnFecWndClickListener);
+        placeFloorBtn.setOnClickListener(mOnFecWndClickListener);
+        placeCeilingBtn.setOnClickListener(mOnFecWndClickListener);
+        correctFishBtn.setOnClickListener(mOnFecWndClickListener);
+        correct4PtzBtn.setOnClickListener(mOnFecWndClickListener);
+        correct5PtzBtn.setOnClickListener(mOnFecWndClickListener);
+        correctFull5PtzBtn.setOnClickListener(mOnFecWndClickListener);
+        correctLatBtn.setOnClickListener(mOnFecWndClickListener);
+        correctARCHorBtn.setOnClickListener(mOnFecWndClickListener);
+        correctARCVerBtn.setOnClickListener(mOnFecWndClickListener);
+        correctWideAngleBtn.setOnClickListener(mOnFecWndClickListener);
+        correct180Btn.setOnClickListener(mOnFecWndClickListener);
+        correct360Btn.setOnClickListener(mOnFecWndClickListener);
+        correctCycBtn.setOnClickListener(mOnFecWndClickListener);
+        // 设置按钮的可见和可用状态
+        int wallTypeValue = FecViewLayoutHelper.getSupportInt(EZFecPlaceType.EZ_FEC_PLACE_WALL, mDeviceInfo);
+        int floorTypeValue = FecViewLayoutHelper.getSupportInt(EZFecPlaceType.EZ_FEC_PLACE_FLOOR, mDeviceInfo);
+        int ceilingTypeValue = FecViewLayoutHelper.getSupportInt(EZFecPlaceType.EZ_FEC_PLACE_CEILING, mDeviceInfo);
+        placeWallBtn.setVisibility(wallTypeValue > 0 ? View.VISIBLE : View.GONE);
+        placeFloorBtn.setVisibility(floorTypeValue > 0 ? View.VISIBLE : View.GONE);
+        placeCeilingBtn.setVisibility(ceilingTypeValue > 0 ? View.VISIBLE : View.GONE);
+        setFecCorrectTypeBtnsEnable(fecPlaceType);
+
+        int height = localInfo.getScreenHeight() - mTitleBar.getHeight() - remotePlayBackArea.getHeight() - controlArea.getHeight()
+                - (mRemotePlayBackRect != null ? mRemotePlayBackRect.top : localInfo.getNavigationBarHeight());
+        mFecPopupWindow = new PopupWindow(layoutView, LayoutParams.MATCH_PARENT, height, true);
+        mFecPopupWindow.setBackgroundDrawable(new BitmapDrawable());
+        mFecPopupWindow.setAnimationStyle(R.style.popwindowUpAnim);
+        mFecPopupWindow.setFocusable(false);
+        mFecPopupWindow.setOutsideTouchable(false);
+        mFecPopupWindow.showAsDropDown(parent);
+        mFecPopupWindow.update();
+
+        fecViewLayoutHelper.fecPopupWindow = mFecPopupWindow;
+    }
+
+    /**
+     * 关闭鱼眼查看模式操作弹出框
+     */
+    private void closeFecViewModePopupWindow() {
+        if (mFecPopupWindow != null) {
+            dismissPopWindow(mFecPopupWindow);
+            mFecPopupWindow = null;
+            fecViewLayoutHelper.fecPopupWindow = null;// fecViewLayoutHelper中的窗口对象置空，必须
+        }
+    }
+
+    /**
+     * 鱼眼矫正模式的点击事件
+     */
+    private OnClickListener mOnFecWndClickListener = v -> {
+        // 没有在播放，拦截
+        if (status != RemoteListContant.STATUS_PLAYING) {
+            return;
+        }
+        switch (v.getId()) {
+            case R.id.fec_place_wall:// 壁装
+            case R.id.fec_place_floor:// 底装
+            case R.id.fec_place_ceiling:// 顶装
+                fecPlaceType = EZFecPlaceType.values()[Integer.parseInt(String.valueOf(v.getTag()))];
+                setFecCorrectTypeBtnsEnable(fecPlaceType);
+                break;
+            case R.id.fec_correct_fish:// 默认鱼眼
+            case R.id.fec_correct_4ptz:// 4分屏
+            case R.id.fec_correct_5ptz:// 5分屏
+            case R.id.fec_correct_full5ptz:// 全景5分屏
+            case R.id.fec_correct_lat:// 维度拉伸
+            case R.id.fec_correct_arc_hor:// ARC
+            case R.id.fec_correct_arc_ver:// ARCV
+            case R.id.fec_correct_wide_angle:// 广角
+            case R.id.fec_correct_180:// 180°全景
+            case R.id.fec_correct_360:// 360°全景
+            case R.id.fec_correct_cyc:// 柱状
+                fecCorrectType = FecViewLayoutHelper.getFecCorrectTypeFromTag(Integer.parseInt(String.valueOf(v.getTag())));
+                fecViewLayoutHelper.openFecCorrect(fecCorrectType, fecPlaceType);
+                break;
+            case R.id.fec_close_btn:
+                closeFecViewModePopupWindow();
+                break;
+            default:
+                break;
+        }
+    };
+
+    /**
+     * 根据安装模式和能力集设置哪些矫正模式可用
+     */
+    private void setFecCorrectTypeBtnsEnable(EZFecPlaceType fecPlaceType) {
+        int supportValue = FecViewLayoutHelper.getSupportInt(fecPlaceType, mDeviceInfo);
+        FecViewLayoutHelper.setFecCorrectButtonsState(fecCorrectTypeButtons, supportValue);
     }
 
     private void showStreamType(int streamType) {

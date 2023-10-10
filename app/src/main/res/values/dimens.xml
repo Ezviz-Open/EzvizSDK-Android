@@ -91,5 +91,8 @@
     <!--功能控件宽度-->
     <dimen name="width_functional_widget">100dp</dimen>
 
+    <!--鱼眼查看模式-->
+    <dimen name="fec_viewmode_left_margin">5dp</dimen>
+    <dimen name="fec_viewmode_top_margin">0dp</dimen>
 
 </resources>
