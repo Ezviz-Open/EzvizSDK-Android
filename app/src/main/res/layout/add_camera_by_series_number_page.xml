@@ -3,14 +3,12 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="@color/application_bg"
-    android:orientation="vertical"
-    >
+    android:orientation="vertical">
 
     <com.videogo.widget.TitleBar
         android:id="@+id/title_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        />
+        android:layout_height="wrap_content" />
 
     <RelativeLayout
         android:id="@+id/inputLinearlayout"
@@ -18,8 +16,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/title_bar"
         android:layout_marginTop="35dp"
-        android:visibility="visible"
-        >
+        android:visibility="visible">
         <!--
                 <ImageButton
                     android:id="@+id/searchBtn"
@@ -39,8 +36,7 @@
             android:layout_height="50dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
-            android:background="@color/white"
-            >
+            android:background="@color/white">
 
             <EditText
                 android:id="@+id/seriesNumberEt"
@@ -57,8 +53,7 @@
                 android:singleLine="true"
                 android:textColor="@color/gray_text"
                 android:textColorHint="@color/gray"
-                android:textSize="@dimen/tab_text_size"
-                />
+                android:textSize="@dimen/tab_text_size" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -67,10 +62,9 @@
             android:layout_height="50dp"
             android:layout_below="@+id/searchEditTextContainer"
             android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
             android:layout_marginTop="20dp"
-            android:background="@color/white"
-            >
+            android:layout_marginRight="5dp"
+            android:background="@color/white">
 
             <EditText
                 android:id="@+id/verifycodeEt"
@@ -87,8 +81,7 @@
                 android:singleLine="true"
                 android:textColor="@color/gray_text"
                 android:textColorHint="@color/gray"
-                android:textSize="@dimen/tab_text_size"
-                />
+                android:textSize="@dimen/tab_text_size" />
         </RelativeLayout>
 
         <Button
@@ -97,14 +90,13 @@
             android:layout_height="50dp"
             android:layout_below="@id/verifycodeEditTextContainer"
             android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
             android:layout_marginTop="40dp"
+            android:layout_marginRight="15dp"
             android:background="@drawable/login_btn_selector"
             android:onClick="onClick"
             android:scaleType="fitCenter"
             android:text="@string/next_button_txt"
-            android:textColor="@color/white"
-            />
+            android:textColor="@color/white" />
 
         <TextView
             android:layout_width="match_parent"
@@ -113,13 +105,12 @@
             android:background="@color/common_bg"
             android:gravity="center"
             android:paddingLeft="@dimen/device_set_padding"
-            android:paddingRight="@dimen/device_set_padding"
             android:paddingTop="@dimen/device_set_text_padding"
+            android:paddingRight="@dimen/device_set_padding"
             android:text="@string/probe_not_support_tip"
             android:textColor="@color/setting_hint_text"
             android:textSize="@dimen/device_set_text_size"
-            android:visibility="gone"
-            />
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/querying_camera_tv"
@@ -141,15 +132,13 @@
         android:layout_below="@+id/title_bar"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:visibility="gone"
-        >
+        android:visibility="gone">
 
         <RelativeLayout
             android:layout_width="175dp"
             android:layout_height="165dp"
             android:layout_marginTop="50dp"
-            android:background="@drawable/results_pic_bg"
-            >
+            android:background="@drawable/results_pic_bg">
 
             <ImageView
                 android:id="@+id/deviceIcon"
@@ -157,8 +146,7 @@
                 android:layout_height="fill_parent"
                 android:layout_centerInParent="true"
                 android:scaleType="fitXY"
-                android:src="@drawable/results_pic_default"
-                />
+                android:src="@drawable/results_pic_default" />
         </RelativeLayout>
 
         <TextView
@@ -168,8 +156,7 @@
             android:layout_marginTop="10dp"
             android:text=""
             android:textColor="@color/common_text"
-            android:textSize="@dimen/loading_text_size"
-            />
+            android:textSize="@dimen/loading_text_size" />
 
         <TextView
             android:id="@+id/tvStatus"
@@ -178,78 +165,71 @@
             android:layout_marginTop="15dp"
             android:text="@string/scan_network_unavailible"
             android:textColor="@color/common_text"
-            android:textSize="@dimen/loading_text_size"
-            />
+            android:textSize="@dimen/loading_text_size" />
 
         <Button
             android:id="@+id/btnNext"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
             android:layout_marginTop="20dp"
+            android:layout_marginRight="10dp"
             android:background="@drawable/login_btn_selector"
             android:text="@string/scan_connet_network"
-            android:textColor="@color/white"
-            />
+            android:textColor="@color/white" />
 
         <Button
             android:id="@+id/unbind_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
             android:layout_marginTop="20dp"
+            android:layout_marginRight="10dp"
             android:background="@drawable/btn_white_selector"
             android:gravity="center"
             android:text="@string/unbind_to_bind"
             android:textColor="#1b9ee2"
-            android:visibility="gone"
-            />
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/activateHint"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
             android:layout_marginTop="17.3dp"
+            android:layout_marginRight="10dp"
             android:background="@drawable/btn_white_selector"
             android:gravity="center"
             android:text="@string/promptUserToActivate"
             android:textColor="#1b9ee2"
-            android:visibility="gone"
-            />
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/addBtn"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
             android:layout_marginTop="20dp"
+            android:layout_marginRight="10dp"
             android:background="@drawable/login_btn_selector"
             android:text="@string/scan_add"
-            android:textColor="@color/white"
-            />
+            android:textColor="@color/white" />
 
         <View
             android:layout_width="1dp"
             android:layout_height="0dp"
-            android:layout_weight="1"
-            />
+            android:layout_weight="1" />
 
         <TextView
             android:id="@+id/connectTip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
+            android:layout_marginBottom="20dp"
             android:text="@string/please_connect_the_power"
             android:textColor="@color/auto_tip_text"
-            android:textSize="@dimen/content_text_size"
-            />
+            android:textSize="@dimen/content_text_size" />
     </LinearLayout>
 
     <LinearLayout
@@ -262,8 +242,7 @@
         android:gravity="center"
         android:orientation="vertical"
         android:padding="10dp"
-        android:visibility="gone"
-        >
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/failedMsg"
@@ -271,8 +250,7 @@
             android:layout_height="wrap_content"
             android:text="@string/no_result_text"
             android:textColor="@color/black_text"
-            android:textSize="@dimen/assistant_text_size"
-            />
+            android:textSize="@dimen/assistant_text_size" />
 
         <Button
             android:id="@+id/myRetry"
@@ -283,8 +261,7 @@
             android:onClick="onClick"
             android:text="@string/refresh"
             android:textColor="@color/white"
-            android:textSize="@dimen/title_text_size"
-            />
+            android:textSize="@dimen/title_text_size" />
     </LinearLayout>
 
     <LinearLayout
@@ -294,8 +271,7 @@
         android:layout_below="@+id/title_bar"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:visibility="visible"
-        >
+        android:visibility="visible">
 
         <!-- android:background="@drawable/input_shade" -->
 
@@ -304,9 +280,19 @@
             android:layout_width="150dp"
             android:layout_height="165dp"
             android:layout_marginTop="35dp"
-            android:background="@anim/device_search_bg"
-            />
+            android:background="@anim/device_search_bg" />
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/touchAP"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:onClick="onTouchClick"
+        android:text="接触式配网"
+        android:visibility="gone" />
 
 </RelativeLayout>

@@ -25,12 +25,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.android.arouter.facade.Postcard;
+import com.alibaba.android.arouter.facade.callback.NavCallback;
+import com.alibaba.android.arouter.launcher.ARouter;
 import com.videogo.constant.Constant;
 import com.videogo.constant.IntentConsts;
 import com.videogo.errorlayer.ErrorInfo;
 import com.videogo.exception.BaseException;
 import com.videogo.exception.ErrorCode;
 import com.videogo.exception.ExtraException;
+import com.videogo.openapi.EzvizAPI;
 import com.videogo.openapi.bean.EZProbeDeviceInfoResult;
 import com.videogo.ui.adddevice.device.DeviceModel;
 import com.videogo.ui.adddevice.presenter.ApLinkConfigWifiPresenterForFullSdk;
@@ -48,6 +52,7 @@ import com.videogo.ui.adddevice.presenter.SmartConfigWifiPresenterForFullSdk;
 import com.videogo.ui.adddevice.presenter.SoundWaveConfigWifiPresenterForFullSdk;
 import ezviz.ezopensdkcommon.common.IntentConstants;
 import ezviz.ezopensdkcommon.common.RootActivity;
+import ezviz.ezopensdkcommon.common.RouteNavigator;
 import ezviz.ezopensdkcommon.configwifi.AutoWifiNetConfigActivity;
 import ezviz.ezopensdkcommon.configwifi.AutoWifiPrepareStepOneActivity;
 import ezviz.ezopensdkcommon.configwifi.ConfigWifiExecutingActivityPresenter;
@@ -226,6 +231,10 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
 
         ImageView searchAnim = (ImageView) findViewById(R.id.searchAnim);
         ((AnimationDrawable) searchAnim.getBackground()).start();
+        // 国内支持，海外不支持
+        if (!EzvizAPI.getInstance().isUsingGlobalSDK()) {
+            findViewById(R.id.touchAP).setVisibility(View.VISIBLE);
+        }
     }
 
 
@@ -323,6 +332,25 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
             default:
                 break;
         }
+    }
+
+    /**
+     * 接触式配网
+     */
+    public void onTouchClick(View view) {
+        LogUtil.i(TAG, "onTouchClick");
+        ARouter.getInstance().build(RouteNavigator.TOUCH_AP_WIFICONFIG_PAGE)
+                .navigation(this, new NavCallback() {
+                    @Override
+                    public void onArrival(Postcard postcard) {
+
+                    }
+
+                    @Override
+                    public void onLost(Postcard postcard) {
+                        // do nothing
+                    }
+                });
     }
 
     private void showWifiRequiredDialog() {

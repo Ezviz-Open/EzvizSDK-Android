@@ -1,17 +1,33 @@
 package com.videogo.ui.adddevice;
 
+import android.Manifest;
+import android.annotation.TargetApi;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.provider.Settings;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 
 import com.videogo.exception.BaseException;
 import com.videogo.util.ConnectionDetector;
+import com.videogo.util.LocalInfo;
 import com.videogo.util.LocalValidate;
 import com.videogo.util.LogUtil;
 import com.videogo.widget.TitleBar;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import cn.bingoogolapple.qrcode.core.QRCodeView;
 import cn.bingoogolapple.qrcode.zxing.ZXingView;
@@ -29,6 +45,11 @@ public class CaptureActivity extends RootActivity implements QRCodeView.Delegate
 
     private ZXingView mZXingView;
 
+    /**
+     * true为应用权限管理返回
+     */
+    private boolean isFromPermissionSetting;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,13 +66,16 @@ public class CaptureActivity extends RootActivity implements QRCodeView.Delegate
         });
         mZXingView = findViewById(R.id.zxingview);
         mZXingView.setDelegate(this);
+        checkPermissions();
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        mZXingView.startCamera(); // 打开后置摄像头开始预览，但是并未开始识别
-        mZXingView.startSpotAndShowRect(); // 显示扫描框，并且延迟0.1秒后开始识别
+    protected void onResume() {
+        super.onResume();
+        if (isFromPermissionSetting) {
+            checkPermissions();
+            isFromPermissionSetting = false;
+        }
     }
 
     @Override
@@ -223,4 +247,93 @@ public class CaptureActivity extends RootActivity implements QRCodeView.Delegate
         intent.putExtras(bundle);
         CaptureActivity.this.startActivity(intent);
     }
+
+    public void checkPermissions() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            checkAndRequestPermission();
+        } else {
+            afterHasPermission();
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private void checkAndRequestPermission() {
+        List<String> lackedPermission = new ArrayList<>();
+        if (!(checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)) {
+            lackedPermission.add(Manifest.permission.CAMERA);
+        }
+        // 权限都已经有了
+        if (lackedPermission.size() == 0) {
+            afterHasPermission();
+        } else {
+            // 请求所缺少的权限，在onRequestPermissionsResult中再看是否获得权限
+            String[] requestPermissions = new String[lackedPermission.size()];
+            lackedPermission.toArray(requestPermissions);
+            requestPermissions(requestPermissions, 1000);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1000 && hasAllPermissionsGranted(grantResults)) {
+            afterHasPermission();
+        } else {
+            try {
+                showPermissionDialog();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 权限设置
+     */
+    private void showPermissionDialog() {
+        AlertDialog dialog = new AlertDialog.Builder(CaptureActivity.this)
+                .setMessage("应用缺少必要的权限！请点击\"权限\"，打开所需要的权限。")
+                .setPositiveButton("去设置", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        isFromPermissionSetting = true;
+                        dialog.dismiss();
+                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        intent.setData(Uri.parse("package:" + getPackageName()));
+                        startActivity(intent);
+                    }
+                })
+                .setNegativeButton("退出应用", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        finish();
+                        System.exit(0);
+                    }
+                }).create();
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(CaptureActivity.this, R.color.black));
+        //设置居中，解决Android9.0 AlertDialog不居中问题
+        Window dialogWindow = dialog.getWindow();
+        WindowManager.LayoutParams p = dialogWindow.getAttributes();
+        p.width = (int) (LocalInfo.getInstance().getScreenWidth() * 0.9);
+        p.gravity = Gravity.CENTER;
+        dialogWindow.setAttributes(p);
+    }
+
+    private void afterHasPermission() {
+        mZXingView.startCamera(); // 打开后置摄像头开始预览，但是并未开始识别
+        mZXingView.startSpotAndShowRect(); // 显示扫描框，并且延迟0.1秒后开始识别
+    }
+
+    private boolean hasAllPermissionsGranted(int[] grantResults) {
+        for (int grantResult : grantResults) {
+            if (grantResult == PackageManager.PERMISSION_DENIED) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 }
