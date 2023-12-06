@@ -105,7 +105,7 @@ public class EZVideoMeetingService extends Service {
         int resultCode = intent.getIntExtra(SCREEN_PARAM_CODE, -1);
         int requestCode = intent.getIntExtra(SCREEN_PARAM_REQUEST, -1);
         Intent data = intent.getParcelableExtra(SCREEN_PARAM_DATA);
-        mEZRtc.onActivityResult(requestCode, resultCode, data);
+        mEZRtc.onActivityResult(requestCode, resultCode, data, this);
     }
 
     private Notification createNotificationChannel(){

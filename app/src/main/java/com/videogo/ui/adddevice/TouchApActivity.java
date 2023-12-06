@@ -37,9 +37,9 @@ import ezviz.ezopensdkcommon.common.RouteNavigator;
 public class TouchApActivity extends RootActivity implements View.OnClickListener {
 
     // WiFi名称
-    private final static String SSID_Name = "ezviz_mobile_AV";
+    private final static String SSID_Name = "";
     // WiFi密码
-    private final static String SSID_Pwd = "chengjun7";
+    private final static String SSID_Pwd = "";
 
     private DeviceTokenInfo tokenInfo;
     private Timer mTimer;

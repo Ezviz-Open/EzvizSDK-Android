@@ -1965,7 +1965,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             mPinnedHeaderListViewForLocal.startAnimation();
             mSectionAdapterForLocal.setOnHikItemClickListener(EZPlayBackListActivity.this);
         }
-        if (!EzvizAPI.getInstance().isUsingGlobalSDK()) {
+        if (!EzvizAPI.getInstance().isUsingGlobalSDK() && mDeviceInfo.isSupportSdCover()) {// 国内 & 支持SD卡录像封面
             // 去获取SD卡视频封面
             List<EZDeviceRecordFile> recordFiles = new ArrayList<>();
             for (int i = 0; i < cloudPartInfoFile.size(); i ++) {
@@ -2518,6 +2518,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                         @Override
                         public void run() {
                             mPlaybackPlayer.resumePlayback();
+                            mPlaybackRateBtn.setText("1x");
                         }
                     });
                 }
