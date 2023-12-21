@@ -58,11 +58,11 @@ public class MainActivity extends RootActivity {
     
     // JuneCheng's AppKey
     private final static String APPKEY_JC = "fd82f9a6f0154aa2aa9284ae7af25a5b";
-    private final static String TOKEN_JC = "at.6tse7wq5b6xm8oa0arsmia2k3wiuublv-3617saq39l-0c51ty8-gb0z1efmn";
+    private final static String TOKEN_JC = "at.8kxdtnxpaj98w0ko0itug0os8cccyrlv-2docrlhcwu-14r1u4i-ytjogtwzl";
     // 开发者账号信息
-    private final static String APPKEY_DEV = "26810f3acd794862b608b6cfbc32a6b8";
-    private final static String TOKEN_DEV = "at.a4jghxw474bh6e1s18kvzhz25d733toq-7p38y4ttfh-0wrsfvh-fyffgyprx";
-    private final static String DEVICE_DEV = "BA7248908";
+    private final static String APPKEY_DEV = "16570cc49f30458fb514977936ac1526";
+    private final static String TOKEN_DEV = "at.9zsnd34u5a0zadey075q20l52o8jrobf-9gw8lcpt5x-0qdpak0-weccxkfpo";
+    private final static String DEVICE_DEV = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -198,7 +198,7 @@ public class MainActivity extends RootActivity {
      */
     private void loadDefaultSdkInitParams() {
         mInitParams = SdkInitParams.createBy(null);
-        mInitParams.appKey = "fd82f9a6f0154aa2aa9284ae7af25a5b";
+        mInitParams.appKey = APPKEY_JC;
         mInitParams.openApiServer = "https://open.ys7.com";
         mInitParams.openAuthApiServer = "https://openauth.ys7.com";
     }

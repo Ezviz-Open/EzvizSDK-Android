@@ -85,6 +85,22 @@
             android:paddingBottom="10dp"
             android:onClick="onClickAutoTest"/>
 
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="P2P开启"
+            android:layout_marginTop="10dp"
+            android:paddingBottom="10dp"
+            android:onClick="onClickP2pOpen"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="P2P关闭"
+            android:layout_marginTop="10dp"
+            android:paddingBottom="10dp"
+            android:onClick="onClickP2pClose"/>
+
     </LinearLayout>
 
 </RelativeLayout>

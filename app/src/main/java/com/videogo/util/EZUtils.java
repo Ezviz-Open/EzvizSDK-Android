@@ -103,8 +103,11 @@ public class EZUtils {
         if (deviceInfo == null) {
             return null;
         }
-        if (deviceInfo.getCameraNum() > 0 && deviceInfo.getCameraInfoList() != null && deviceInfo.getCameraInfoList().size() > camera_index) {
+        // 没有通道信息，则取子设备信息；如果自己的设备没有挂载在网关下的话，不用考虑子设备
+        if (deviceInfo.getCameraInfoList() != null && deviceInfo.getCameraInfoList().size() > camera_index) {// 通道信息
             return deviceInfo.getCameraInfoList().get(camera_index);
+        } else if (deviceInfo.getSubDeviceInfoList() != null && deviceInfo.getSubDeviceInfoList().size() > camera_index) {// 子设备信息
+            return deviceInfo.getSubDeviceInfoList().get(camera_index);
         }
         return null;
     }

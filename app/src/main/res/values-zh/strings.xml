@@ -4,7 +4,7 @@
     <string name="cameras_txt">我的</string>
     <string name="app_name">EZOpenSDK</string>
     <string name="exit">确定退出登录</string>
-    <string name="exit_tip">是否要切换到其他账号？ \注意：当前app将会被强制关闭，请重新手动打开它！</string>
+    <string name="exit_tip">是否要切换到其他账号？ \n注意：当前app将会被强制关闭，请重新手动打开它！</string>
     <string name="confirm">确定</string>
     <string name="cancel">取消</string>
     <string name="certain">确定</string>
@@ -71,6 +71,7 @@
     <string name="scan_cue_txt">请将设备机身或说明书上的二维码放置在扫描框内，手机将自动识别</string>
     <string name="scan_title_txt">序列号扫描</string>
     <string name="get_camera_list_fail">获取设备列表失败</string>
+    <string name="not_camera_device">该设备不是视频类设备</string>
     <string name="refresh">重试</string>
     <string name="later_alarm">消息推送</string>
     <string name="today">今天</string>

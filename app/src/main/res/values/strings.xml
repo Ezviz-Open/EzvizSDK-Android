@@ -66,6 +66,7 @@
     <string name="scan_cue_txt">Scan the QR code on the device or the cover of the Quick Start Guide.</string>
     <string name="scan_title_txt">Scan Serial No.</string>
     <string name="get_camera_list_fail">Getting device list failed.</string>
+    <string name="not_camera_device">is not camera device.</string>
     <string name="refresh">Try Again</string>
     <string name="later_alarm">Push Notification(s)</string>
     <string name="today">Today</string>
@@ -528,7 +529,7 @@
     <string name="access_token">"AccessToken:"</string>
     <string name="string_ezopenurl">"Url:"</string>
     <string name="string_apiurl">"ApiUrl:"</string>
-    <string name="string_authurl">"WebUrl:"</string>
+    <string name="string_authurl">"AuthUrl:"</string>
     <string name="string_deviceserial">"device_serial:"</string>
     <string name="server_area">ServerArea:</string>
     <string name="start_to_experience">start to experience !</string>

@@ -629,16 +629,17 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         // 国内支持SD卡录像封面获取，海外不支持
         if (!EzvizAPI.getInstance().isUsingGlobalSDK()) {
             // 与设备建立链接，获取SD卡录像封面（页面退出的时候必须断开链接，释放资源，见onDestroy方法）
-            RecordCoverFetcherManager.getInstance().initFetcher(this, mCameraInfo.getDeviceSerial(), mCameraInfo.getCameraNo(), new RecordCoverFetcherManager.RecordCoverFetcherInitCallBack() {
-                @Override
-                public void onFetcherInitSuccess() {
+            RecordCoverFetcherManager.getInstance().initFetcher(this, mCameraInfo.getDeviceSerial(), mCameraInfo.getCameraNo(),
+                    new RecordCoverFetcherManager.RecordCoverFetcherInitCallBack() {
+                        @Override
+                        public void onFetcherInitSuccess() {
 
-                }
+                        }
 
-                @Override
-                public void onFetcherInitFailed() {
+                        @Override
+                        public void onFetcherInitFailed() {
 
-                }
+                        }
             });
         }
         /// 鱼眼设备专用设置，如果没有鱼眼设备，不需要如下代码
@@ -751,7 +752,8 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                     errorInfoText = getErrorTip(R.string.remoteplayback_fail, errorCode);
                 }
                 showPlayEventTip(errorInfoText);
-                if (errorCode == ErrorCode.ERROR_CAS_STREAM_RECV_ERROR || errorCode == ErrorCode.ERROR_TRANSF_DEVICE_OFFLINE || errorCode == ErrorCode.ERROR_CAS_PLATFORM_CLIENT_REQUEST_NO_PU_FOUNDED || errorCode == ErrorCode.ERROR_CAS_MSG_PU_NO_RESOURCE) {
+                if (errorCode == ErrorCode.ERROR_CAS_STREAM_RECV_ERROR || errorCode == ErrorCode.ERROR_TRANSF_DEVICE_OFFLINE ||
+                        errorCode == ErrorCode.ERROR_CAS_PLATFORM_CLIENT_REQUEST_NO_PU_FOUNDED || errorCode == ErrorCode.ERROR_CAS_MSG_PU_NO_RESOURCE) {
                     updateCameraInfo();
                 }
             }
@@ -859,7 +861,8 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         progressSeekbar.setProgress(progress);
         progressBar.setProgress(progress);
 
-        LogUtil.i(TAG, "handlePlayProgress, begin time:" + begin + " endtime:" + end + " osdTime:" + osdTime.getTimeInMillis() + " " + "progress:" + progress);
+        LogUtil.i(TAG, "handlePlayProgress, begin time:" + begin +
+                " endtime:" + end + " osdTime:" + osdTime.getTimeInMillis() + " " + "progress:" + progress);
 
         if (osd >= begin && osd <= end) {
             int beginTimeClock = (int) ((osd - begin) / 1000);
@@ -1525,7 +1528,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             public void onClick(View arg0) {
                 if (!mCheckBtnDevice.isChecked()) {
                     mCheckBtnDevice.setChecked(true);
-                    downloadBtn.setVisibility(mDeviceInfo.isSupportSDRecordDownload()?View.VISIBLE:View.GONE);
+                    downloadBtn.setVisibility(EZBusinessTool.isSupportSDRecordDownload(mDeviceInfo, mCameraInfo)?View.VISIBLE:View.GONE);
                     rightButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.common_title_recordtype_selector));
                     rightButton.setVisibility(View.VISIBLE);
                     if (mDeviceRecordsAdapter == null) {
@@ -1965,7 +1968,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             mPinnedHeaderListViewForLocal.startAnimation();
             mSectionAdapterForLocal.setOnHikItemClickListener(EZPlayBackListActivity.this);
         }
-        if (!EzvizAPI.getInstance().isUsingGlobalSDK() && mDeviceInfo.isSupportSdCover()) {// 国内 & 支持SD卡录像封面
+        if (!EzvizAPI.getInstance().isUsingGlobalSDK() && EZBusinessTool.isSupportSdCover(mDeviceInfo, mCameraInfo)) {// 国内 & 支持SD卡录像封面
             // 去获取SD卡视频封面
             List<EZDeviceRecordFile> recordFiles = new ArrayList<>();
             for (int i = 0; i < cloudPartInfoFile.size(); i ++) {
@@ -1997,13 +2000,16 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                     cloudFile.setBitmap(bitmap);
                     for (int i = 0; i < cloudPartInfoFileExs.size(); i++) {
                         CloudPartInfoFileEx cloudFileEx = cloudPartInfoFileExs.get(i);
-                        if (cloudFileEx.getDataOne() != null && cloudFile.getBegin().equals(cloudFileEx.getDataOne().getBegin()) && cloudFile.getEnd().equals(cloudFileEx.getDataOne().getEnd())) {
+                        if (cloudFileEx.getDataOne() != null && cloudFile.getBegin().equals(cloudFileEx.getDataOne().getBegin()) &&
+                                cloudFile.getEnd().equals(cloudFileEx.getDataOne().getEnd())) {
                             cloudFileEx.getDataOne().setBitmap(bitmap);
                             break;
-                        } else if (cloudFileEx.getDataTwo() != null && cloudFile.getBegin().equals(cloudFileEx.getDataTwo().getBegin()) && cloudFile.getEnd().equals(cloudFileEx.getDataTwo().getEnd())) {
+                        } else if (cloudFileEx.getDataTwo() != null && cloudFile.getBegin().equals(cloudFileEx.getDataTwo().getBegin()) &&
+                                cloudFile.getEnd().equals(cloudFileEx.getDataTwo().getEnd())) {
                             cloudFileEx.getDataTwo().setBitmap(bitmap);
                             break;
-                        } else if (cloudFileEx.getDataThree() != null && cloudFile.getBegin().equals(cloudFileEx.getDataThree().getBegin()) && cloudFile.getEnd().equals(cloudFileEx.getDataThree().getEnd())) {
+                        } else if (cloudFileEx.getDataThree() != null && cloudFile.getBegin().equals(cloudFileEx.getDataThree().getBegin()) &&
+                                cloudFile.getEnd().equals(cloudFileEx.getDataThree().getEnd())) {
                             cloudFileEx.getDataThree().setBitmap(bitmap);
                             break;
                         }
@@ -2615,10 +2621,9 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
 
                         // 可以采用deviceSerial+时间作为文件命名，demo中简化，只用时间命名
                         Date date = new Date();
-                        String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + String.format("%tY"
-, date) + String.format("%tm", date) + String.format("%td", date) + "/" + String.format("%tH"
-                        , date) + String.format("%tM", date) + String.format("%tS", date) + String.format("%tL",
-                                date) + ".jpg";
+                        String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + String.format("%tY", date) +
+                                String.format("%tm", date) + String.format("%td", date) + "/" + String.format("%tH", date) +
+                                String.format("%tM", date) + String.format("%tS", date) + String.format("%tL", date) + ".jpg";
 
                         if (TextUtils.isEmpty(path)) {
                             bmp.recycle();
@@ -2859,19 +2864,19 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             if (v instanceof Button) {
                 String targetRateWithX = (String) ((Button) v).getText();
                 String rate = targetRateWithX.replaceAll("(?i)x", "");
-                int rateInt = Integer.parseInt(rate);
+                double rateDouble = Double.parseDouble(rate);
                 EZConstants.EZPlaybackRate targetRateEnum = null;
                 // 寻找对应的枚举值
                 for (EZConstants.EZPlaybackRate rateEnum : EZConstants.EZPlaybackRate.values()) {
-                    if (rateInt == rateEnum.speed) {
+                    if (rateDouble == rateEnum.speed) {
                         targetRateEnum = rateEnum;
                         break;
                     }
                 }
                 if (mCheckBtnDevice.isChecked()) {
-                    if (mPlaybackPlayer.getStreamFetchType() == 2 && !mDeviceInfo.isSupportDirectInnerRelaySpeed()) {
+                    if (mPlaybackPlayer.getStreamFetchType() == 2 && !EZBusinessTool.isSupportDirectInnerRelaySpeed(mDeviceInfo, mCameraInfo)) {
                         showToast(R.string.device_directinner_playbackrate_not_support);
-                    } else if (!mDeviceInfo.isSupportPlaybackRate()) {
+                    } else if (!EZBusinessTool.isSupportPlaybackRate(mDeviceInfo, mCameraInfo)) {
                         showToast(R.string.device_playbackrate_not_support);
                     } else {
                         // 切换到指定倍速

@@ -103,8 +103,14 @@ public enum ServerAreasEnum {
     /**
      * 温氏
      */
-    WENSHI(126, "WENSHI", "https://ezcpcloudopen.wens.com.cn",
-            "https://ezcpcloudopenauth.wens.com.cn", false);
+    WENSHI(126, "WenShi", "https://ezcpcloudopen.wens.com.cn",
+            "https://ezcpcloudopenauth.wens.com.cn", false),
+
+    /**
+     * 华住
+     */
+    HUAZHU(127, "HuaZhu", "https://ezcpatctestopen.ys7.com",
+                   "https://ezcpatctestopenauth.ys7.com", false);
 
 
 //    TEST_NEW(130,"testnew", "https://ys-open.wens.com.cn",

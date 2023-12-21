@@ -2,6 +2,11 @@ package com.videogo.ui.common;
 
 import android.text.TextUtils;
 
+import com.videogo.openapi.EZConstants;
+import com.videogo.openapi.bean.EZCameraInfo;
+import com.videogo.openapi.bean.EZDeviceInfo;
+import com.videogo.openapi.bean.EZSubDeviceInfo;
+
 /**
  * Copyright (C) 2022 HIKVISION Inc.
  * Comments:
@@ -89,4 +94,83 @@ public class EZBusinessTool {
                 return deviceType.startsWith("CAS_WG_TEST");
         }
     }
+
+    /**
+     * 是否支持对讲
+     */
+    public static EZConstants.EZTalkbackCapability isSupportTalk(EZDeviceInfo deviceInfo, EZCameraInfo cameraInfo) {
+        // 网关下子设备的能力集挂载在自己的对象上
+        if (cameraInfo instanceof EZSubDeviceInfo) {
+            EZSubDeviceInfo subDeviceInfo = (EZSubDeviceInfo)cameraInfo;
+            return subDeviceInfo.isSupportTalk();
+        }
+        return deviceInfo.isSupportTalk();
+    }
+
+    /**
+     * 是否支持云台
+     */
+    public static boolean isSupportPTZ(EZDeviceInfo deviceInfo, EZCameraInfo cameraInfo) {
+        if (cameraInfo instanceof EZSubDeviceInfo) {
+            EZSubDeviceInfo subDeviceInfo = (EZSubDeviceInfo)cameraInfo;
+            return subDeviceInfo.isSupportPTZ();
+        }
+        return deviceInfo.isSupportPTZ();
+    }
+
+    /**
+     * 是否支持内网直连时倍数设置
+     */
+    public static boolean isSupportDirectInnerRelaySpeed(EZDeviceInfo deviceInfo, EZCameraInfo cameraInfo) {
+        if (cameraInfo instanceof EZSubDeviceInfo) {
+            EZSubDeviceInfo subDeviceInfo = (EZSubDeviceInfo)cameraInfo;
+            return subDeviceInfo.isSupportDirectInnerRelaySpeed();
+        }
+        return deviceInfo.isSupportDirectInnerRelaySpeed();
+    }
+
+    /**
+     * 是否支持回放倍率设置
+     */
+    public static boolean isSupportPlaybackRate(EZDeviceInfo deviceInfo, EZCameraInfo cameraInfo) {
+        if (cameraInfo instanceof EZSubDeviceInfo) {
+            EZSubDeviceInfo subDeviceInfo = (EZSubDeviceInfo)cameraInfo;
+            return subDeviceInfo.isSupportPlaybackRate();
+        }
+        return deviceInfo.isSupportPlaybackRate();
+    }
+
+    /**
+     * 是否支持SD卡录像封面
+     */
+    public static boolean isSupportSdCover(EZDeviceInfo deviceInfo, EZCameraInfo cameraInfo) {
+        if (cameraInfo instanceof EZSubDeviceInfo) {
+            EZSubDeviceInfo subDeviceInfo = (EZSubDeviceInfo)cameraInfo;
+            return subDeviceInfo.isSupportSdCover();
+        }
+        return deviceInfo.isSupportSdCover();
+    }
+
+    /**
+     * 是否支持SD卡录像下载
+     */
+    public static boolean isSupportSDRecordDownload(EZDeviceInfo deviceInfo, EZCameraInfo cameraInfo) {
+        if (cameraInfo instanceof EZSubDeviceInfo) {
+            EZSubDeviceInfo subDeviceInfo = (EZSubDeviceInfo)cameraInfo;
+            return subDeviceInfo.isSupportSDRecordDownload();
+        }
+        return deviceInfo.isSupportSDRecordDownload();
+    }
+
+    /**
+     * 是否支持缩放
+     */
+    public static boolean isSupportZoom(EZDeviceInfo deviceInfo, EZCameraInfo cameraInfo) {
+        if (cameraInfo instanceof EZSubDeviceInfo) {
+            EZSubDeviceInfo subDeviceInfo = (EZSubDeviceInfo)cameraInfo;
+            return subDeviceInfo.isSupportZoom();
+        }
+        return deviceInfo.isSupportZoom();
+    }
+
 }

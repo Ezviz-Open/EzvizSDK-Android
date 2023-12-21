@@ -187,7 +187,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
     private ImageButton mRealPlayBtn;// 播放/暂停
     private ImageButton mRealPlaySoundBtn;// 声音开关
     private Button mRealPlayQualityBtn;// 清晰度设置
-    private TextView mRealPlayFlowTv;// 预览流量显示
+    private TextView mRealPlayFlowTv;// 预览每秒接收到的码流大小显示
     private CheckTextButton mFullscreenButton;// 放大
 
     private LinearLayout mRealPlayRecordLy;// 录像过程中时长显示布局
@@ -253,7 +253,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
     private WaitDialog mWaitDialog;// 设置清晰度dialog
 
     private RealPlayBroadcastReceiver mBroadcastReceiver;// 监听手机息屏广播
-    private Timer mUpdateTimer;// 预览成功后，一秒刷新一次（预览流量、录像计时、弹出框隐藏）
+    private Timer mUpdateTimer;// 预览成功后，一秒刷新一次（预览每秒接收到的码流大小、录像计时、弹出框隐藏）
     private TimerTask mUpdateTimerTask;
 
     // 全屏按钮 Full screen button
@@ -284,7 +284,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
     private EZDeviceInfo mDeviceInfo = null;
     private EZCameraInfo mCameraInfo = null;
 
-    private long mStreamFlow = 0;// 流量数据
+    private long mStreamFlow = 0;// 播放接收到的码流总大小
 
     // 视频宽高
     private int mVideoWidth;
@@ -715,12 +715,12 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
                     // 出界判断 Out of bounds
                     if (DRAG_LEFT == direction || DRAG_RIGHT == direction) {
                         // 左移/右移出界判断 Left / right out of bounds
-                        if (mDeviceInfo.isSupportPTZ()) {
+                        if (EZBusinessTool.isSupportPTZ(mDeviceInfo, mCameraInfo)) {
                             return true;
                         }
                     } else if (DRAG_UP == direction || DRAG_DOWN == direction) {
                         // 上移/下移出界判断  Move up / down to judge
-                        if (mDeviceInfo.isSupportPTZ()) {
+                        if (EZBusinessTool.isSupportPTZ(mDeviceInfo, mCameraInfo)) {
                             return true;
                         }
                     }
@@ -742,7 +742,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             @Override
             public void onZoom(float scale) {
                 LogUtil.d(TAG, "onZoom:" + scale);
-                if (mEZPlayer != null && mDeviceInfo != null && mDeviceInfo.isSupportZoom()) {
+                if (mEZPlayer != null && mDeviceInfo != null && EZBusinessTool.isSupportZoom(mDeviceInfo, mCameraInfo)) {
                     startZoom(scale);
                 }
             }
@@ -761,7 +761,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
                 if (mEZPlayer != null) {
                     stopDrag(false);
                 }
-                if (mEZPlayer != null && mDeviceInfo != null && mDeviceInfo.isSupportZoom()) {
+                if (mEZPlayer != null && mDeviceInfo != null && EZBusinessTool.isSupportZoom(mDeviceInfo, mCameraInfo)) {
                     stopZoom();
                 }
             }
@@ -769,6 +769,15 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             @Override
             public void onZoomChange(float scale, CustomRect oRect, CustomRect curRect) {
                 LogUtil.d(TAG, "onZoomChange:");
+                try {
+                    if (scale == 1) {
+                        mEZPlayer.setDisplayRegion(false, null, null);
+                    } else {
+                        mEZPlayer.setDisplayRegion(true, oRect, curRect);
+                    }
+                } catch (BaseException e) {
+                    e.printStackTrace();
+                }
             }
 
             /**
@@ -923,15 +932,11 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         boolean zoomIn = scale > 1.01 ? true : false;
         if (mZoomScale != 0 && preZoomIn != zoomIn) {
             LogUtil.d(TAG, "startZoom stop:" + mZoomScale);
-            //            mEZOpenSDK.controlPTZ(mZoomScale > 1.01 ? RealPlayStatus.PTZ_ZOOMIN
-            //                    : RealPlayStatus.PTZ_ZOOMOUT, RealPlayStatus.PTZ_SPEED_DEFAULT, EZPlayer.PTZ_COMMAND_STOP);
             mZoomScale = 0;
         }
         if (scale != 0 && (mZoomScale == 0 || preZoomIn != zoomIn)) {
             mZoomScale = scale;
             LogUtil.d(TAG, "startZoom start:" + mZoomScale);
-            //            mEZOpenSDK.controlPTZ(mZoomScale > 1.01 ? RealPlayStatus.PTZ_ZOOMIN
-            //                    : RealPlayStatus.PTZ_ZOOMOUT, RealPlayStatus.PTZ_SPEED_DEFAULT, EZPlayer.PTZ_COMMAND_START);
         }
     }
 
@@ -955,7 +960,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         if (mEZPlayer == null || mDeviceInfo == null) {
             return 0;
         }
-        if (mDeviceInfo.isSupportPTZ() || mDeviceInfo.isSupportZoom()) {
+        if (EZBusinessTool.isSupportPTZ(mDeviceInfo, mCameraInfo) || EZBusinessTool.isSupportZoom(mDeviceInfo, mCameraInfo)) {
             return 1;
         } else {
             return 0;
@@ -1126,7 +1131,8 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
 
     private void updateOrientation() {
         if (mIsOnTalk) {
-            if (mEZPlayer != null && mDeviceInfo != null && mDeviceInfo.isSupportTalk() != EZConstants.EZTalkbackCapability.EZTalkbackNoSupport) {
+            if (mEZPlayer != null && mDeviceInfo != null &&
+                    EZBusinessTool.isSupportTalk(mDeviceInfo, mCameraInfo) != EZConstants.EZTalkbackCapability.EZTalkbackNoSupport) {
                 setOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
             } else {
                 setForceOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -1749,7 +1755,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         mTalkBackControlBtn = (Button) layoutView.findViewById(R.id.talkback_control_btn);
         mTalkBackControlBtn.setOnTouchListener(mOnTouchListener);
 
-        if (mDeviceInfo.isSupportTalk() == EZConstants.EZTalkbackCapability.EZTalkbackFullDuplex) {
+        if (EZBusinessTool.isSupportTalk(mDeviceInfo, mCameraInfo) == EZConstants.EZTalkbackCapability.EZTalkbackFullDuplex) {
             mTalkRingView.setVisibility(View.VISIBLE);
             mTalkBackControlBtn.setEnabled(false);
             mTalkBackControlBtn.setText(R.string.talking);
@@ -2562,11 +2568,12 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
      */
     private void setRealPlayTalkUI() {
         // 设备支持对讲
-        if (mEZPlayer != null && mDeviceInfo != null && (mDeviceInfo.isSupportTalk() != EZConstants.EZTalkbackCapability.EZTalkbackNoSupport)) {
+        if (mEZPlayer != null && mDeviceInfo != null &&
+                (EZBusinessTool.isSupportTalk(mDeviceInfo, mCameraInfo) != EZConstants.EZTalkbackCapability.EZTalkbackNoSupport)) {
             mRealPlayTalkBtnLy.setVisibility(View.VISIBLE);
             mRealPlayTalkBtn.setEnabled(mCameraInfo != null && mDeviceInfo.getStatus() == 1);
 
-            if (mDeviceInfo.isSupportTalk() != EZConstants.EZTalkbackCapability.EZTalkbackNoSupport) {
+            if (EZBusinessTool.isSupportTalk(mDeviceInfo, mCameraInfo) != EZConstants.EZTalkbackCapability.EZTalkbackNoSupport) {
                 mRealPlayFullTalkBtn.setVisibility(View.VISIBLE);
             } else {
                 mRealPlayFullTalkBtn.setVisibility(View.GONE);
@@ -2891,7 +2898,8 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         setRealPlaySuccessUI();
         updatePtzUI();
         updateTalkUI();
-        mRealPlayTalkBtn.setEnabled(mDeviceInfo != null && mDeviceInfo.isSupportTalk() != EZConstants.EZTalkbackCapability.EZTalkbackNoSupport);
+        mRealPlayTalkBtn.setEnabled(mDeviceInfo != null &&
+                EZBusinessTool.isSupportTalk(mDeviceInfo, mCameraInfo) != EZConstants.EZTalkbackCapability.EZTalkbackNoSupport);
         if (mEZPlayer != null) {
             mStreamFlow = mEZPlayer.getStreamFlow();
         }

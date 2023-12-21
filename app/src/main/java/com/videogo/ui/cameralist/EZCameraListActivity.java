@@ -72,6 +72,7 @@ import com.videogo.widget.pulltorefresh.PullToRefreshBase.Orientation;
 import com.videogo.widget.pulltorefresh.PullToRefreshListView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -251,16 +252,20 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
             jumpToDeviceInfoInputPage();
             return;
         }
-        // 设备没有通道号，拦截
-        if (deviceInfo.getCameraNum() <= 0 || deviceInfo.getCameraInfoList() == null || deviceInfo.getCameraInfoList().size() <= 0) {
-            LogUtil.d(TAG, "cameralist is null or cameralist size is 0");
-            return;
-        }
-        // 单通道设备
+        // 单通道设备，直接跳转预览页面
         if (deviceInfo.getCameraNum() == 1 && deviceInfo.getCameraInfoList() != null && deviceInfo.getCameraInfoList().size() == 1) {
             LogUtil.d(TAG, "cameralist have one camera");
             jumpToRealPlayActivity(deviceInfo, 0);
-        } else {// 多通道设备
+        }
+        // 多通道设备，跳转通道列表进行选择
+        else if (deviceInfo.getCameraNum() > 1 && deviceInfo.getCameraInfoList() != null) {
+            SelectCameraDialog selectCameraDialog = new SelectCameraDialog();
+            selectCameraDialog.setEZDeviceInfo(deviceInfo);
+            selectCameraDialog.setCameraItemClick(EZCameraListActivity.this);
+            selectCameraDialog.show(getFragmentManager(), "onPlayClick");
+        }
+        // 子设备
+        else if (deviceInfo.getSubDeviceInfoList() != null && deviceInfo.getSubDeviceInfoList().size() > 0) {
             SelectCameraDialog selectCameraDialog = new SelectCameraDialog();
             selectCameraDialog.setEZDeviceInfo(deviceInfo);
             selectCameraDialog.setCameraItemClick(EZCameraListActivity.this);
@@ -276,15 +281,20 @@ public class EZCameraListActivity extends RootActivity implements OnClickListene
             jumpToDeviceInfoInputPage();
             return;
         }
-        if (deviceInfo.getCameraNum() <= 0 || deviceInfo.getCameraInfoList() == null || deviceInfo.getCameraInfoList().size() <= 0) {
-            LogUtil.d(TAG, "cameralist is null or cameralist size is 0");
-            return;
-        }
         // 单通道设备
         if (deviceInfo.getCameraNum() == 1 && deviceInfo.getCameraInfoList() != null && deviceInfo.getCameraInfoList().size() == 1) {
             LogUtil.d(TAG, "cameralist have one camera");
             jumpToPlaybackActivity(deviceInfo, 0);
-        } else {// 多通道设备
+        }
+        // 多通道设备
+        else if (deviceInfo.getCameraNum() > 1 && deviceInfo.getCameraInfoList() != null) {
+            SelectCameraDialog selectCameraDialog = new SelectCameraDialog();
+            selectCameraDialog.setEZDeviceInfo(deviceInfo);
+            selectCameraDialog.setCameraItemClick(EZCameraListActivity.this);
+            selectCameraDialog.show(getFragmentManager(), "RemotePlayBackClick");
+        }
+        // 子设备
+        else if (deviceInfo.getSubDeviceInfoList() != null && deviceInfo.getSubDeviceInfoList().size() > 0) {
             SelectCameraDialog selectCameraDialog = new SelectCameraDialog();
             selectCameraDialog.setEZDeviceInfo(deviceInfo);
             selectCameraDialog.setCameraItemClick(EZCameraListActivity.this);

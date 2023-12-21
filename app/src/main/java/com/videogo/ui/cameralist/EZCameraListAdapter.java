@@ -1,16 +1,16 @@
-/* 
+/*
  * @ProjectName VideoGoJar
  * @Copyright null
- * 
+ *
  * @FileName CameraListAdapter.java
  * @Description 这里对文件进行描述
- * 
+ *
  * @author chenxingyf1
  * @data 2014-7-14
- * 
+ *
  * @note 这里写本文件的详细功能描述和注释
  * @note 历史记录
- * 
+ *
  * @warning 这里写本文件的相关警告
  */
 package com.videogo.ui.cameralist;
@@ -66,11 +66,11 @@ public class EZCameraListAdapter extends BaseAdapter {
         public ImageView offlineBtn;
 
         public TextView cameraNameTv;
-        
+
         public ImageButton cameraDelBtn;
 
         public ImageButton alarmListBtn;
-        
+
         public ImageButton remoteplaybackBtn;
 
         public ImageButton setDeviceBtn;
@@ -80,20 +80,20 @@ public class EZCameraListAdapter extends BaseAdapter {
         public View itemIconArea;
 
         public ImageView offlineBgBtn;
-        
+
         public ImageButton deleteBtn;
     }
-    
+
     public EZCameraListAdapter(Context context) {
         mContext = context;
         mCameraInfoList = new ArrayList<EZDeviceInfo>();
         mExecuteItemMap = new HashMap<String, EZDeviceInfo>();
     }
-    
+
     public void setOnItemClickListener(OnItemClickListener l) {
         mListener = l;
     }
-    
+
     public void addItem(EZDeviceInfo item) {
         mCameraInfoList.add(item);
     }
@@ -105,12 +105,12 @@ public class EZCameraListAdapter extends BaseAdapter {
             }
         }
     }
-    
+
     public void clearItem() {
         //mExecuteItemMap.clear();
         mCameraInfoList.clear();
     }
-    
+
     /* (non-Javadoc)
      * @see android.widget.Adapter#getCount()
      */
@@ -160,14 +160,14 @@ public class EZCameraListAdapter extends BaseAdapter {
             viewHolder.offlineBtn = (ImageView) convertView.findViewById(R.id.item_offline);
             viewHolder.cameraNameTv = (TextView) convertView.findViewById(R.id.camera_name_tv);
             viewHolder.cameraDelBtn = (ImageButton) convertView.findViewById(R.id.camera_del_btn);
-            viewHolder.alarmListBtn = (ImageButton) convertView.findViewById(R.id.tab_alarmlist_btn);            
+            viewHolder.alarmListBtn = (ImageButton) convertView.findViewById(R.id.tab_alarmlist_btn);
             viewHolder.remoteplaybackBtn = (ImageButton) convertView.findViewById(R.id.tab_remoteplayback_btn);
             viewHolder.setDeviceBtn = (ImageButton) convertView.findViewById(R.id.tab_setdevice_btn);
             viewHolder.videoTalkBtn = (ImageButton) convertView.findViewById(R.id.tab_video_talk_btn);
             viewHolder.offlineBgBtn = (ImageView) convertView.findViewById(R.id.offline_bg);
             viewHolder.itemIconArea = convertView.findViewById(R.id.item_icon_area);
             viewHolder.deleteBtn = (ImageButton) convertView.findViewById(R.id.camera_del_btn);
-            
+
             // 设置点击图标的监听响应函数
             viewHolder.playBtn.setOnClickListener(mOnClickListener);
 
@@ -176,7 +176,7 @@ public class EZCameraListAdapter extends BaseAdapter {
 
             // 设置报警列表的监听响应函数
             viewHolder.alarmListBtn.setOnClickListener(mOnClickListener);
-            
+
             // 设置历史回放的监听响应函数
             viewHolder.remoteplaybackBtn.setOnClickListener(mOnClickListener);
 
@@ -187,13 +187,13 @@ public class EZCameraListAdapter extends BaseAdapter {
             viewHolder.videoTalkBtn.setOnClickListener(mOnClickListener);
 
             viewHolder.deleteBtn.setOnClickListener(mOnClickListener);
-            
+
             // 设置控件集到convertView
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        
+
         // 设置position
         viewHolder.playBtn.setTag(position);
         viewHolder.remoteplaybackBtn.setTag(position);
@@ -230,12 +230,11 @@ public class EZCameraListAdapter extends BaseAdapter {
             viewHolder.setDeviceBtn.setVisibility(View.GONE);
         }
         /*手表设备视频通话功能按钮*/
-        viewHolder.videoTalkBtn.setVisibility(View.VISIBLE);
-//        if (deviceInfo != null && ("KW1".equalsIgnoreCase(deviceInfo.getCategory()) || "DS-3LHL10".equalsIgnoreCase(deviceInfo.getCategory()))){
-//            viewHolder.videoTalkBtn.setVisibility(View.VISIBLE);
-//        }else{
-//            viewHolder.videoTalkBtn.setVisibility(View.INVISIBLE);
-//        }
+        if (deviceInfo != null && ("KW1".equalsIgnoreCase(deviceInfo.getCategory()) || "DS-3LHL10".equalsIgnoreCase(deviceInfo.getCategory()))){
+            viewHolder.videoTalkBtn.setVisibility(View.VISIBLE);
+        } else {
+            viewHolder.videoTalkBtn.setVisibility(View.INVISIBLE);
+        }
         return convertView;
     }
 
@@ -247,7 +246,7 @@ public class EZCameraListAdapter extends BaseAdapter {
             mExecutorService = null;
         }
     }
-    
+
     private View.OnClickListener mOnClickListener = new View.OnClickListener() {
 
         @Override
@@ -270,14 +269,14 @@ public class EZCameraListAdapter extends BaseAdapter {
                     case R.id.tab_video_talk_btn:
                         mListener.onVideoTalkClick(EZCameraListAdapter.this, v, position);
                         break;
-                    case R.id.camera_del_btn: 
+                    case R.id.camera_del_btn:
                         mListener.onDeleteClick(EZCameraListAdapter.this, v, position);
                         break;
                 }
             }
         }
     };
-    
+
     public interface OnItemClickListener {
         public void onPlayClick(BaseAdapter adapter, View view, int position);
         public void onPlayBackClick(BaseAdapter adapter, View view, int position);

@@ -8,9 +8,10 @@ import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.view.View
-import android.widget.Toast
-import com.videogo.EzvizApplication
 import com.videogo.global.ValueKeys
+import com.videogo.openapi.EZGlobalSDK
+import com.videogo.openapi.EZOpenSDK
+import com.videogo.openapi.EzvizAPI
 import com.videogo.ui.LanDevice.LanDeviceActivity
 import com.videogo.ui.others.streamctrl.OriginStreamControlActivity
 import com.videogo.ui.videotalk.ConfluenceTestEntranceActivity
@@ -87,6 +88,25 @@ class MoreFeaturesEntranceActivity : RootActivity() {
             .create()
             .show()
     }
+
+    fun onClickP2pOpen(view: View) {
+        if (EzvizAPI.getInstance().isUsingGlobalSDK) {
+            // 设置是否支持P2P取流,详见api
+            EZGlobalSDK.enableP2P(true)
+        } else {
+            EZOpenSDK.enableP2P(true)
+        }
+    }
+
+    fun onClickP2pClose(view: View) {
+        if (EzvizAPI.getInstance().isUsingGlobalSDK) {
+            // 设置是否支持P2P取流,详见api
+            EZGlobalSDK.enableP2P(false)
+        } else {
+            EZOpenSDK.enableP2P(false)
+        }
+    }
+
 
     /**
      * 用来判断服务是否运行.
