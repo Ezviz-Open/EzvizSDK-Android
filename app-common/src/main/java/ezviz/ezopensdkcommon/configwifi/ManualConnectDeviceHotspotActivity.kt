@@ -2,13 +2,16 @@
 
 package ezviz.ezopensdkcommon.configwifi
 
-import android.app.Activity
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
+import android.text.Html
 import android.text.TextUtils
 import android.view.View
+import android.widget.Toast
 import com.ezviz.sdk.configwifi.WiFiUtils
 import com.hikvision.wifi.configuration.BaseUtil
 import ezviz.ezopensdkcommon.R
@@ -32,15 +35,17 @@ class ManualConnectDeviceHotspotActivity : RootActivity() {
         intent?.apply {
             val prefix = "EZVIZ_"
             mSSID = getStringExtra(DEVICE_HOTSPOT_SSID)
-            if(TextUtils.isEmpty(mSSID)){
+            if (TextUtils.isEmpty(mSSID)) {
                 mSSID = prefix + getStringExtra(DEVICE_SERIAL)
             }
             mPWD = getStringExtra(DEVICE_HOTSPOT_PWD)
-            if(TextUtils.isEmpty(mPWD)){
+            if (TextUtils.isEmpty(mPWD)) {
                 mPWD = prefix + getStringExtra(DEVICE_VERIFY_CODE)
             }
-            tv_ssid.text = getString(R.string.device_hotspot_ssid) + mSSID
-            tv_pwd.text = getString(R.string.device_hotspot_pwd) + mPWD
+            tv_ssid.text = mSSID
+            tv_pwd.text = mPWD
+            val string = String.format(getString(R.string.wifi_config_step_two_hint), "<font color='#ff8800'>$mSSID</font>")
+            tv_setting_hint.text = Html.fromHtml(string)
         }
     }
 
@@ -72,6 +77,13 @@ class ManualConnectDeviceHotspotActivity : RootActivity() {
     fun onclickGoToWifiSetting(view: View) {
         val intent = Intent(Settings.ACTION_WIFI_SETTINGS)
         startActivity(intent)
+    }
+
+    fun onclickPasswordCopy(view: View) {
+        val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+        val clip = ClipData.newPlainText("text", tv_pwd.text)
+        clipboard.setPrimaryClip(clip)
+        Toast.makeText(applicationContext, getString(R.string.copied_to_clipboard), Toast.LENGTH_LONG).show()
     }
 
     companion object {

@@ -119,7 +119,7 @@ public class AutoWifiNetConfigActivity extends RootActivity {
             tvSSID.setText(wifiName);
         }
         tvSSID.setText("ezviz_mobile_AV");
-        edtPassword.setText("chengjun");
+        edtPassword.setText("chengjun7");
     }
 
     private boolean isValidWifiSSID(String wifiName) {

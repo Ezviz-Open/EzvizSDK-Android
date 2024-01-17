@@ -753,7 +753,8 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                 }
                 showPlayEventTip(errorInfoText);
                 if (errorCode == ErrorCode.ERROR_CAS_STREAM_RECV_ERROR || errorCode == ErrorCode.ERROR_TRANSF_DEVICE_OFFLINE ||
-                        errorCode == ErrorCode.ERROR_CAS_PLATFORM_CLIENT_REQUEST_NO_PU_FOUNDED || errorCode == ErrorCode.ERROR_CAS_MSG_PU_NO_RESOURCE) {
+                        errorCode == ErrorCode.ERROR_CAS_PLATFORM_CLIENT_REQUEST_NO_PU_FOUNDED ||
+                        errorCode == ErrorCode.ERROR_CAS_MSG_PU_NO_RESOURCE) {
                     updateCameraInfo();
                 }
             }
@@ -1192,7 +1193,8 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                 final EZCloudStreamDownload ezCloudStreamDownloader = new EZCloudStreamDownload(strFileNameWithPath,
                         cloudFile);
                 // 云存储录像支持下载进度回调，SD卡录像下载不支持
-                ezCloudStreamDownloader.setStreamDownloadCallback(new EZStreamDownloadCallbackWithNotify(cloudFile, notificationId, notificationTitle));
+                ezCloudStreamDownloader.setStreamDownloadCallback(
+                        new EZStreamDownloadCallbackWithNotify(cloudFile, notificationId, notificationTitle));
                 ezCloudStreamDownloader.setSecretKey(DataManager.getInstance().getDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial()));
                 ezCloudStreamDownloader.start();
                 mDownloadTaskRecordListAbstract.add(new DownloadTaskRecordOfCloud(ezCloudStreamDownloader,
@@ -2390,7 +2392,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             mTitleBar.setVisibility(View.VISIBLE);
             pinnedHeaderListView.setVisibility(View.VISIBLE);
             if (controlArea.getVisibility() == View.VISIBLE) {
-                exitBtn.setVisibility(View.VISIBLE);
+//                exitBtn.setVisibility(View.VISIBLE);// 应测试要求，右上角的关闭按钮不显示
                 captureBtn.setVisibility(View.GONE);
                 videoRecordingBtn.setVisibility(View.VISIBLE);
             }
@@ -2563,6 +2565,10 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
 //        }
 
         if (mPlaybackPlayer != null) {
+            /**
+             * 此路径必须指定为沙盒路径；不能指定为相册路径，新系统上有限制
+             * This path must be specified as a sandbox path; Cannot be specified as album path, there are restrictions on the new system
+             */
             String strRecordFile = DemoConfig.getRecordsFolder() + "/" + System.currentTimeMillis() + ".mp4";
             LogUtil.i(TAG, "current record path is " + strRecordFile);
             mPlaybackPlayer.setStreamDownloadCallback(new EZOpenSDKListener.EZStreamDownloadCallbackEx() {
@@ -2761,7 +2767,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
 
     /**
      * en: call EZPlayer.startPlayback to start playback
-     * zh: 调用EZPlayer.startPlayback接口开始回放
+     * zh: 调用EZPlayer.startPlayback接口开始回放（重播或验证码输入后调用）
      */
     private void startPlayback() {
         if (mDeviceRecordInfo != null) {

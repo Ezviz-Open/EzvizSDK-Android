@@ -581,8 +581,14 @@
     <string name="app_common_deivce_hotspot_info_can_not_empty">设备热点名称和密码不能为空！</string>
     <string name="app_common_stop_config_wifi_while_switched_to_background">配网界面关闭，配网已经停止</string>>
     <string name="please_try_connect_device_hotspot_manually">自动AP配网失败，请到系统设置中手动连接设备热点，连接成功并返回后，demo将开始手动AP配网。</string>
+    <string name="wifi_config_step_one_hint">待连接的设备WiFi信息如下：</string>
+    <string name="wifi_config_step_two_hint">进入手机系统WiFi设置页面，选择名称为%s的网络，用提示的密码进行连接</string>
+    <string name="wifi_config_step_three_hint">返回demo，等待与设备连接，成功后自动进入下一步操作</string>
+    <string name="wifi_config_note_hint">注意：设备默认热点都是EZVIZ前缀，如果你的设备是定制设备(前缀可能是SoftAP，也可能是其他)，对应的热点密码也是相应的前缀。详细请查看ApConfigWifiPresenterForFullSdk.java类中的注释。</string>
+    <string name="copy_password">复制密码</string>
+    <string name="copied_to_clipboard">已复制到剪贴板</string>
     <string name="go_to_connect_wifi">去连接wifi</string>
-    <string name="device_hotspot_ssid">设备热点SSID：</string>
-    <string name="device_hotspot_pwd">设备热点密码：</string>
+    <string name="device_hotspot_ssid">名称：</string>
+    <string name="device_hotspot_pwd">密码：</string>
 
 </resources>

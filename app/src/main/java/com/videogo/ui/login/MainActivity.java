@@ -58,12 +58,15 @@ public class MainActivity extends RootActivity {
     
     // JuneCheng's AppKey
     private final static String APPKEY_JC = "fd82f9a6f0154aa2aa9284ae7af25a5b";
-    private final static String TOKEN_JC = "at.8kxdtnxpaj98w0ko0itug0os8cccyrlv-2docrlhcwu-14r1u4i-ytjogtwzl";
+    private final static String TOKEN_JC = "at.3t9p0w314w12ad4887267p8c4o5af39f-4n7efa5ap1-0jrdnl7-pmqy7sxox";
     // 开发者账号信息
-    private final static String APPKEY_DEV = "16570cc49f30458fb514977936ac1526";
-    private final static String TOKEN_DEV = "at.9zsnd34u5a0zadey075q20l52o8jrobf-9gw8lcpt5x-0qdpak0-weccxkfpo";
+    private final static String APPKEY_DEV = "";
+    private final static String TOKEN_DEV = "";
     private final static String DEVICE_DEV = "";
 
+    /**
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -288,7 +291,7 @@ public class MainActivity extends RootActivity {
                     errMsg = getApplicationContext().getString(R.string.tip_of_bad_net);
                     break;
                 default:
-                    errMsg = getApplicationContext().getString(R.string.login_expire);
+                    errMsg = getApplicationContext().getString(R.string.login_expire) + "\n" + e.getErrorInfo().description;
                     break;
             }
             toast(errMsg);

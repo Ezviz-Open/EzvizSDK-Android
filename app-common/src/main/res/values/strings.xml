@@ -577,8 +577,14 @@
     <string name="app_common_deivce_hotspot_info_can_not_empty">Device hotspot name or password can not be empty!</string>
     <string name="app_common_stop_config_wifi_while_switched_to_background">Closed config wifi page, and configuration has stopped</string>
     <string name="please_try_connect_device_hotspot_manually">Failed to use “Automatic AP Config”, please try to connect device hotspot manually in wifi settings and return to demo,  it will try to start “Manual AP Config”.</string>
+    <string name="wifi_config_step_one_hint">The Wi-Fi to be connected is as follows:</string>
+    <string name="wifi_config_step_two_hint">Enter Wi-Fi setting of iPhone,connect Wi-Fi:%s with password above.</string>
+    <string name="wifi_config_step_three_hint">Return to demo, wait for the device to connect, and automatically proceed to the next step after successful operation.</string>
+    <string name="wifi_config_note_hint">Note: The default hotspots on the device are prefixed with EZVIZ. If your device is a custom device (the prefix may be SoftAP or other), the corresponding hotspot password is also a corresponding prefix. Please refer to the comments in the ApConfigWifiPresenterForFullSdk.Java class for details.</string>
+    <string name="copy_password">Copy Password</string>
+    <string name="copied_to_clipboard">copied to clipboard</string>
     <string name="go_to_connect_wifi">Go to connect wifi</string>
-    <string name="device_hotspot_ssid">Device hotspot SSID: </string>
-    <string name="device_hotspot_pwd">Device hotspot password: </string>
+    <string name="device_hotspot_ssid">SSID: </string>
+    <string name="device_hotspot_pwd">Password: </string>
 
 </resources>

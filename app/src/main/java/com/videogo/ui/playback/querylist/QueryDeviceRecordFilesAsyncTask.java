@@ -7,6 +7,7 @@ import com.videogo.device.DeviceReportInfo;
 import com.videogo.errorlayer.ErrorInfo;
 import com.videogo.exception.BaseException;
 import com.videogo.openapi.EZConstants;
+import com.videogo.openapi.EZGlobalSDK;
 import com.videogo.openapi.bean.EZDeviceRecordFile;
 import com.videogo.openapi.bean.resp.CloudPartInfoFile;
 import com.videogo.ui.playback.RemoteListContant;

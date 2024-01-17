@@ -8,50 +8,197 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginLeft="50dp"
-        android:layout_marginRight="50dp"
-        android:layout_centerInParent="true">
+        android:layout_centerInParent="true"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:orientation="vertical">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/please_try_connect_device_hotspot_manually"/>
+            android:text="@string/please_try_connect_device_hotspot_manually" />
 
+        <!-- Step 1 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="50dp"
-            android:layout_marginBottom="50dp">
+            android:layout_margin="10dp"
+            android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/tv_ssid"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Device hotspot SSID"
-                android:textSize="16dp"
-                android:textColor="@android:color/holo_red_light"
-                android:textIsSelectable="true"/>
+                android:text="1"
+                android:textColor="@color/black"
+                android:textSize="26dp" />
 
-            <TextView
-                android:id="@+id/tv_pwd"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Device hotspot password"
-                android:textSize="16dp"
-                android:textColor="@android:color/holo_red_light"
-                android:textIsSelectable="true"/>
+                android:layout_marginLeft="20dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/wifi_config_step_one_hint"
+                    android:textColor="@color/black"
+                    android:textIsSelectable="true"
+                    android:textSize="14dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/device_hotspot_ssid"
+                        android:textColor="@color/black"
+                        android:textIsSelectable="true"
+                        android:textSize="14dp" />
+
+                    <TextView
+                        android:id="@+id/tv_ssid"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:text="EZVIZ_xxxxxxxxx"
+                        android:textColor="@android:color/holo_orange_dark"
+                        android:textIsSelectable="true"
+                        android:textSize="14dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/device_hotspot_pwd"
+                        android:textColor="@color/black"
+                        android:textIsSelectable="true"
+                        android:textSize="14dp" />
+
+                    <TextView
+                        android:id="@+id/tv_pwd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="EZVIZ_xxxxxx"
+                        android:textColor="@android:color/holo_orange_dark"
+                        android:textIsSelectable="true"
+                        android:textSize="14dp" />
+                </LinearLayout>
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="28dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginRight="50dp"
+                    android:onClick="onclickPasswordCopy"
+                    android:text="@string/copy_password" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
-        <Button
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/gray" />
+
+        <!-- Step 2 -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/go_to_connect_wifi"
-            android:layout_marginLeft="50dp"
-            android:layout_marginRight="50dp"
-            android:onClick="onclickGoToWifiSetting"/>
+            android:layout_margin="10dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2"
+                android:textColor="@color/black"
+                android:textSize="26dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_setting_hint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/wifi_config_step_two_hint"
+                    android:textColor="@color/black"
+                    android:textIsSelectable="true"
+                    android:textSize="14dp" />
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="28dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginRight="50dp"
+                    android:onClick="onclickGoToWifiSetting"
+                    android:text="@string/go_to_connect_wifi" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/gray" />
+
+        <!-- Step 3 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3"
+                android:textColor="@color/black"
+                android:textSize="26dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/wifi_config_step_three_hint"
+                    android:textColor="@color/black"
+                    android:textIsSelectable="true"
+                    android:textSize="14dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:text="@string/wifi_config_note_hint"
+            android:textColor="@android:color/holo_red_light"
+            android:textIsSelectable="true"
+            android:textSize="14dp" />
 
     </LinearLayout>
 

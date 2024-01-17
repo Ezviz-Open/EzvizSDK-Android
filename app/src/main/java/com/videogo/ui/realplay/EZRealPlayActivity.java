@@ -95,6 +95,7 @@ import com.videogo.openapi.bean.EZDevicePtzAngleInfo;
 import com.videogo.openapi.bean.EZPMPlayPrivateTokenInfo;
 import com.videogo.openapi.bean.EZVideoQualityInfo;
 import com.videogo.realplay.RealPlayStatus;
+import com.videogo.stream.EZTalkback;
 import com.videogo.ui.cameralist.EZCameraListActivity;
 import com.videogo.ui.common.EZBusinessTool;
 import com.videogo.ui.common.ScreenOrientationHelper;
@@ -1714,8 +1715,8 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         new Thread(() -> {
             boolean ptz_result = false;
             try {
-                ptz_result = EzvizApplication.getOpenSDK().controlPTZ(mCameraInfo.getDeviceSerial(), mCameraInfo.getCameraNo(), command,
-                        action, EZConstants.PTZ_SPEED_DEFAULT);
+                    EzvizApplication.getOpenSDK().controlPTZMix(mCameraInfo.getDeviceSerial(), mCameraInfo.getCameraNo(), command,
+                            action, EZConstants.PTZ_SPEED_FAST);
                 if (action == EZPTZAction.EZPTZActionSTOP) {
                     Message msg = Message.obtain();
                     msg.what = MSG_HIDE_PTZ_ANGLE;
@@ -2029,6 +2030,10 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
 //        }
 
         if (mEZPlayer != null) {
+            /**
+             * 此路径必须指定为沙盒路径；不能指定为相册路径，新系统上有限制
+             * This path must be specified as a sandbox path; Cannot be specified as album path, there are restrictions on the new system
+             */
             final String strRecordFile = DemoConfig.getRecordsFolder() + "/" + System.currentTimeMillis() + ".mp4";
             LogUtil.i(TAG, "recorded video file path is " + strRecordFile);
             mEZPlayer.setStreamDownloadCallback(new EZOpenSDKListener.EZStreamDownloadCallback() {
@@ -2535,20 +2540,37 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
                 break;
             case ErrorCode.ERROR_CAS_PTZ_OPENING_PRIVACY_FAILED:// 当前正在开启隐私遮蔽 Is currently opening privacy masking
             case ErrorCode.ERROR_CAS_PTZ_CLOSING_PRIVACY_FAILED:// 当前正在关闭隐私遮蔽   The privacy mask is currently being turned off
-            case ErrorCode.ERROR_CAS_PTZ_MIRRORING_FAILED:// 设备正在镜像操作（设备镜像要几秒钟，防止频繁镜像操作）The device is mirroring (the device mirroring takes a few seconds to prevent frequent mirroring)
+            /**
+             * 设备正在镜像操作（设备镜像要几秒钟，防止频繁镜像操作）
+             * The device is mirroring (the device mirroring takes a few seconds to prevent frequent mirroring)
+             */
+            case ErrorCode.ERROR_CAS_PTZ_MIRRORING_FAILED:
                 Utils.showToast(EZRealPlayActivity.this, R.string.ptz_operation_too_frequently, msg.arg1);
                 break;
-            case ErrorCode.ERROR_CAS_PTZ_CONTROLING_FAILED:// 设备正在键控动作（上下左右）(一个客户端在上下左右控制，另外一个在开其它东西) The device is keying action (up and down left and right) (a client in the upper and lower left and right control, the other one in the open other things)
+            /**
+             * 设备正在键控动作（上下左右）(一个客户端在上下左右控制，另外一个在开其它东西)
+             * The device is keying action (up and down left and right)
+             * (a client in the upper and lower left and right control, the other one in the open other things)
+             */
+            case ErrorCode.ERROR_CAS_PTZ_CONTROLING_FAILED:
                 break;
             case ErrorCode.ERROR_CAS_PTZ_FAILED:// 云台当前操作失败 PTZ current operation failed
                 break;
             case ErrorCode.ERROR_CAS_PTZ_PRESET_EXCEED_MAXNUM_FAILED:// 当前预置点超过最大个数 The current preset exceeds the maximum number
                 Utils.showToast(EZRealPlayActivity.this, R.string.ptz_preset_exceed_maxnum_failed, msg.arg1);
                 break;
-            case ErrorCode.ERROR_CAS_PTZ_PRIVACYING_FAILED:// 设备处于隐私遮蔽状态（关闭了镜头，再去操作云台相关）The device is in a privacy state (close the lens, and then operate the PTZ related)
+            /**
+             * 设备处于隐私遮蔽状态（关闭了镜头，再去操作云台相关）
+             * The device is in a privacy state (close the lens, and then operate the PTZ related)
+             */
+            case ErrorCode.ERROR_CAS_PTZ_PRIVACYING_FAILED:
                 Utils.showToast(EZRealPlayActivity.this, R.string.ptz_privacying_failed, msg.arg1);
                 break;
-            case ErrorCode.ERROR_CAS_PTZ_TTSING_FAILED:// 设备处于语音对讲状态(区别以前的语音对讲错误码，云台单独列一个）Equipment in the voice intercom state (the difference between the previous voice intercom error code, PTZ separate one)
+            /**
+             * 设备处于语音对讲状态(区别以前的语音对讲错误码，云台单独列一个）
+             * Equipment in the voice intercom state (the difference between the previous voice intercom error code, PTZ separate one)
+             */
+            case ErrorCode.ERROR_CAS_PTZ_TTSING_FAILED:
                 Utils.showToast(EZRealPlayActivity.this, R.string.ptz_mirroring_failed, msg.arg1);
                 break;
             case ErrorCode.ERROR_CAS_PTZ_ROTATION_UP_LIMIT_FAILED:// 设备云台旋转到达上限位 The PTZ rotation reaches the upper limit

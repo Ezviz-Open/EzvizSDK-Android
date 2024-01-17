@@ -317,7 +317,8 @@
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="10dp"
                 android:textColor="@color/white"
-                android:textSize="@dimen/remotelist_time_text_size" />
+                android:textSize="@dimen/remotelist_time_text_size"
+                android:visibility="gone"/>
 
             <SeekBar
                 android:id="@+id/progress_seekbar"

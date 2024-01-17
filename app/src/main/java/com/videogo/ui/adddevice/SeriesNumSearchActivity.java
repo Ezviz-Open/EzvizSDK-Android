@@ -232,7 +232,7 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
         ImageView searchAnim = (ImageView) findViewById(R.id.searchAnim);
         ((AnimationDrawable) searchAnim.getBackground()).start();
         // 国内支持，海外不支持
-        if (!EzvizAPI.getInstance().isUsingGlobalSDK()) {
+        if (!EzvizAPI.getInstance().isUsingGlobalSDK() && mType == 0) {
             findViewById(R.id.touchAP).setVisibility(View.VISIBLE);
         }
     }
