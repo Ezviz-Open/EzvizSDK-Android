@@ -3,11 +3,24 @@
 package com.videogo.ui.others
 
 import android.app.ActivityManager
+import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
+import android.text.InputFilter
+import android.text.InputFilter.LengthFilter
+import android.text.InputType
+import android.text.TextUtils
 import android.util.Log
+import android.util.TypedValue
+import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
+import android.view.WindowManager
+import android.widget.*
+import com.videogo.constant.Constant
 import com.videogo.global.ValueKeys
 import com.videogo.openapi.EZGlobalSDK
 import com.videogo.openapi.EZOpenSDK
@@ -18,15 +31,21 @@ import com.videogo.ui.videotalk.ConfluenceTestEntranceActivity
 import com.videogo.ui.videotalk.EZRtcTestActivity
 import com.videogo.ui.videotalk.EZVideoMeetingService
 import com.videogo.ui.videotalk.MultiTestActivity
+import com.videogo.util.LocalInfo
 import com.videogo.util.SpTool
+import com.videogo.util.Utils
+import com.videogo.util.VerifyCodeInput.VerifyCodeInputListener
 import ezviz.ezopensdk.R
 import ezviz.ezopensdkcommon.common.RootActivity
+import kotlinx.android.synthetic.main.activity_more_features_entrance.*
 
 class MoreFeaturesEntranceActivity : RootActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_more_features_entrance)
+        title_bar.setTitle("萤石功能测试")
+        title_bar.addBackButton(View.OnClickListener { onBackPressed() })
     }
 
     fun onClickDebug(v: View){
@@ -96,6 +115,7 @@ class MoreFeaturesEntranceActivity : RootActivity() {
         } else {
             EZOpenSDK.enableP2P(true)
         }
+        showToast("p2p已开启")
     }
 
     fun onClickP2pClose(view: View) {
@@ -105,8 +125,8 @@ class MoreFeaturesEntranceActivity : RootActivity() {
         } else {
             EZOpenSDK.enableP2P(false)
         }
+        showToast("p2p已关闭")
     }
-
 
     /**
      * 用来判断服务是否运行.
