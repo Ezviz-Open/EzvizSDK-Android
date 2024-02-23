@@ -2,15 +2,17 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="300dp"
-    android:background="@color/common_bg" >
-    
+    android:background="@color/common_bg">
+
+    <!-- 对讲效果 -->
     <com.videogo.widget.RingView
         android:id="@+id/talkback_rv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/transparent"
-        android:visibility="gone" /> 
-            
+        android:visibility="gone" />
+
+    <!-- 右上角关闭 -->
     <ImageButton
         android:id="@+id/talkback_close_btn"
         android:layout_width="wrap_content"
@@ -18,17 +20,17 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:background="@drawable/play_close_selector"
-        android:onClick="onClick" />    
-        
-   <Button
-       android:id="@+id/talkback_control_btn"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:layout_centerInParent="true"
-       android:text="@string/press_to_talk_release_to_listen"
-       android:textColor="@color/white"
-       android:textSize="@dimen/realplay_button_text_size"
-       android:background="@drawable/play_talkback_selector"/>
+        android:onClick="onClick" />
+
+    <Button
+        android:id="@+id/talkback_control_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="@drawable/play_talkback_selector"
+        android:text="@string/press_to_talk_release_to_listen"
+        android:textColor="@color/white"
+        android:textSize="@dimen/realplay_button_text_size" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -45,5 +47,38 @@
             android:text="@string/switch_to_handset" />
 
     </LinearLayout>
-			             
+
+    <!-- 变声 -->
+    <LinearLayout
+        android:id="@+id/talk_voice_change_ll"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onTalkVoiceChangeClick"
+            android:tag="0"
+            android:text="原声" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onTalkVoiceChangeClick"
+            android:tag="7"
+            android:text="小丑音" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onTalkVoiceChangeClick"
+            android:tag="-7"
+            android:text="大叔音" />
+
+    </LinearLayout>
+
 </RelativeLayout>

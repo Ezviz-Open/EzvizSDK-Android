@@ -89,13 +89,13 @@ import com.videogo.openapi.EZConstants.EZFecPlaceType;
 import com.videogo.openapi.EZConstants.EZFecCorrectType;
 import com.videogo.openapi.EZOpenSDKListener;
 import com.videogo.openapi.EZPlayer;
+import com.videogo.openapi.EzvizAPI;
 import com.videogo.openapi.bean.EZCameraInfo;
 import com.videogo.openapi.bean.EZDeviceInfo;
 import com.videogo.openapi.bean.EZDevicePtzAngleInfo;
 import com.videogo.openapi.bean.EZPMPlayPrivateTokenInfo;
 import com.videogo.openapi.bean.EZVideoQualityInfo;
 import com.videogo.realplay.RealPlayStatus;
-import com.videogo.stream.EZTalkback;
 import com.videogo.ui.cameralist.EZCameraListActivity;
 import com.videogo.ui.common.EZBusinessTool;
 import com.videogo.ui.common.ScreenOrientationHelper;
@@ -120,7 +120,6 @@ import com.videogo.widget.loading.LoadingTextView;
 
 import org.MediaPlayer.PlayM4.Player;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -128,7 +127,6 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.videogo.util.VideoFileUtil;
 import com.videogo.global.DemoConfig;
 import ezviz.ezopensdk.R;
 
@@ -863,7 +861,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         }
 
         setRealPlaySvLayout();
-        mScreenOrientationHelper = new ScreenOrientationHelper(this, mFullscreenButton, /*mFullscreenFullButton*/mFullScreenTitleBarBackBtn);
+        mScreenOrientationHelper = new ScreenOrientationHelper(this, mFullscreenButton, mFullScreenTitleBarBackBtn);
 
         mWaitDialog = new WaitDialog(this, android.R.style.Theme_Translucent_NoTitleBar);
         mWaitDialog.setCancelable(false);
@@ -912,7 +910,9 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             fecViewLayoutHelper.playWindowVg = playWindowVg;
             fecViewLayoutHelper.player = mEZPlayer;
             fecViewLayoutHelper.playPtzRL = realPlayPtzRL;
-            fecViewLayoutHelper.setSurfaceViews(new SurfaceView[]{mRealPlaySv1, mRealPlaySv2, mRealPlaySv3, mRealPlaySv4, mRealPlaySv5, mRealPlaySv6});
+            SurfaceView[] surfaceViews = new SurfaceView[]{mRealPlaySv1, mRealPlaySv2, mRealPlaySv3, mRealPlaySv4,
+                    mRealPlaySv5, mRealPlaySv6};
+            fecViewLayoutHelper.setSurfaceViews(surfaceViews);
             playWindowVg.post(() -> fecViewLayoutHelper.setPlayViewAspectRadioWith1V1());
         }
     }
@@ -1524,6 +1524,21 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
     }
 
     /**
+     * 对讲变声
+     */
+    public void onTalkVoiceChangeClick(View view) {
+        EZConstants.EZVoiceChangeType voiceChangeType = EZBusinessTool.getVoiceChangeType((String) view.getTag());
+        mEZPlayer.startVoiceChange(voiceChangeType, (isSuccess, errorInfo) -> runOnUiThread(() -> {
+            if (isSuccess) {
+                showToast("voice change success");
+            } else {
+                String info = errorInfo != null ? "" + errorInfo.errorCode : "";
+                showToast("voice change failed. " + info);
+            }
+        }));
+    }
+
+    /**
      * 各类弹出框中的点击事件
      */
     private OnClickListener mOnPopWndClickListener = v -> {
@@ -1715,7 +1730,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         new Thread(() -> {
             boolean ptz_result = false;
             try {
-                    EzvizApplication.getOpenSDK().controlPTZMix(mCameraInfo.getDeviceSerial(), mCameraInfo.getCameraNo(), command,
+                ptz_result = EzvizApplication.getOpenSDK().controlPTZ(mCameraInfo.getDeviceSerial(), mCameraInfo.getCameraNo(), command,
                             action, EZConstants.PTZ_SPEED_FAST);
                 if (action == EZPTZAction.EZPTZActionSTOP) {
                     Message msg = Message.obtain();
@@ -1760,6 +1775,9 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             mTalkRingView.setVisibility(View.VISIBLE);
             mTalkBackControlBtn.setEnabled(false);
             mTalkBackControlBtn.setText(R.string.talking);
+        }
+        if (!EzvizAPI.getInstance().isUsingGlobalSDK()) {// 对讲变声支持国内，不支持海外
+            layoutView.findViewById(R.id.talk_voice_change_ll).setVisibility(View.VISIBLE);
         }
 
         int height = mLocalInfo.getScreenHeight() - mPortraitTitleBar.getHeight() - mRealPlayPlayRl.getHeight()

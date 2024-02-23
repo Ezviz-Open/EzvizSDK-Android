@@ -17,6 +17,22 @@ import com.videogo.openapi.bean.EZSubDeviceInfo;
 public class EZBusinessTool {
 
     /**
+     * 获取变声类型
+     * @param tag
+     * @return
+     */
+    public static EZConstants.EZVoiceChangeType getVoiceChangeType(String tag) {
+        switch (Integer.parseInt(tag)) {
+            case -7:
+                return EZConstants.EZVoiceChangeType.EZ_VOICE_CHANGE_TYPE_MAN;
+            case 7:
+                return EZConstants.EZVoiceChangeType.EZ_VOICE_CHANGE_TYPE_CLOWN;
+            default:
+                return EZConstants.EZVoiceChangeType.EZ_VOICE_CHANGE_TYPE_NORMAL;
+        }
+    }
+
+    /**
      * 根据type获取取流方式名
      *
      * @param streamType
