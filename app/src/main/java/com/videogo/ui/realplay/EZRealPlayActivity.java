@@ -947,8 +947,6 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         }
         if (mZoomScale != 0) {
             LogUtil.d(TAG, "stopZoom stop:" + mZoomScale);
-            //            mEZOpenSDK.controlPTZ(mZoomScale > 1.01 ? RealPlayStatus.PTZ_ZOOMIN
-            //                    : RealPlayStatus.PTZ_ZOOMOUT, RealPlayStatus.PTZ_SPEED_DEFAULT, EZPlayer.PTZ_COMMAND_STOP);
             mZoomScale = 0;
         }
     }
@@ -1479,7 +1477,9 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
                 }
             });
         }
-
+        // 对讲开启前，关闭播放器的声音；否则画面码流和对讲码流中同时播放声音，导致回音
+        // Turn off the sound of the player before starting the intercom; Otherwise,
+        // playing sound simultaneously in both the picture stream and the intercom stream may cause echo
         if (mEZPlayer != null) {
             mEZPlayer.closeSound();
         }
@@ -1731,7 +1731,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             boolean ptz_result = false;
             try {
                 ptz_result = EzvizApplication.getOpenSDK().controlPTZ(mCameraInfo.getDeviceSerial(), mCameraInfo.getCameraNo(), command,
-                            action, EZConstants.PTZ_SPEED_FAST);
+                        action, EZConstants.PTZ_SPEED_FAST);
                 if (action == EZPTZAction.EZPTZActionSTOP) {
                     Message msg = Message.obtain();
                     msg.what = MSG_HIDE_PTZ_ANGLE;
