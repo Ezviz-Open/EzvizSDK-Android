@@ -37,10 +37,6 @@ public class QueryDeviceRecordFilesAsyncTask extends HikAsyncTask<String, Void, 
     private List<CloudPartInfoFile> convertCalendarFiles;
     private QueryPlayBackListTaskCallback playBackListTaskCallback = null;
     private volatile boolean abort = false;
-    private boolean onlyHasLocal = false;
-    private int localErrorCode = 0;
-    private int queryMode = DeviceReportInfo.REPOERT_QUERY_RELATE_TF;
-    private String queryDetail = "";
     private int cloudTotal;
     private final String MINUTE;
 
@@ -61,10 +57,6 @@ public class QueryDeviceRecordFilesAsyncTask extends HikAsyncTask<String, Void, 
         this.queryDate = queryDate;
     }
 
-    public void setOnlyHasLocal(boolean onlyHasLocal) {
-        this.onlyHasLocal = onlyHasLocal;
-    }
-
     @Override
     protected void onPreExecute() {
     }
@@ -78,22 +70,10 @@ public class QueryDeviceRecordFilesAsyncTask extends HikAsyncTask<String, Void, 
     @Override
     protected void onPostExecute(Integer result) {
         if (!abort) {
-            playBackListTaskCallback
-                    .queryTaskOver(RemoteListContant.TYPE_LOCAL, queryMode, localErrorCode, queryDetail);
             if (result == RemoteListContant.QUERY_LOCAL_SUCCESSFUL) {
                 playBackListTaskCallback.querySuccessFromDevice(playBackListLocalItems, cloudTotal, convertCalendarFiles);
             } else if (result == RemoteListContant.QUERY_NO_DATA) {
-                if (onlyHasLocal) {
-                    playBackListTaskCallback.queryOnlyLocalNoData();
-                } else {
-                    playBackListTaskCallback.queryLocalNoData();
-                }
-            } else if (result == RemoteListContant.QUERY_EXCEPTION) {
-                if (onlyHasLocal) {
-                    playBackListTaskCallback.queryException();
-                } else {
-                    playBackListTaskCallback.queryLocalException();
-                }
+                playBackListTaskCallback.queryHasNoData(RemoteListContant.TYPE_LOCAL);
             }
         }
     }
@@ -144,7 +124,7 @@ public class QueryDeviceRecordFilesAsyncTask extends HikAsyncTask<String, Void, 
             for (int i = 0; i < tmpList.size(); i++) {
                 EZDeviceRecordFile file = tmpList.get(i);
                 CloudPartInfoFile cpif = new CloudPartInfoFile();
-
+                // 云存储和SD卡录像共用组件，所以需要做对象转换
                 convertEZDeviceRecordFile2CloudPartInfoFile(cpif, file, i);
                 convertCalendarFiles.add(cpif);
             }
@@ -192,7 +172,6 @@ public class QueryDeviceRecordFilesAsyncTask extends HikAsyncTask<String, Void, 
             return RemoteListContant.QUERY_LOCAL_SUCCESSFUL;
         }
         return RemoteListContant.QUERY_NO_DATA;
-
     }
 
     private CloudPartInfoFile getCloudPartInfoFile(CloudPartInfoFile cloudPartInfoFile, Date beginDate, Date endDate) {

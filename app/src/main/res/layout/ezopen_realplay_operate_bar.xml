@@ -151,5 +151,67 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/realplay_operate_third_line_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <!-- 云录制截图上传 -->
+            <LinearLayout
+                android:id="@+id/realplay_snapshot_upload_btn_ly"
+                android:layout_width="@dimen/width_functional_widget"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <ImageButton
+                    android:id="@+id/realplay_snapshot_upload_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/play_previously_selector"
+                    android:onClick="onClick" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="7dp"
+                    android:text="@string/capture_upload"
+                    android:textColor="@color/common_sub_text"
+                    android:textSize="@dimen/realplay_text_size" />
+
+            </LinearLayout>
+
+            <!--  -->
+            <LinearLayout
+                android:layout_width="@dimen/width_functional_widget"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:visibility="invisible">
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/play_talk_selector"
+                    android:onClick="onClick" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="7dp"
+                    android:text="@string/talk"
+                    android:textColor="@color/common_sub_text"
+                    android:textSize="@dimen/realplay_text_size" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
     </LinearLayout>
+
 </HorizontalScrollView>

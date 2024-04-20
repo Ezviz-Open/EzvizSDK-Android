@@ -238,6 +238,7 @@
     <string name="talk">Two-way Audio</string>
     <string name="capture">Snapshot</string>
     <string name="record">Video</string>
+    <string name="capture_upload">CloudRecord Snapshot Upload</string>
     <string name="viewmode">View Mode</string>
     <string name="close_camera_lens">Privacy Mode</string>
     <string name="open_camera_lens">Privacy Mode</string>
@@ -429,8 +430,10 @@
     <string name="ez_auto_wifi_line_connect">Wired Connection</string>
     <string name="ez_auto_wifi_connecting_failed">Configuring Wi-Fi failed, try again or check whether the Wi-Fi password is right</string>
     <string name="ez_cloud_video">CloudPlay</string>
-    <string name="ez_device_video">No video in the SD card.</string>
+    <string name="ez_sdkcloudrecord_video">SDKCloudRecordPlay</string>
+    <string name="ez_device_video">DevicePlay</string>
     <string name="ez_no_remote_data">No record found in the CloudPlay.</string>
+    <string name="ez_no_remote_data_sdkcloud">No record found in the SDKCloudPlay.</string>
     <string name="ez_no_remote_data_device">No local record found.</string>
     <string name="ez_event_message">Message</string>
     <string name="ez_event_message_detail">Message Details</string>

@@ -251,6 +251,7 @@
     <string name="talk">对讲</string>
     <string name="capture">截图</string>
     <string name="record">录像</string>
+    <string name="capture_upload">云录制截图上传</string>
     <string name="viewmode">查看模式</string>
     <string name="close_camera_lens">镜头遮蔽</string>
     <string name="open_camera_lens">镜头开启</string>
@@ -447,8 +448,10 @@
     <string name="ez_auto_wifi_line_connect">使用有线连接</string>
     <string name="ez_auto_wifi_connecting_failed">配置Wi-Fi失败，请重试或返回检查Wi-Fi密码是否正确</string>
     <string name="ez_cloud_video">云录像</string>
+    <string name="ez_sdkcloudrecord_video">SDK云录制</string>
     <string name="ez_device_video">SD卡录像</string>
     <string name="ez_no_remote_data">没有查询到云录像</string>
+    <string name="ez_no_remote_data_sdkcloud">没有查询到云录制录像</string>
     <string name="ez_no_remote_data_device">没有查询到本地录像</string>
     <string name="ez_event_message">消息</string>
     <string name="ez_event_message_detail">消息详情</string>

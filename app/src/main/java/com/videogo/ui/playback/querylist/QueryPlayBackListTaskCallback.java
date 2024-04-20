@@ -14,22 +14,12 @@ import com.videogo.openapi.bean.resp.CloudPartInfoFile;
 
 public interface QueryPlayBackListTaskCallback {
 
-    void queryHasNoData();
+    void queryHasNoData(int type);
 
-    void queryOnlyHasLocalFile();
+    void querySuccessFromCloud(List<CloudPartInfoFileEx> cloudPartInfoFileExs, List<CloudPartInfoFile> cloudPartInfoFile);
 
-    void queryOnlyLocalNoData();
-
-    void queryLocalException();
-
-    void querySuccessFromCloud(List<CloudPartInfoFileEx> cloudPartInfoFileExs, int queryMLocalStatus, List<CloudPartInfoFile> cloudPartInfoFile);
+    void querySuccessFromSDKCloud(List<CloudPartInfoFileEx> cloudPartInfoFileExs, List<CloudPartInfoFile> cloudPartInfoFile);
 
     void querySuccessFromDevice(List<CloudPartInfoFileEx> cloudPartInfoFileExs, int position, List<CloudPartInfoFile> cloudPartInfoFile);
-
-    void queryLocalNoData();
-
-    void queryException();
-
-    void queryTaskOver(int type, int queryMode, int queryErrorCode, String detail);
 
 }

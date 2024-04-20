@@ -59,28 +59,12 @@ public enum ServerAreasEnum {
     /*线上平台的id范围为0到99，测试平台的id范围为100+*/
 
     /**
-     * 测试平台:pb
-     */
-    TEST2(100, "pb", "https://pbopen.ys7.com",
-            "https://pbopenauth.ys7.com",
-            "5f111fc7a1ff4e5897795a0240412c6d"),
-    /**
-     * 测试平台:test11
-     */
-    TEST11(105, "test11", "https://test11open.ys7.com",
-            "https://test11openauth.ys7.com"),
-    /**
      * 测试平台:test12
      */
     TEST12(110, "test12", "https://test12open.ys7.com",
             "https://test12openauth.ys7.com",
             "b22035492c7949bca95286382ed90b01"),
 
-    TEST14(112, "test14", "https://test14open.ys7.com",
-            "https://test14openauth.ys7.com"),
-
-    TEST15(113, "test15", "https://test15open.ys7.com",
-            "https://test15openauth.ys7.com"),
     /**
      * 测试平台:testcn
      */

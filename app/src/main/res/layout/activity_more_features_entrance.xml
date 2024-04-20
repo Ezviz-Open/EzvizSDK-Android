@@ -101,6 +101,14 @@
                 android:paddingBottom="10dp"
                 android:text="P2P关闭" />
 
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:onClick="onClickCloudRecordSpaceId"
+                android:paddingBottom="10dp"
+                android:text="设置云录制SpaceId" />
+
         </LinearLayout>
 
     </ScrollView>

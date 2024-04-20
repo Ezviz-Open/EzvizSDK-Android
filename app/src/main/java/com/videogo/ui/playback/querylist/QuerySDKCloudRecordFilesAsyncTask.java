@@ -5,12 +5,14 @@ import android.app.Activity;
 import com.videogo.EzvizApplication;
 import com.videogo.device.DeviceReportInfo;
 import com.videogo.exception.BaseException;
+import com.videogo.global.ValueKeys;
 import com.videogo.openapi.bean.EZCloudRecordFile;
 import com.videogo.openapi.bean.resp.CloudPartInfoFile;
+import com.videogo.ui.common.HikAsyncTask;
 import com.videogo.ui.playback.RemoteListContant;
 import com.videogo.ui.playback.bean.CloudPartInfoFileEx;
-import com.videogo.ui.common.HikAsyncTask;
 import com.videogo.util.CollectionUtil;
+import com.videogo.util.SpTool;
 import com.videogo.util.Utils;
 
 import java.text.SimpleDateFormat;
@@ -22,7 +24,7 @@ import java.util.List;
 
 import ezviz.ezopensdk.R;
 
-public class QueryCloudRecordFilesAsyncTask extends HikAsyncTask<String, Void, Integer> {
+public class QuerySDKCloudRecordFilesAsyncTask extends HikAsyncTask<String, Void, Integer> {
     private final String MINUTE;
 
     // 设备序列号
@@ -32,12 +34,13 @@ public class QueryCloudRecordFilesAsyncTask extends HikAsyncTask<String, Void, I
     // 搜索日期（格式为：yyyy-MM-dd）
     private Date searchDate;
     private volatile boolean abort = false;
+    private int cloudErrorCode = 0;
     private QueryPlayBackListTaskCallback queryPlayBackListTaskCallback;
     private List<CloudPartInfoFile> cloudPartFiles;
     List<CloudPartInfoFileEx> cloudPartInfoFileExList = new ArrayList<CloudPartInfoFileEx>();
 
-    public QueryCloudRecordFilesAsyncTask(String deviceSerial, int channelNo,
-                                          QueryPlayBackListTaskCallback queryPlayBackListTaskCallback) {
+    public QuerySDKCloudRecordFilesAsyncTask(String deviceSerial, int channelNo,
+                                             QueryPlayBackListTaskCallback queryPlayBackListTaskCallback) {
         MINUTE = ((Activity) queryPlayBackListTaskCallback).getString(R.string.play_hour);
         this.deviceSerial = deviceSerial;
         this.channelNo = channelNo;
@@ -67,9 +70,9 @@ public class QueryCloudRecordFilesAsyncTask extends HikAsyncTask<String, Void, I
     protected void onPostExecute(Integer result) {
         if (!abort) {
             if (result == RemoteListContant.QUERY_NO_DATA) {// 云没有数据
-                queryPlayBackListTaskCallback.queryHasNoData(RemoteListContant.TYPE_CLOUD);
+                queryPlayBackListTaskCallback.queryHasNoData(RemoteListContant.TYPE_SDKCLOUD);
             } else if (result == RemoteListContant.QUERY_CLOUD_SUCCESSFUL) {// 云有数据
-                queryPlayBackListTaskCallback.querySuccessFromCloud(cloudPartInfoFileExList, cloudPartFiles);
+                queryPlayBackListTaskCallback.querySuccessFromSDKCloud(cloudPartInfoFileExList, cloudPartFiles);
             }
         }
     }
@@ -90,6 +93,7 @@ public class QueryCloudRecordFilesAsyncTask extends HikAsyncTask<String, Void, I
     	dst.setVideoType(src.getVideoType());
         dst.setiStorageVersion(src.getiStorageVersion());
         dst.setFileSize(src.getFileSize());
+        dst.setSpaceId(src.getSpaceId());
     }
 
     private int queryCloudFile(){
@@ -107,11 +111,10 @@ public class QueryCloudRecordFilesAsyncTask extends HikAsyncTask<String, Void, I
 
 		List<EZCloudRecordFile> tmpList = null;
 		try {
-			tmpList = EzvizApplication.getOpenSDK().searchRecordFileFromCloud(deviceSerial,channelNo,
-					startTime, endTime);
+			tmpList = EzvizApplication.getOpenSDK().searchRecordFileFromSDKCloud(deviceSerial, channelNo,
+					startTime, endTime, SpTool.obtainValue(ValueKeys.SDK_CLOUD_SPACEID));
 		} catch (BaseException e) {
 			e.printStackTrace();
-
         }
 
         cloudPartFiles = new ArrayList<>();

@@ -4,8 +4,16 @@ import android.text.TextUtils;
 
 import com.videogo.openapi.EZConstants;
 import com.videogo.openapi.bean.EZCameraInfo;
+import com.videogo.openapi.bean.EZCloudRecordFile;
 import com.videogo.openapi.bean.EZDeviceInfo;
+import com.videogo.openapi.bean.EZDeviceRecordFile;
 import com.videogo.openapi.bean.EZSubDeviceInfo;
+import com.videogo.openapi.bean.resp.CloudPartInfoFile;
+import com.videogo.util.Utils;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Copyright (C) 2022 HIKVISION Inc.
@@ -109,6 +117,37 @@ public class EZBusinessTool {
             default:
                 return deviceType.startsWith("CAS_WG_TEST");
         }
+    }
+
+    public static void convertCloudPartInfoFile2EZCloudRecordFile(EZCloudRecordFile dst, CloudPartInfoFile src) {
+        dst.setCoverPic(src.getPicUrl());
+        dst.setDownloadPath(src.getDownloadPath());
+        dst.setFileId(src.getFileId());
+        dst.setEncryption(src.getKeyCheckSum());
+        dst.setStartTime(Utils.convert14Calender(src.getStartTime()));
+        dst.setStopTime(Utils.convert14Calender(src.getEndTime()));
+        dst.setDeviceSerial(src.getDeviceSerial());
+        dst.setCameraNo(src.getCameraNo());
+        dst.setVideoType(src.getVideoType());
+        dst.setiStorageVersion(src.getiStorageVersion());
+        dst.setFileSize(src.getFileSize());
+        dst.setSpaceId(src.getSpaceId());
+    }
+
+    public static void convertCloudPartInfoFile2EZDeviceRecordFile(EZDeviceRecordFile dst, CloudPartInfoFile src) {
+        dst.setStartTime(Utils.convert14Calender(src.getStartTime()));
+        dst.setStopTime(Utils.convert14Calender(src.getEndTime()));
+    }
+
+    public static Date getMinDate() {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Date date = sdf.parse("2012-01-01");
+            return date;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**

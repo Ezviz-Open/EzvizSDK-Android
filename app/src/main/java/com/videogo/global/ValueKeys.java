@@ -7,5 +7,7 @@ public enum ValueKeys {
     /*设备序列号*/
     DEVICE_SERIAL,
     /*萤石测试人员-自动化测试专用*/
-    AUTO_TEST;
+    AUTO_TEST,
+    /*云录制空间id*/
+    SDK_CLOUD_SPACEID;
 }

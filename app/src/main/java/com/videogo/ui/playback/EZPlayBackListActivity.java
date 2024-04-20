@@ -6,12 +6,9 @@ import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.app.DatePickerDialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -20,40 +17,28 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
-import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.Settings;
 import android.support.v4.content.ContextCompat;
-import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.Animation.AnimationListener;
-import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.DatePicker;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -66,7 +51,6 @@ import android.widget.RelativeLayout.LayoutParams;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.videogo.constant.Constant;
 import com.videogo.constant.IntentConsts;
@@ -96,6 +80,7 @@ import com.videogo.ui.playback.bean.CloudPartInfoFileEx;
 import com.videogo.ui.playback.querylist.QueryCloudRecordFilesAsyncTask;
 import com.videogo.ui.playback.querylist.QueryDeviceRecordFilesAsyncTask;
 import com.videogo.ui.playback.querylist.QueryPlayBackListTaskCallback;
+import com.videogo.ui.playback.querylist.QuerySDKCloudRecordFilesAsyncTask;
 import com.videogo.ui.playback.querylist.SectionListAdapter;
 import com.videogo.ui.playback.querylist.SectionListAdapter.OnHikItemClickListener;
 import com.videogo.ui.playback.querylist.StandardArrayAdapter;
@@ -105,6 +90,7 @@ import com.videogo.stream.EZDeviceStreamDownload;
 import com.videogo.ui.common.EZBusinessTool;
 import com.videogo.ui.common.ScreenOrientationHelper;
 import com.videogo.ui.realplay.FecViewLayoutHelper;
+import com.videogo.util.AppUtil;
 import com.videogo.util.AudioPlayUtil;
 import com.videogo.util.DataManager;
 import com.videogo.util.EZUtils;
@@ -114,11 +100,8 @@ import com.videogo.util.LocalInfo;
 import com.videogo.util.LogUtil;
 import com.videogo.util.Utils;
 import com.videogo.widget.CheckTextButton;
-import com.videogo.widget.CustomRect;
-import com.videogo.widget.CustomTouchListener;
 import com.videogo.widget.PinnedHeaderListView;
 import com.videogo.widget.TitleBar;
-import com.videogo.widget.WaitDialog;
 import com.videogo.widget.loading.LoadingTextView;
 import com.videogo.widget.loading.LoadingView;
 import com.videogo.widget.toprightmenu.EZMenuItem;
@@ -149,52 +132,46 @@ import static com.videogo.ui.cameralist.EZCameraListActivity.mDownloadTaskRecord
 import static com.videogo.ui.cameralist.EZCameraListActivity.showSimpleNotification;
 
 @SuppressLint({"DefaultLocale", "HandlerLeak", "NewApi"})
-public class EZPlayBackListActivity extends RootActivity implements QueryPlayBackListTaskCallback,
-        OnHikItemClickListener, /*Callback*/ TextureView.SurfaceTextureListener, OnClickListener, OnTouchListener,
-  ArrayAdapterChangeListener, VerifyCodeInput.VerifyCodeInputListener {
-
+public class EZPlayBackListActivity extends RootActivity implements QueryPlayBackListTaskCallback, OnHikItemClickListener,
+        TextureView.SurfaceTextureListener, OnClickListener, ArrayAdapterChangeListener, VerifyCodeInput.VerifyCodeInputListener {
     // TAG
     private static final String TAG = EZPlayBackListActivity.class.getSimpleName();
 
-    // 动画更新
-    private static final int ANIMATION_UPDATE = 0xde;
-
-    // 显示数据网络提示
-    private boolean mShowNetworkTip = true;
-    private BroadcastReceiver mReceiver = null;
-
     // 查询时间
     private Date queryDate = null;
-    // 自定义ListView
-    private PinnedHeaderListView pinnedHeaderListView;
-    private PinnedHeaderListView mPinnedHeaderListViewForLocal;
-    // 列表适配器
+    // 录像类型
+    private int mRecordType;
+    // 云存储ListView & 适配器
+    private PinnedHeaderListView mPinnedHeaderListViewForCloud;
     private StandardArrayAdapter mCloudRecordsAdapter;
-    // ListView适配器
-    private SectionListAdapter sectionAdapter;
-
+    private SectionListAdapter mSectionAdapterForCloud;
+    // 云录制ListView & 适配器
+    private PinnedHeaderListView mPinnedHeaderListViewForSDKCloud;
+    private StandardArrayAdapter mSDKCloudRecordsAdapter;
+    private SectionListAdapter mSectionAdapterForSDKCloud;
+    // SD卡录像ListView & 适配器
+    private PinnedHeaderListView mPinnedHeaderListViewForLocal;
     private StandardArrayAdapter mDeviceRecordsAdapter;
-    // ListView适配器
     private SectionListAdapter mSectionAdapterForLocal;
 
     // 列表查询task(云存储)
     private QueryCloudRecordFilesAsyncTask queryCloudRecordFilesAsyncTask;
+    // 列表查询task(云录制)
+    private QuerySDKCloudRecordFilesAsyncTask querySDKCloudRecordFilesAsyncTask;
     // 列表查询task(本地)
     private QueryDeviceRecordFilesAsyncTask queryDeviceRecordFilesAsyncTask;
 
     // 标题
     private TitleBar mTitleBar;
-    // 查询异常布局
-    private LinearLayout queryExceptionLayout;
-    // 没有数据
-    private LinearLayout novideoImg;
-    // 没有数据本地
+    // 没有云存储数据
+    private LinearLayout mNovideoImgCloud;
+    // 没有云录制数据
+    private LinearLayout mNovideoImgSDKCloud;
+    // 没有SD卡数据
     private LinearLayout mNoVideoImgLocal;
 
     // 加载进度圈
     private LoadingTextView loadingBar;
-    // 预览UI父视图
-     private RelativeLayout mPlayBackPlayRl;
     // 播放区域
     private RelativeLayout remotePlayBackArea;
     // 关闭播放区域按钮
@@ -208,9 +185,6 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
     private SurfaceView mPlayBackSv4;
     private SurfaceView mPlayBackSv5;
     private SurfaceView mPlayBackSv6;
-    private CustomTouchListener mRemotePlayBackTouchListener = null;
-    // 播放比例
-    private float mPlayScale = 1;
 
     // 本地信息
     private LocalInfo localInfo = null;
@@ -220,7 +194,6 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
     private TextView remoteLoadingBufferTv, touchLoadingBufferTv;
     // 播放进度条
     private SeekBar progressSeekbar = null;
-    private ProgressBar progressBar = null;
     // 开始时间文本
     private TextView beginTimeTV = null;
     // 结束时间文本
@@ -238,8 +211,6 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
     // 播放控制区域
     private LinearLayout controlArea = null;
     private LinearLayout progressArea = null;
-    // 拍照
-    private ImageButton captureBtn = null;
     // 录像
     private ImageButton videoRecordingBtn = null;
     // 下载按钮
@@ -250,7 +221,6 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
     // 屏幕方向
     private int mOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
 
-    private TextView mRemotePlayBackRatioTv = null;
     // 页面Layout
     private ViewGroup remoteListPage = null;
 
@@ -301,31 +271,6 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
     private String mRecordTime = null;
     // 是否为选择日期事件
     private boolean isDateSelected = false;
-    // 下载动画
-    private ImageView downloading;
-    // 下载个数
-    private TextView downloadingNumber;
-    // 下载区域布局
-    private RelativeLayout downLayout;
-    // 云播放下载提示状态
-    private boolean isCloudPrompt = false;
-    // 云播放下载提示状态key
-    private static final String HAS_BEAN_CLOUD_PROMPT = "has_bean_cloud_prompt";
-
-    private SharedPreferences sharedPreferences;
-    // 抖动动画
-    private Animation downShake;
-
-    private AnimationDrawable downDrawable;
-
-    private ImageView matteImage;
-
-    private LinearLayout autoLayout;
-
-    // 取消按钮
-    private Button cancelBtn;
-    // 文件大小文本
-    private TextView fileSizeText;
     // 标题栏中间日期边上的向下箭头
     private ImageView selDateImage;
 
@@ -338,22 +283,18 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
     private CheckTextButton mFullscreenButton;
     private ScreenOrientationHelper mScreenOrientationHelper;
 
-    private WaitDialog mWaitDlg = null;
-    // 右上角编辑按钮
-    private TextView rightEditView;
     // 左上角返回按钮
     private Button backBtn;
-    // 删除视频
-    private TextView deleteVideoText;
 
     private EZPlayer mPlaybackPlayer = null;
     private RelativeLayout mContentTabCloudRl;
+    private RelativeLayout mContentTabSDKCloudRl;
     private RelativeLayout mContentTabDeviceRl;
-    private ImageView mCloudVideoImg;
+    private ImageView mCloudVideoActiveImg;
     private CheckTextButton mCheckBtnCloud;
+    private CheckTextButton mCheckBtnSDKCloud;
     private CheckTextButton mCheckBtnDevice;
     private FrameLayout mTabContentMainFrame;
-    private boolean mIsLocalDataQueryPerformed = false;
     // whether it is in recording
     private boolean isRecording = false;
     private ViewGroup mControlBarRL;
@@ -431,7 +372,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                     updateRemotePlayUI();
                     break;
                 case RemoteListContant.MSG_REMOTELIST_STREAM_TIMEOUT:
-                    handleStreamTimeOut();
+                    // 处理播放取流超时
                     break;
                 case MSG_REMOTE_PLAYBACK_RATE_LOWER:
                     Log.d(TAG, "MSG_REMOTE_PLAYBACK_RATE_LOWER");
@@ -463,10 +404,6 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         }
         showToast("changed to lower playback rate: " + changedPlaybackRate);
         mPlaybackRateBtn.setText(changedPlaybackRate);
-    }
-
-    // 处理播放取流超时
-    private void handleStreamTimeOut() {
     }
 
     // 重播
@@ -513,14 +450,13 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         remotePlayBackArea.setVisibility(View.GONE);
         // 不允许旋转屏幕
         mScreenOrientationHelper.disableSensorOrientation();
-        progressBar.setVisibility(View.GONE);
         mControlDisplaySec = 0;
         loadingImgView.setVisibility(View.GONE);
         loadingPbLayout.setVisibility(View.GONE);
         touchProgressLayout.setVisibility(View.GONE);
         status = RemoteListContant.STATUS_STOP;
         notPause = false;
-        pinnedHeaderListView.startAnimation();
+        mPinnedHeaderListViewForCloud.startAnimation();
     }
 
     // 更新录像时间
@@ -563,11 +499,9 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         }
         mControlDisplaySec = 0;
         exitBtn.setVisibility(View.GONE);
-        progressBar.setVisibility(View.GONE);
         beginTimeTV.setText(endTimeTV.getText());
         status = RemoteListContant.STATUS_STOP;
         loadingPbLayout.setVisibility(View.VISIBLE);
-        autoLayout.setVisibility(View.GONE);
         // 播放完毕隐藏进度条
         progressArea.setVisibility(View.INVISIBLE);
         // 展示再次播放功能按钮
@@ -608,13 +542,10 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // 页面统计
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ez_playback_list_page);
         // 保持屏幕常亮
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        mWaitDlg = new WaitDialog(this, android.R.style.Theme_Translucent_NoTitleBar);
-        mWaitDlg.setCancelable(false);
         getData();
         if (mCameraInfo == null) {
             LogUtil.d(TAG, "cameraInfo is null");
@@ -624,7 +555,6 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         startQueryCloudRecordFiles();
         initListener();
         initRemoteListPlayer();
-        showDownPopup();
         fakePerformClickUI();
         // 国内支持SD卡录像封面获取，海外不支持
         if (!EzvizAPI.getInstance().isUsingGlobalSDK()) {
@@ -648,20 +578,30 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
     }
 
     private void fakePerformClickUI() {
-        if (autoLayout.getVisibility() == View.VISIBLE) {
-            autoLayout.setVisibility(View.GONE);
-        }
-        fileSizeText.setText("");
         downloadBtn.setPadding(0, 0, 0, 0);
         remotePlayBackArea.setVisibility(View.VISIBLE);
         errorReplay.setVisibility(View.GONE);
         loadingPlayBtn.setVisibility(View.GONE);
     }
 
+    private void recordCheckBtnsReset() {
+        mCheckBtnCloud.setChecked(false);
+        mCheckBtnSDKCloud.setChecked(false);
+        mCheckBtnDevice.setChecked(false);
+        mContentTabCloudRl.setVisibility(View.GONE);
+        mContentTabSDKCloudRl.setVisibility(View.GONE);
+        mContentTabDeviceRl.setVisibility(View.GONE);
+    }
+
     private void showTab(int id) {
         switch (id) {
-            case R.id.novideo_img:
-                novideoImg.setVisibility(View.VISIBLE);
+            case R.id.novideo_img_cloud:
+                mNovideoImgCloud.setVisibility(View.VISIBLE);
+                loadingBar.setVisibility(View.GONE);
+                mTabContentMainFrame.setVisibility(View.VISIBLE);
+                break;
+            case R.id.novideo_img_sdkcloud:
+                mNovideoImgSDKCloud.setVisibility(View.VISIBLE);
                 loadingBar.setVisibility(View.GONE);
                 mTabContentMainFrame.setVisibility(View.VISIBLE);
                 break;
@@ -672,27 +612,28 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                 mTabContentMainFrame.setVisibility(View.VISIBLE);
                 break;
             case R.id.loadingTextView:
-                novideoImg.setVisibility(View.GONE);
+                mNovideoImgCloud.setVisibility(View.GONE);
                 loadingBar.setVisibility(View.VISIBLE);
                 mTabContentMainFrame.setVisibility(View.GONE);
+                break;
+            case R.id.content_tab_cloud_root:
+                mNovideoImgCloud.setVisibility(View.GONE);
+                loadingBar.setVisibility(View.GONE);
+                mTabContentMainFrame.setVisibility(View.VISIBLE);
+                break;
+            case R.id.content_tab_sdkcloud_root:
+                mNovideoImgSDKCloud.setVisibility(View.GONE);
+                loadingBar.setVisibility(View.GONE);
+                mTabContentMainFrame.setVisibility(View.VISIBLE);
                 break;
             case R.id.content_tab_device_root:
                 mNoVideoImgLocal.setVisibility(View.GONE);
                 loadingBar.setVisibility(View.GONE);
                 mTabContentMainFrame.setVisibility(View.VISIBLE);
                 break;
-            case R.id.ez_tab_content_frame:
-                novideoImg.setVisibility(View.GONE);
-                loadingBar.setVisibility(View.GONE);
-                mTabContentMainFrame.setVisibility(View.VISIBLE);
-                break;
             default:
                 break;
         }
-    }
-
-    private void showDownPopup() {
-
     }
 
     // 更新抓图/录像显示UI
@@ -755,13 +696,10 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                 if (errorCode == ErrorCode.ERROR_CAS_STREAM_RECV_ERROR || errorCode == ErrorCode.ERROR_TRANSF_DEVICE_OFFLINE ||
                         errorCode == ErrorCode.ERROR_CAS_PLATFORM_CLIENT_REQUEST_NO_PU_FOUNDED ||
                         errorCode == ErrorCode.ERROR_CAS_MSG_PU_NO_RESOURCE) {
-                    updateCameraInfo();
+
                 }
             }
         }
-    }
-
-    private void updateCameraInfo() {
     }
 
     /**
@@ -791,14 +729,12 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         controlArea.setVisibility(View.VISIBLE);
         progressArea.setVisibility(View.VISIBLE);
         mControlDisplaySec = 0;
-        captureBtn.setEnabled(true);
         videoRecordingBtn.setEnabled(true);
         setRemoteListSvLayout();
         mScreenOrientationHelper.enableSensorOrientation();
         loadingImgView.setVisibility(View.GONE);
         loadingPbLayout.setVisibility(View.GONE);
         touchProgressLayout.setVisibility(View.GONE);
-        progressBar.setVisibility(View.GONE);
         errorTipsVg.setVisibility(View.GONE);
         errorReplay.setVisibility(View.GONE);
         downloadBtn.setPadding(Utils.dip2px(this, 5), 0, Utils.dip2px(this, 5), 0);
@@ -845,12 +781,6 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
 
         ViewGroup playWindowVg = (ViewGroup) findViewById(R.id.vg_play_window);
         playWindowVg.setLayoutParams(svLp);
-
-        mRemotePlayBackTouchListener.setSacaleRect(Constant.MAX_SCALE, 0, 0, realPlaySvlp.width, realPlaySvlp.height);
-    }
-
-    private void onPlayAreaTouched() {
-        // do nothing
     }
 
     private void handlePlayProgress(Calendar osdTime) {
@@ -860,7 +790,6 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         double x = ((osd - begin) * RemoteListContant.PROGRESS_MAX_VALUE) / (double) (end - begin);
         int progress = (int) x;
         progressSeekbar.setProgress(progress);
-        progressBar.setProgress(progress);
 
         LogUtil.i(TAG, "handlePlayProgress, begin time:" + begin +
                 " endtime:" + end + " osdTime:" + osdTime.getTimeInMillis() + " " + "progress:" + progress);
@@ -903,107 +832,61 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
     }
 
     private void initListener() {
-        backBtn = mTitleBar.addBackButton(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onExitCurrentPage();
-                finish();
-            }
+        backBtn = mTitleBar.addBackButton(v -> {
+            onExitCurrentPage();
+            finish();
         });
-        rightButton = mTitleBar.addRightButton(R.drawable.common_title_extension_selector, new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                if (mCheckBtnCloud.isChecked()) {
-                    if (EzvizAPI.getInstance().isUsingGlobalSDK()) {
-                        EZAbroadCloudServiceExAct.launch(EZPlayBackListActivity.this, mCameraInfo.getDeviceSerial(),
-                                mCameraInfo.getCameraNo());
-                    }
-                } else {
-                    if (menuItems == null) {
-                        menuItems = new ArrayList<>();
-                        menuItems.add(new EZMenuItem(R.mipmap.videogo_icon, "全部"));
-                        menuItems.add(new EZMenuItem(R.mipmap.videogo_icon, "定时"));
-                        menuItems.add(new EZMenuItem(R.mipmap.videogo_icon, "事件"));
-                    }
-                    if (mTopRightMenu == null) {
-                        mTopRightMenu = new EZTopRightMenu(EZPlayBackListActivity.this);
-                        mTopRightMenu.setWidth(450)      //默认宽度wrap_content
-                                .showIcon(false)     //显示菜单图标，默认为true
-                                .dimBackground(true)           //背景变暗，默认为true
-                                .needAnimationStyle(true)   //显示动画，默认为true
-                                .setAnimationStyle(R.style.TRM_ANIM_STYLE)  //默认为R.style.TRM_ANIM_STYLE
-                                .addMenuList(menuItems).setOnMenuItemClickListener(new EZTopRightMenu.OnMenuItemClickListener() {
-                            @Override
-                            public void onMenuItemClick(int position) {
-                                if (position == 1) {
-                                    recordType = EZ_VIDEO_RECORD_TYPE_CMR;
-                                } else if (position == 2) {
-                                    recordType = EZ_VIDEO_RECORD_TYPE_Event;
-                                } else {
-                                    recordType = EZ_VIDEO_RECORD_TYPE_ALL;
-                                }
-                                startQueryDeviceRecordFiles();
-                            }
-                        });
-                    }
-                    mTopRightMenu.showAsDropDown(rightButton, -300, 10);
+        rightButton = mTitleBar.addRightButton(R.drawable.common_title_extension_selector, v -> {
+            if (mCheckBtnCloud.isChecked()) {
+                if (EzvizAPI.getInstance().isUsingGlobalSDK()) {
+                    EZAbroadCloudServiceExAct.launch(EZPlayBackListActivity.this, mCameraInfo.getDeviceSerial(),
+                            mCameraInfo.getCameraNo());
                 }
+            } else {
+                if (menuItems == null) {
+                    menuItems = new ArrayList<>();
+                    menuItems.add(new EZMenuItem(R.mipmap.videogo_icon, "全部"));
+                    menuItems.add(new EZMenuItem(R.mipmap.videogo_icon, "定时"));
+                    menuItems.add(new EZMenuItem(R.mipmap.videogo_icon, "事件"));
+                }
+                if (mTopRightMenu == null) {
+                    mTopRightMenu = new EZTopRightMenu(EZPlayBackListActivity.this);
+                    mTopRightMenu.setWidth(450)      //默认宽度wrap_content
+                            .showIcon(false)     //显示菜单图标，默认为true
+                            .dimBackground(true)           //背景变暗，默认为true
+                            .needAnimationStyle(true)   //显示动画，默认为true
+                            .setAnimationStyle(R.style.TRM_ANIM_STYLE)  //默认为R.style.TRM_ANIM_STYLE
+                            .addMenuList(menuItems).setOnMenuItemClickListener(new EZTopRightMenu.OnMenuItemClickListener() {
+                        @Override
+                        public void onMenuItemClick(int position) {
+                            if (position == 1) {
+                                recordType = EZ_VIDEO_RECORD_TYPE_CMR;
+                            } else if (position == 2) {
+                                recordType = EZ_VIDEO_RECORD_TYPE_Event;
+                            } else {
+                                recordType = EZ_VIDEO_RECORD_TYPE_ALL;
+                            }
+                            startQueryDeviceRecordFiles();
+                        }
+                    });
+                }
+                mTopRightMenu.showAsDropDown(rightButton, -300, 10);
             }
         });
         rightButton.setVisibility(EzvizAPI.getInstance().isUsingGlobalSDK() ? View.VISIBLE : View.GONE);
-        selDateImage = mTitleBar.addTitleButton(R.drawable.remote_cal_selector, new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // 处于编辑状态不可点击
-                if (sectionAdapter != null && sectionAdapter.isEdit()) {
-                    return;
-                }
-                goToCalendar();
+        selDateImage = mTitleBar.addTitleButton(R.drawable.remote_cal_selector, v -> {
+            goToCalendar();
+        });
+        mTitleBar.setOnTitleClickListener(arg0 -> {
+            goToCalendar();
+        });
+        downloadBtn.setOnClickListener(v -> {
+            if (mCloudRecordInfo != null) {
+                startDownloadCloudVideo(mCloudRecordInfo);
+            } else {
+                startDownloadDeviceVideo(mDeviceRecordInfo);
             }
         });
-        mTitleBar.setOnTitleClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View arg0) {
-                // 处于编辑状态不可点击
-                if (sectionAdapter != null && sectionAdapter.isEdit()) {
-                    return;
-                }
-                goToCalendar();
-            }
-        });
-
-        downLayout.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-//                startActivity(new Intent(EZPlayBackListActivity.this, ImagesManagerActivity.class));
-                /*if (downloadHelper.getDownloadCountInQueue() == 0) {
-                    downLayout.setVisibility(View.INVISIBLE);
-                }*/
-            }
-        });
-
-        downloadBtn.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                if (mCloudRecordInfo != null) {
-                    startDownloadCloudVideo(mCloudRecordInfo);
-                } else {
-                    startDownloadDeviceVideo(mDeviceRecordInfo);
-                }
-            }
-        });
-        rightEditView = new TextView(this);
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT
-                , LinearLayout.LayoutParams.WRAP_CONTENT);
-        rightEditView.setLayoutParams(layoutParams);
-        rightEditView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
-        rightEditView.setPadding(0, 0, Utils.dip2px(this, 15), 0);
-        mTitleBar.addRightView(rightEditView);
-        rightEditView.setVisibility(View.GONE);
-        deleteVideoText.setOnClickListener(this);
         // loading继续播放按钮
         loadingPlayBtn.setOnClickListener(this);
         // 重播按钮事件
@@ -1011,12 +894,6 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         errorReplay.setOnClickListener(this);
         // 播放下一片段按钮事件
         nextPlayBtn.setOnClickListener(this);
-        // 查询异常区域touch事件
-        queryExceptionLayout.setOnTouchListener(this);
-        // 回放区域touch事件
-        remotePlayBackArea.setOnTouchListener(this);
-        // 控制区域touch事件
-        controlArea.setOnTouchListener(this);
         controlArea.setOnClickListener(this);
         // 暂停播放按钮事件
         pauseBtn.setOnClickListener(this);
@@ -1024,8 +901,6 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         soundBtn.setOnClickListener(this);
         // 退出播放按钮事件
         exitBtn.setOnClickListener(this);
-        // 抓图按钮事件
-        captureBtn.setOnClickListener(this);
         // 录像按钮事件
         videoRecordingBtn.setOnClickListener(this);
         // 抓图/录像形成图片区域点击事件
@@ -1049,7 +924,6 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                     long trackTime = beginTime + (progress * avg);
 
                     seekInit(true, false);
-                    progressBar.setProgress(progress);
 
                     LogUtil.i(TAG,
                             "onSeekBarStopTracking, begin time:" + beginTime + " endtime:" + endTime + " avg:" + avg + " MAX" +
@@ -1083,44 +957,6 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                 }
             }
         });
-
-        downShake.setAnimationListener(new AnimationListener() {
-
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                downLayout.clearAnimation();
-            }
-        });
-
-        mReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                LogUtil.d(TAG, "onReceive:" + intent.getAction());
-            }
-        };
-        IntentFilter filter = new IntentFilter();
-        registerReceiver(mReceiver, filter);
-    }
-
-    // 退出编辑状态
-    private void exitEditStatus() {
-        selDateImage.setVisibility(View.VISIBLE);
-        backBtn.setVisibility(View.VISIBLE);
-        deleteVideoText.setVisibility(View.GONE);
-        sectionAdapter.clearAllSelectedCloudFiles();
-        sectionAdapter.setEdit(false);
-        mCloudRecordsAdapter.notifyDataSetChanged();
-        pinnedHeaderListView.startAnimation();
     }
 
     private void onExitCurrentPage() {
@@ -1135,21 +971,13 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             mScreenOrientationHelper.portrait();
             return;
         }
-        if (backBtn != null && backBtn.getVisibility() == View.GONE) {
-            exitEditStatus();
-        } else {
-            onExitCurrentPage();
-            finish();
-        }
+        onExitCurrentPage();
+        finish();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mReceiver != null) {
-            unregisterReceiver(mReceiver);
-        }
-
         closePlayBack();
 
         if (mPlaybackPlayer != null) {
@@ -1159,7 +987,6 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             RecordCoverFetcherManager.getInstance().stopFetcher();// 断开与设备的链接
         }
         stopQueryTask();
-        removeHandler(handler);
         removeHandler(playBackHandler);
     }
 
@@ -1181,27 +1008,24 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         final String notificationTitle = "download video from cloud";
         final int notificationId = getUniqueNotificationId();
         showSimpleNotification(mContext, notificationId, notificationTitle, "downloading...click to cancel!", true);
-        getTaskManager().submit(new Runnable() {
-            @Override
-            public void run() {
-                String strFileNameWithPath =
-                 DemoConfig.getRecordsFolder() + "/cloud_" + System.currentTimeMillis() + ".mp4";
-                final File file = new File(strFileNameWithPath);
-                if (!file.getParentFile().exists()) {
-                    file.getParentFile().mkdirs();
-                }
-                final EZCloudStreamDownload ezCloudStreamDownloader = new EZCloudStreamDownload(strFileNameWithPath,
-                        cloudFile);
-                // 云存储录像支持下载进度回调，SD卡录像下载不支持
-                ezCloudStreamDownloader.setStreamDownloadCallback(
-                        new EZStreamDownloadCallbackWithNotify(cloudFile, notificationId, notificationTitle));
-                ezCloudStreamDownloader.setSecretKey(DataManager.getInstance().getDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial()));
-                ezCloudStreamDownloader.start();
-                mDownloadTaskRecordListAbstract.add(new DownloadTaskRecordOfCloud(ezCloudStreamDownloader,
-                 notificationId));
-
-                toast("started! And you can find download progress from notification bar.");
+        getTaskManager().submit(() -> {
+            String strFileNameWithPath =
+             DemoConfig.getRecordsFolder() + "/cloud_" + System.currentTimeMillis() + ".mp4";
+            final File file = new File(strFileNameWithPath);
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
             }
+            final EZCloudStreamDownload ezCloudStreamDownloader = new EZCloudStreamDownload(strFileNameWithPath,
+                    cloudFile);
+            // 云存储录像支持下载进度回调，SD卡录像下载不支持
+            ezCloudStreamDownloader.setStreamDownloadCallback(
+                    new EZStreamDownloadCallbackWithNotify(cloudFile, notificationId, notificationTitle));
+            ezCloudStreamDownloader.setSecretKey(DataManager.getInstance().getDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial()));
+            ezCloudStreamDownloader.start();
+            mDownloadTaskRecordListAbstract.add(new DownloadTaskRecordOfCloud(ezCloudStreamDownloader,
+             notificationId));
+
+            toast("started! And you can find download progress from notification bar.");
         });
     }
 
@@ -1312,36 +1136,9 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         }
     }
 
-    private Handler handler = new Handler() {
-
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case ANIMATION_UPDATE:
-                    ImageButton imageButton = (ImageButton) msg.obj;
-                    if (downShake == null || downLayout == null || imageButton == null || downloadingNumber == null) {
-                        return;
-                    }
-                    downLayout.startAnimation(downShake);
-                    imageButton.setVisibility(View.GONE);
-                    ViewGroup parent = (ViewGroup) imageButton.getParent();
-                    parent.removeView(imageButton);
-                    if (downloadingNumber.getVisibility() == View.INVISIBLE) {
-                        downloadingNumber.setVisibility(View.VISIBLE);
-                    }
-                    startGifAnimation();
-                    break;
-                default:
-                    break;
-            }
-        }
-
-    };
-
     // 切换到日历界面
     private void goToCalendar() {
-        if (getMinDate() != null && new Date().before(getMinDate())) {
+        if (EZBusinessTool.getMinDate() != null && new Date().before(EZBusinessTool.getMinDate())) {
             showToast(R.string.calendar_setting_error);
             return;
         }
@@ -1357,61 +1154,41 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         dpd.setCancelable(true);
         dpd.setTitle(R.string.select_date);
         dpd.setCanceledOnTouchOutside(true);
-        dpd.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.certain),
-         new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dg, int which) {
-                DatePicker dp = null;
-                Field[] fields = dg.getClass().getDeclaredFields();
-                for (Field field : fields) {
-                    field.setAccessible(true);
-                    if (field.getName().equals("mDatePicker")) {
-                        try {
-                            dp = (DatePicker) field.get(dg);
-                        } catch (IllegalArgumentException e) {
-                            e.printStackTrace();
-                        } catch (IllegalAccessException e) {
-                            e.printStackTrace();
-                        }
+        dpd.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.certain), (dg, which) -> {
+            DatePicker dp = null;
+            Field[] fields = dg.getClass().getDeclaredFields();
+            for (Field field : fields) {
+                field.setAccessible(true);
+                if (field.getName().equals("mDatePicker")) {
+                    try {
+                        dp = (DatePicker) field.get(dg);
+                    } catch (IllegalArgumentException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
                     }
                 }
-                if (dp != null) {
-                    dp.clearFocus();
-                    Calendar selectCalendar = Calendar.getInstance();
-                    selectCalendar.set(Calendar.YEAR, dp.getYear());
-                    selectCalendar.set(Calendar.MONTH, dp.getMonth());
-                    selectCalendar.set(Calendar.DAY_OF_MONTH, dp.getDayOfMonth());
-                    rightEditView.setVisibility(View.GONE);
-                    isDateSelected = true;
-                    queryDate = selectCalendar.getTime();
-                    onDateChanged();
-                }
+            }
+            if (dp != null) {
+                dp.clearFocus();
+                Calendar selectCalendar = Calendar.getInstance();
+                selectCalendar.set(Calendar.YEAR, dp.getYear());
+                selectCalendar.set(Calendar.MONTH, dp.getMonth());
+                selectCalendar.set(Calendar.DAY_OF_MONTH, dp.getDayOfMonth());
+                isDateSelected = true;
+                queryDate = selectCalendar.getTime();
+                onDateChanged();
             }
         });
-        dpd.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.cancel),
-         new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                LogUtil.d("Picker", "Cancel!");
-                if (!isFinishing()) {
-                    dialog.dismiss();
-                }
-
+        dpd.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.cancel), (dialog, which) -> {
+            LogUtil.d("Picker", "Cancel!");
+            if (!isFinishing()) {
+                dialog.dismiss();
             }
+
         });
 
         dpd.show();
-    }
-
-    private Date getMinDate() {
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            Date date = sdf.parse("2012-01-01");
-            return date;
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     private void onDateChanged() {
@@ -1420,10 +1197,17 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         }
         switch (mRecordType) {
             case RemoteListContant.TYPE_CLOUD:
+                mSDKCloudRecordsAdapter = null;
                 mDeviceRecordsAdapter = null;
                 startQueryCloudRecordFiles();
                 break;
+            case RemoteListContant.TYPE_SDKCLOUD:
+                mCloudRecordsAdapter = null;
+                mDeviceRecordsAdapter = null;
+                startQuerySDKCloudRecordFiles();
+                break;
             case RemoteListContant.TYPE_LOCAL:
+                mCloudRecordsAdapter = null;
                 mCloudRecordsAdapter = null;
                 startQueryDeviceRecordFiles();
                 break;
@@ -1437,11 +1221,10 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         if (queryDate != null) {
             mTitleBar.setTitle(RemoteListUtil.converToMonthAndDay(queryDate));
         }
-        pinnedHeaderListView.setVisibility(View.GONE);
-        queryExceptionLayout.setVisibility(View.GONE);
+        mPinnedHeaderListViewForCloud.setVisibility(View.GONE);
         stopQueryTask();
         mCloudRecordsAdapter = null;
-        sectionAdapter = null;
+        mSectionAdapterForCloud = null;
         hasShowListViewLine(false);
         queryCloudRecordFilesAsyncTask = new QueryCloudRecordFilesAsyncTask(mCameraInfo.getDeviceSerial(),
                 mCameraInfo.getCameraNo(), EZPlayBackListActivity.this);
@@ -1451,24 +1234,35 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         queryCloudRecordFilesAsyncTask.execute();
     }
 
+    private void startQuerySDKCloudRecordFiles() {
+        mPinnedHeaderListViewForSDKCloud.setVisibility(View.GONE);
+        stopQueryTask();
+        mSDKCloudRecordsAdapter = null;
+        mSectionAdapterForSDKCloud = null;
+        hasShowListViewLine(false);
+        querySDKCloudRecordFilesAsyncTask = new QuerySDKCloudRecordFilesAsyncTask(mCameraInfo.getDeviceSerial(),
+                mCameraInfo.getCameraNo(), EZPlayBackListActivity.this);
+        loadingBar.setVisibility(View.VISIBLE);
+        showTab(R.id.loadingTextView);
+        querySDKCloudRecordFilesAsyncTask.setSearchDate(queryDate);
+        querySDKCloudRecordFilesAsyncTask.execute();
+    }
+
     private void startQueryDeviceRecordFiles() {
         int cloudTotal = 100000;
-        hasShowListViewLine(false);
-        mWaitDlg.show();
+        mPinnedHeaderListViewForLocal.setVisibility(View.GONE);
         stopQueryTask();
+        hasShowListViewLine(false);
         queryDeviceRecordFilesAsyncTask = new QueryDeviceRecordFilesAsyncTask(mCameraInfo.getDeviceSerial(),
                 mCameraInfo.getCameraNo(), recordType, EZPlayBackListActivity.this);
+        loadingBar.setVisibility(View.VISIBLE);
+        showTab(R.id.loadingTextView);
         queryDeviceRecordFilesAsyncTask.setQueryDate(queryDate);
-        queryDeviceRecordFilesAsyncTask.setOnlyHasLocal(true);
         queryDeviceRecordFilesAsyncTask.execute(String.valueOf(cloudTotal));
     }
 
     private void hasShowListViewLine(boolean isShow) {
-        if (isShow) {
-            findViewById(R.id.listview_line).setVisibility(View.VISIBLE);
-        } else {
-            findViewById(R.id.listview_line).setVisibility(View.INVISIBLE);
-        }
+        findViewById(R.id.listview_line).setVisibility(isShow ? View.VISIBLE : View.INVISIBLE);
     }
 
     private void stopQueryTask() {
@@ -1477,7 +1271,11 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             queryCloudRecordFilesAsyncTask.setAbort(true);
             queryCloudRecordFilesAsyncTask = null;
         }
-
+        if (querySDKCloudRecordFilesAsyncTask != null) {
+            querySDKCloudRecordFilesAsyncTask.cancel(true);
+            querySDKCloudRecordFilesAsyncTask.setAbort(true);
+            querySDKCloudRecordFilesAsyncTask = null;
+        }
         if (queryDeviceRecordFilesAsyncTask != null) {
             queryDeviceRecordFilesAsyncTask.cancel(true);
             queryDeviceRecordFilesAsyncTask.setAbort(true);
@@ -1487,77 +1285,78 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
 
     public void initUi() {
         mContentTabCloudRl = (RelativeLayout) findViewById(R.id.content_tab_cloud_root);
+        mContentTabSDKCloudRl = (RelativeLayout) findViewById(R.id.content_tab_sdkcloud_root);
         mContentTabDeviceRl = (RelativeLayout) findViewById(R.id.content_tab_device_root);
-        mCloudVideoImg = (ImageView) findViewById(R.id.img_active_cloud_video);
+        mCloudVideoActiveImg = (ImageView) findViewById(R.id.img_active_cloud_video);
         mCheckBtnCloud = (CheckTextButton) findViewById(R.id.pb_search_tab_btn_cloud);
+        mCheckBtnSDKCloud = (CheckTextButton) findViewById(R.id.pb_search_tab_btn_sdkcloud);
         mCheckBtnDevice = (CheckTextButton) findViewById(R.id.pb_search_tab_btn_device);
         mTabContentMainFrame = (FrameLayout) findViewById(R.id.ez_tab_content_frame);
 
-        mCheckBtnDevice.setToggleEnable(false);
         mCheckBtnCloud.setToggleEnable(false);
+        mCheckBtnSDKCloud.setToggleEnable(false);
+        mCheckBtnDevice.setToggleEnable(false);
         mCheckBtnCloud.setChecked(true);
-        OnCheckedChangeListener onCheckedChangeListener = new OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (buttonView.getId() == R.id.pb_search_tab_btn_cloud) {
-                    mContentTabCloudRl.setVisibility(isChecked ? View.VISIBLE : View.GONE);
-                    mCheckBtnDevice.setChecked(!isChecked);
-                } else if ((buttonView.getId() == R.id.pb_search_tab_btn_device)) {
-                    mContentTabDeviceRl.setVisibility(isChecked ? View.VISIBLE : View.GONE);
-                    mCheckBtnCloud.setChecked(!isChecked);
-                }
-            }
-        };
-        mCheckBtnDevice.setOnCheckedChangeListener(onCheckedChangeListener);
-        mCheckBtnCloud.setOnCheckedChangeListener(onCheckedChangeListener);
-
-        mCheckBtnCloud.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View arg0) {
-                if (!mCheckBtnCloud.isChecked()) {
-                    mCheckBtnCloud.setChecked(true);
-                    downloadBtn.setVisibility(View.VISIBLE);
-                    rightButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.common_title_extension_selector));
-                    rightButton.setVisibility(EzvizAPI.getInstance().isUsingGlobalSDK() ? View.VISIBLE : View.GONE);
-                    if (mCloudRecordsAdapter == null) {
-                        startQueryCloudRecordFiles();
-                    }
+        // 录像类型切换事件
+        mCheckBtnCloud.setOnClickListener(arg0 -> {
+            mRecordType = RemoteListContant.TYPE_CLOUD;
+            if (!mCheckBtnCloud.isChecked()) {
+                recordCheckBtnsReset();
+                mCheckBtnCloud.setChecked(true);
+                mContentTabCloudRl.setVisibility(View.VISIBLE);
+                downloadBtn.setVisibility(View.VISIBLE);
+                rightButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.common_title_extension_selector));
+                rightButton.setVisibility(EzvizAPI.getInstance().isUsingGlobalSDK() ? View.VISIBLE : View.GONE);
+                if (mCloudRecordsAdapter == null) {
+                    startQueryCloudRecordFiles();
                 }
             }
         });
-        mCheckBtnDevice.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View arg0) {
-                if (!mCheckBtnDevice.isChecked()) {
-                    mCheckBtnDevice.setChecked(true);
-                    downloadBtn.setVisibility(EZBusinessTool.isSupportSDRecordDownload(mDeviceInfo, mCameraInfo)?View.VISIBLE:View.GONE);
-                    rightButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.common_title_recordtype_selector));
-                    rightButton.setVisibility(View.VISIBLE);
-                    if (mDeviceRecordsAdapter == null) {
-                        startQueryDeviceRecordFiles();
-                    }
+        mCheckBtnSDKCloud.setOnClickListener(arg0 -> {
+            mRecordType = RemoteListContant.TYPE_SDKCLOUD;
+            if (!mCheckBtnSDKCloud.isChecked()) {
+                recordCheckBtnsReset();
+                mCheckBtnSDKCloud.setChecked(true);
+                mContentTabSDKCloudRl.setVisibility(View.VISIBLE);
+                downloadBtn.setVisibility(View.GONE);
+                rightButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.common_title_extension_selector));
+                rightButton.setVisibility(View.GONE);
+                if (mSDKCloudRecordsAdapter == null) {
+                    startQuerySDKCloudRecordFiles();
+                }
+            }
+        });
+        mCheckBtnDevice.setOnClickListener(arg0 -> {
+            mRecordType = RemoteListContant.TYPE_LOCAL;
+            if (!mCheckBtnDevice.isChecked()) {
+                recordCheckBtnsReset();
+                mCheckBtnDevice.setChecked(true);
+                mContentTabDeviceRl.setVisibility(View.VISIBLE);
+                downloadBtn.setVisibility(EZBusinessTool.isSupportSDRecordDownload(mDeviceInfo, mCameraInfo)?View.VISIBLE:View.GONE);
+                rightButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.common_title_recordtype_selector));
+                rightButton.setVisibility(View.VISIBLE);
+                if (mDeviceRecordsAdapter == null) {
+                    startQueryDeviceRecordFiles();
                 }
             }
         });
 
-        pinnedHeaderListView = (PinnedHeaderListView) findViewById(R.id.listView);
+        mPinnedHeaderListViewForCloud = (PinnedHeaderListView) findViewById(R.id.listView);
+        mPinnedHeaderListViewForSDKCloud = (PinnedHeaderListView) findViewById(R.id.listView_sdkcloud);
         mPinnedHeaderListViewForLocal = (PinnedHeaderListView) findViewById(R.id.listView_device);
         remoteListPage = (ViewGroup) findViewById(R.id.remote_list_page);
         mTitleBar = (TitleBar) findViewById(R.id.title);
         /* 测量状态栏高度 **/
         ViewTreeObserver viewTreeObserver = remoteListPage.getViewTreeObserver();
-        viewTreeObserver.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                if (mRemotePlayBackRect == null) {
-                    // 获取状况栏高度
-                    mRemotePlayBackRect = new Rect();
-                    getWindow().getDecorView().getWindowVisibleDisplayFrame(mRemotePlayBackRect);
-                }
+        viewTreeObserver.addOnGlobalLayoutListener(() -> {
+            if (mRemotePlayBackRect == null) {
+                // 获取状况栏高度
+                mRemotePlayBackRect = new Rect();
+                getWindow().getDecorView().getWindowVisibleDisplayFrame(mRemotePlayBackRect);
             }
         });
-        queryExceptionLayout = (LinearLayout) findViewById(R.id.query_exception_ly);
-        novideoImg = (LinearLayout) findViewById(R.id.novideo_img);
+        mNovideoImgCloud = (LinearLayout) findViewById(R.id.novideo_img_cloud);
+        mNovideoImgSDKCloud = (LinearLayout) findViewById(R.id.novideo_img_sdkcloud);
         mNoVideoImgLocal = (LinearLayout) findViewById(R.id.novideo_img_device);
         loadingBar = (LoadingTextView) findViewById(R.id.loadingTextView);
         loadingBar.setText(R.string.loading_text_default);
@@ -1569,72 +1368,19 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         playBackPtzRL = findViewById(R.id.play_ptz_rl);
         mTextureView = findViewById(R.id.remote_playback_wnd_sv);
         mTextureView.setSurfaceTextureListener(this);
-        mRemotePlayBackRatioTv = (TextView) findViewById(R.id.remoteplayback_ratio_tv);
-        mRemotePlayBackTouchListener = new CustomTouchListener() {
-
-            @Override
-            public boolean canZoom(float scale) {
-                // do nothing
-                return false;
-            }
-
-            @Override
-            public boolean canDrag(int direction) {
-                return mPlayScale != 1;
-            }
-
-            @Override
-            public void onSingleClick() {
-                onPlayAreaTouched();
-            }
-
-            @Override
-            public void onDoubleClick(View v, MotionEvent e) {
-                LogUtil.d(TAG, "onDoubleClick:");
-            }
-
-            @Override
-            public void onZoom(float scale) {
-            }
-
-            @Override
-            public void onDrag(int direction, float distance, float rate) {
-                LogUtil.d(TAG, "onDrag:" + direction);
-            }
-
-            @Override
-            public void onEnd(int mode) {
-                LogUtil.d(TAG, "onEnd:" + mode);
-            }
-
-            @Override
-            public void onZoomChange(float scale, CustomRect oRect, CustomRect curRect) {
-                LogUtil.d(TAG, "onZoomChange:" + scale);
-            }
-        };
-        mTextureView.setOnTouchListener(mRemotePlayBackTouchListener);
 
         setRemoteListSvLayout();
 
         mPlaybackRateBtn = (Button) findViewById(R.id.btn_change_playback_rate);
         mRemotePlayBackRecordLy = (LinearLayout) findViewById(R.id.remoteplayback_record_ly);
         progressSeekbar = (SeekBar) findViewById(R.id.progress_seekbar);
-        progressBar = (ProgressBar) findViewById(R.id.progressbar);
         beginTimeTV = (TextView) findViewById(R.id.begin_time_tv);
         controlArea = (LinearLayout) findViewById(R.id.control_area);
         progressArea = (LinearLayout) findViewById(R.id.progress_area);
-        captureBtn = (ImageButton) findViewById(R.id.remote_playback_capture_btn);
         videoRecordingBtn = (ImageButton) findViewById(R.id.remote_playback_video_recording_btn);
         downloadBtn = (LinearLayout) findViewById(R.id.remote_playback_download_btn);
-        downLayout = (RelativeLayout) findViewById(R.id.down_layout);
-        fileSizeText = (TextView) findViewById(R.id.file_size_text);
-        deleteVideoText = (TextView) findViewById(R.id.delete_playback);
         measure(downloadBtn);
-        measure(downLayout);
         measure(controlArea);
-        downloading = (ImageView) findViewById(R.id.downloading);
-        downDrawable = ((AnimationDrawable) downloading.getBackground());
-        downloadingNumber = (TextView) findViewById(R.id.downloading_number);
         loadingImgView = (LoadingView) findViewById(R.id.remote_loading_iv);
         loadingPbLayout = (LinearLayout) findViewById(R.id.loading_pb_ly);
 
@@ -1651,17 +1397,9 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         replayBtn = (ImageButton) findViewById(R.id.replay_btn);
         nextPlayBtn = (ImageButton) findViewById(R.id.next_play_btn);
         progressSeekbar.setMax(RemoteListContant.PROGRESS_MAX_VALUE);
-        progressBar.setMax(RemoteListContant.PROGRESS_MAX_VALUE);
-        matteImage = (ImageView) findViewById(R.id.matte_image);
-
-        autoLayout = (LinearLayout) findViewById(R.id.auto_play_layout);
-        autoLayout.setVisibility(View.GONE);
-        cancelBtn = (Button) findViewById(R.id.cancel_auto_play_btn);
-        cancelBtn.setOnClickListener(this);
 
         streamTypeTv = (TextView) findViewById(R.id.stream_type_tv);
         touchProgressLayout = (LinearLayout) findViewById(R.id.touch_progress_layout);
-        showDownLoad();
 
         mFullscreenButton = (CheckTextButton) findViewById(R.id.fullscreen_button);
         mScreenOrientationHelper = new ScreenOrientationHelper(this, mFullscreenButton);
@@ -1671,7 +1409,6 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         mLandscapeTitleBar = (TitleBar) findViewById(R.id.pb_title_bar_landscape);
         mLandscapeTitleBar.setStyle(Color.rgb(0xff, 0xff, 0xff), getResources().getDrawable(R.color.dark_bg_70p),
          null/*getResources().getDrawable(R.drawable.message_back_selector)*/);
-        mLandscapeTitleBar.setOnTouchListener(this);
         if (mCameraInfo != null) {
             mLandscapeTitleBar.setTitle(mCameraInfo.getCameraName());
         }
@@ -1683,7 +1420,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         if (FecViewLayoutHelper.isFecDevice(mDeviceInfo)) {
             // 鱼眼设备显示"查看模式" & 调整画面比例为1:1
             mFullscreenButton.setVisibility(View.GONE);// 鱼眼设备不支持全屏，隐藏全屏按钮
-            mCloudVideoImg.setVisibility(View.GONE);// 页面太挤，图片不显示
+            mCloudVideoActiveImg.setVisibility(View.GONE);// 页面太挤，云存储开通图片不显示
             ImageButton viewTypeBtn = (ImageButton) findViewById(R.id.remote_playback_viewtype_btn);
             viewTypeBtn.setVisibility(View.VISIBLE);
             viewTypeBtn.setOnClickListener(v -> openFecViewModePopupWindow(controlArea));
@@ -1707,13 +1444,6 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             fecViewLayoutHelper.playPtzRL = playBackPtzRL;
             fecViewLayoutHelper.setSurfaceViews(new SurfaceView[]{mPlayBackSv1, mPlayBackSv2, mPlayBackSv3, mPlayBackSv4, mPlayBackSv5, mPlayBackSv6});
             playWindowVg.post(() -> fecViewLayoutHelper.setPlayViewAspectRadioWith1V1());
-        }
-    }
-
-    private void startGifAnimation() {
-        if (!downDrawable.isRunning()) {
-            downDrawable = (AnimationDrawable) downloading.getBackground();
-            downDrawable.start();
         }
     }
 
@@ -1759,16 +1489,6 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                 imm.hideSoftInputFromWindow(mTextureView.getWindowToken(), 0);
             }
         }, 200);
-
-        int downCount = 0;//downloadHelper.getDownloadCountInQueue();
-        downloadingNumber.setText("" + downCount);
-        if (downCount <= 0) {
-            downLayout.setVisibility(View.INVISIBLE);
-            downloadingNumber.setVisibility(View.INVISIBLE);
-        } else {
-            startGifAnimation();
-        }
-
         // 判断是否处理暂停状态
         if (notPause || status == RemoteListContant.STATUS_DECRYPT) {
             mTextureView.setVisibility(View.VISIBLE);
@@ -1857,7 +1577,6 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
     // 页面不可见时UI
     private void onActivityStopUI() {
         if (exitBtn != null) exitBtn.setVisibility(View.GONE);
-        if (progressBar != null) progressBar.setVisibility(View.GONE);
         mControlDisplaySec = 0;
     }
 
@@ -1879,72 +1598,62 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         getWindowManager().getDefaultDisplay().getMetrics(metric);
         localInfo.setScreenWidthHeight(metric.widthPixels, metric.heightPixels);
         localInfo.setNavigationBarHeight((int) Math.ceil(25 * getResources().getDisplayMetrics().density));
-        sharedPreferences = getSharedPreferences(Constant.VIDEOGO_PREFERENCE_NAME, 0);
-        isCloudPrompt = sharedPreferences.getBoolean(HAS_BEAN_CLOUD_PROMPT, true);
-
-        downShake = AnimationUtils.loadAnimation(this, R.anim.button_shake);
-        downShake.reset();
-        downShake.setFillAfter(true);
     }
 
     @Override
-    public void queryHasNoData() {
-        showTab(R.id.novideo_img);
+    public void queryHasNoData(int type) {
+        if (type == RemoteListContant.TYPE_CLOUD) {
+            showTab(R.id.novideo_img_cloud);
+        } else if (type == RemoteListContant.TYPE_SDKCLOUD) {
+            showTab(R.id.novideo_img_sdkcloud);
+        } else if (type == RemoteListContant.TYPE_LOCAL) {
+            showTab(R.id.novideo_img_device);
+        }
     }
 
     @Override
-    public void queryOnlyHasLocalFile() {
-        hasShowListViewLine(false);
-        stopQueryTask();
-        queryDeviceRecordFilesAsyncTask = new QueryDeviceRecordFilesAsyncTask(mCameraInfo.getDeviceSerial(),
-         mCameraInfo.getCameraNo(), recordType, this);
-        queryDeviceRecordFilesAsyncTask.setQueryDate(queryDate);
-        queryDeviceRecordFilesAsyncTask.setOnlyHasLocal(true);
-        queryDeviceRecordFilesAsyncTask.execute(String.valueOf(0));
-    }
-
-    // 录像查询为空UI显示
-    private void queryNoDataUIDisplay() {
-        loadingBar.setVisibility(View.GONE);
-        novideoImg.setVisibility(View.VISIBLE);
-        showTab(R.id.novideo_img);
-    }
-
-    @Override
-    public void queryLocalException() {
-        // do nothing
-    }
-
-    @Override
-    public void querySuccessFromCloud(List<CloudPartInfoFileEx> cloudPartInfoFileExs, int queryMLocalStatus,
-     List<CloudPartInfoFile> cloudPartInfoFile) {
-        rightEditView.setVisibility(View.VISIBLE);
+    public void querySuccessFromCloud(List<CloudPartInfoFileEx> cloudPartInfoFileExs, List<CloudPartInfoFile> cloudPartInfoFile) {
         findViewById(R.id.display_layout).setVisibility(View.VISIBLE);
         hasShowListViewLine(true);
         loadingBar.setVisibility(View.GONE);
-        pinnedHeaderListView.setVisibility(View.VISIBLE);
-        showTab(R.id.ez_tab_content_frame);
-        if (queryMLocalStatus == RemoteListContant.HAS_LOCAL) {
-            CloudPartInfoFileEx partInfoFileEx = new CloudPartInfoFileEx();
-            partInfoFileEx.setMore(true);
-            cloudPartInfoFileExs.add(partInfoFileEx);
-        }
+        mPinnedHeaderListViewForCloud.setVisibility(View.VISIBLE);
+        showTab(R.id.content_tab_cloud_root);
         mCloudRecordsAdapter = new StandardArrayAdapter(this, R.id.layout, cloudPartInfoFileExs);
         mCloudRecordsAdapter.setAdapterChangeListener(this);
-        sectionAdapter = new SectionListAdapter(EZPlayBackListActivity.this, getLayoutInflater(),
+        mSectionAdapterForCloud = new SectionListAdapter(EZPlayBackListActivity.this, getLayoutInflater(),
          mCloudRecordsAdapter, mCameraInfo.getDeviceSerial());
-        pinnedHeaderListView.setAdapter(sectionAdapter);
+        mPinnedHeaderListViewForCloud.setAdapter(mSectionAdapterForCloud);
 
-        pinnedHeaderListView.setOnScrollListener(sectionAdapter);
-        pinnedHeaderListView.setPinnedHeaderView(getLayoutInflater().inflate(R.layout.list_section,
-         pinnedHeaderListView, false));
-        pinnedHeaderListView.startAnimation();
-        sectionAdapter.setOnHikItemClickListener(EZPlayBackListActivity.this);
+        mPinnedHeaderListViewForCloud.setOnScrollListener(mSectionAdapterForCloud);
+        mPinnedHeaderListViewForCloud.setPinnedHeaderView(getLayoutInflater().inflate(R.layout.list_section,
+                mPinnedHeaderListViewForCloud, false));
+        mPinnedHeaderListViewForCloud.startAnimation();
+        mSectionAdapterForCloud.setOnHikItemClickListener(EZPlayBackListActivity.this);
+    }
+
+    @Override
+    public void querySuccessFromSDKCloud(List<CloudPartInfoFileEx> cloudPartInfoFileExs, List<CloudPartInfoFile> cloudPartInfoFile) {
+        hasShowListViewLine(true);
+        loadingBar.setVisibility(View.GONE);
+        mPinnedHeaderListViewForSDKCloud.setVisibility(View.VISIBLE);
+        showTab(R.id.content_tab_sdkcloud_root);
+        mSDKCloudRecordsAdapter = new StandardArrayAdapter(this, R.id.layout, cloudPartInfoFileExs);
+        mSDKCloudRecordsAdapter.setAdapterChangeListener(this);
+        mSectionAdapterForSDKCloud = new SectionListAdapter(EZPlayBackListActivity.this, getLayoutInflater(),
+                mSDKCloudRecordsAdapter, mCameraInfo.getDeviceSerial());
+        mPinnedHeaderListViewForSDKCloud.setAdapter(mSectionAdapterForSDKCloud);
+
+        mPinnedHeaderListViewForSDKCloud.setOnScrollListener(mSectionAdapterForSDKCloud);
+        mPinnedHeaderListViewForSDKCloud.setPinnedHeaderView(getLayoutInflater().inflate(R.layout.list_section,
+                mPinnedHeaderListViewForSDKCloud, false));
+        mPinnedHeaderListViewForSDKCloud.startAnimation();
+        mSectionAdapterForSDKCloud.setOnHikItemClickListener(EZPlayBackListActivity.this);
     }
 
     @Override
     public void querySuccessFromDevice(List<CloudPartInfoFileEx> cloudPartInfoFileExs, int position, List<CloudPartInfoFile> cloudPartInfoFile) {
         hasShowListViewLine(true);
+        loadingBar.setVisibility(View.GONE);
         showTab(R.id.content_tab_device_root);
         mPinnedHeaderListViewForLocal.setVisibility(View.VISIBLE);
 
@@ -1953,7 +1662,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             mDeviceRecordsAdapter.addLocalFileExAll(cloudPartInfoFileExs);
             mDeviceRecordsAdapter.notifyDataSetChanged();
             int selPosition = mDeviceRecordsAdapter.getCloudFileEx().size() - 2;
-            if (getAndroidOSVersion() < 14) {
+            if (AppUtil.getAndroidOSVersion() < 14) {
                 mPinnedHeaderListViewForLocal.setSelection(selPosition > 0 ? selPosition : 0);
             } else {
                 mPinnedHeaderListViewForLocal.smoothScrollToPositionFromTop(selPosition > 0 ? selPosition : 0, 100, 500);
@@ -2035,76 +1744,10 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         }
     }
 
-
-    @Override
-    public void queryOnlyLocalNoData() {
-        queryNoDataUIDisplay();
-        showTab(R.id.novideo_img_device);
-    }
-
-    @Override
-    public void queryLocalNoData() {
-        showTab(R.id.novideo_img_device);
-    }
-
-    @Override
-    public void queryException() {
-        loadingBar.setVisibility(View.GONE);
-        queryExceptionLayout.setVisibility(View.VISIBLE);
-        findViewById(R.id.display_layout).setVisibility(View.GONE);
-    }
-
-    private int mRecordType;
-
-    @Override
-    public void queryTaskOver(int type, int queryMode, int queryErrorCode, String detail) {
-        mRecordType = type;
-        if (type == RemoteListContant.TYPE_CLOUD) {
-            LogUtil.e(TAG, "queryTaskOver: TYPE_CLOUD");
-        } else if (type == RemoteListContant.TYPE_LOCAL) {
-            if (mWaitDlg != null && mWaitDlg.isShowing()) {
-                mWaitDlg.dismiss();
-            }
-            LogUtil.e(TAG, "queryTaskOver: TYPE_LOCAL");
-            queryDeviceRecordFilesAsyncTask = null;
-        }
-    }
-
-    private int getAndroidOSVersion() {
-        int osVersion;
-        try {
-            osVersion = Integer.parseInt(android.os.Build.VERSION.SDK);
-        } catch (NumberFormatException e) {
-            osVersion = 0;
-        }
-        return osVersion;
-    }
-
-    private void convertCloudPartInfoFile2EZCloudRecordFile(EZCloudRecordFile dst, CloudPartInfoFile src) {
-        dst.setCoverPic(src.getPicUrl());
-        dst.setDownloadPath(src.getDownloadPath());
-        dst.setFileId(src.getFileId());
-        dst.setEncryption(src.getKeyCheckSum());
-        dst.setStartTime(Utils.convert14Calender(src.getStartTime()));
-        dst.setStopTime(Utils.convert14Calender(src.getEndTime()));
-        dst.setDeviceSerial(src.getDeviceSerial());
-        dst.setCameraNo(src.getCameraNo());
-        dst.setVideoType(src.getVideoType());
-        dst.setiStorageVersion(src.getiStorageVersion());
-        dst.setFileSize(src.getFileSize());
-    }
-
-    private void convertCloudPartInfoFile2EZDeviceRecordFile(EZDeviceRecordFile dst, CloudPartInfoFile src) {
-        dst.setStartTime(Utils.convert14Calender(src.getStartTime()));
-        dst.setStopTime(Utils.convert14Calender(src.getEndTime()));
-    }
+    // ------------------------- OnHikItemClickListener -------------------------
 
     @Override
     public void onHikItemClickListener(CloudPartInfoFile cloudFile, ClickedListItem playClickItem) {
-        if (autoLayout.getVisibility() == View.VISIBLE) {
-            autoLayout.setVisibility(View.GONE);
-        }
-        fileSizeText.setText("");
         newPlayInit(true, true);
         timeBucketUIInit(playClickItem.getBeginTime(), playClickItem.getEndTime());
         currentClickItemFile = playClickItem;
@@ -2113,15 +1756,14 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         mCloudRecordInfo = null;
 //        lastDevicePlaybackRate = EZConstants.EZPlaybackRate.EZ_PLAYBACK_RATE_1;
 
-        if (!cloudFile.isCloud()) {
-            downloadBtn.setVisibility(View.VISIBLE);
+        if (mRecordType == RemoteListContant.TYPE_LOCAL) {
             RemoteFileInfo fileInfo = cloudFile.getRemoteFileInfo();
             this.fileInfo = fileInfo.copy();
             mDeviceRecordInfo = new EZDeviceRecordFile();
             mCloudRecordInfo = null;
-            convertCloudPartInfoFile2EZDeviceRecordFile(mDeviceRecordInfo, cloudFile);
+            EZBusinessTool.convertCloudPartInfoFile2EZDeviceRecordFile(mDeviceRecordInfo, cloudFile);
             mSectionAdapterForLocal.setSelection(cloudFile.getPosition());
-            if (getAndroidOSVersion() < 14) {
+            if (AppUtil.getAndroidOSVersion() < 14) {
                 mPinnedHeaderListViewForLocal.setSelection(playClickItem.getPosition());
             } else {
                 mPinnedHeaderListViewForLocal.smoothScrollToPositionFromTop(playClickItem.getPosition(), 100, 500);
@@ -2132,34 +1774,74 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
 
             startRecordOriginVideo();
             mPlaybackPlayer.startPlaybackV2(EZPlaybackStreamParam.createBy(mDeviceRecordInfo));
-        } else {
+        } else if (mRecordType == RemoteListContant.TYPE_CLOUD) {
             downloadBtn.setVisibility(View.VISIBLE);
-            sectionAdapter.setSelection(cloudFile.getPosition());
-            if (getAndroidOSVersion() < 14) {
-                pinnedHeaderListView.setSelection(playClickItem.getPosition());
+            mSectionAdapterForCloud.setSelection(cloudFile.getPosition());
+            if (AppUtil.getAndroidOSVersion() < 14) {
+                mPinnedHeaderListViewForCloud.setSelection(playClickItem.getPosition());
             } else {
-                pinnedHeaderListView.smoothScrollToPositionFromTop(playClickItem.getPosition(), 100, 500);
+                mPinnedHeaderListViewForCloud.smoothScrollToPositionFromTop(playClickItem.getPosition(), 100, 500);
             }
 
-            if (!isCloudPrompt) {
-                isCloudPrompt = true;
-                sharedPreferences.edit().putBoolean(HAS_BEAN_CLOUD_PROMPT, true).commit();
-                // setWindowAlpha(0.2f);
-                matteImage.setVisibility(View.VISIBLE);
-                mScreenOrientationHelper.disableSensorOrientation();
+            mCloudRecordInfo = new EZCloudRecordFile();
+            mDeviceRecordInfo = null;
+            EZBusinessTool.convertCloudPartInfoFile2EZCloudRecordFile(mCloudRecordInfo, cloudFile);
+            mPlaybackPlayer.setHandler(playBackHandler);
+            mPlaybackPlayer.setSurfaceEx(mTextureView.getSurfaceTexture());
+
+            startRecordOriginVideo();
+            mPlaybackPlayer.startPlaybackV2(EZPlaybackStreamParam.createBy(mCloudRecordInfo));
+        } else if (mRecordType == RemoteListContant.TYPE_SDKCLOUD) {
+            downloadBtn.setVisibility(View.GONE);
+            mSectionAdapterForSDKCloud.setSelection(cloudFile.getPosition());
+            if (AppUtil.getAndroidOSVersion() < 14) {
+                mPinnedHeaderListViewForSDKCloud.setSelection(playClickItem.getPosition());
             } else {
-                mCloudRecordInfo = new EZCloudRecordFile();
-                mDeviceRecordInfo = null;
-                convertCloudPartInfoFile2EZCloudRecordFile(mCloudRecordInfo, cloudFile);
-                mPlaybackPlayer.setHandler(playBackHandler);
+                mPinnedHeaderListViewForSDKCloud.smoothScrollToPositionFromTop(playClickItem.getPosition(), 100, 500);
+            }
 
-                mPlaybackPlayer.setSurfaceEx(mTextureView.getSurfaceTexture());
+            mCloudRecordInfo = new EZCloudRecordFile();
+            mDeviceRecordInfo = null;
+            EZBusinessTool.convertCloudPartInfoFile2EZCloudRecordFile(mCloudRecordInfo, cloudFile);
+            mPlaybackPlayer.setHandler(playBackHandler);
+            mPlaybackPlayer.setSurfaceEx(mTextureView.getSurfaceTexture());
 
-                startRecordOriginVideo();
-                mPlaybackPlayer.startPlaybackV2(EZPlaybackStreamParam.createBy(mCloudRecordInfo));
+            startRecordOriginVideo();
+            mPlaybackPlayer.startPlaybackV2(EZPlaybackStreamParam.createBy(mCloudRecordInfo));
+        }
+    }
+
+    @Override
+    public void onHikMoreClickListener(boolean isExpand) {
+        if (isExpand) {
+            if (mCloudRecordsAdapter != null && mCloudRecordsAdapter.getLocalFileEx() != null) {
+                mCloudRecordsAdapter.addLocalFileExAll();
+                mCloudRecordsAdapter.notifyDataSetChanged();
+                int position = mCloudRecordsAdapter.getCloudFileEx().size() - 1;
+                if (AppUtil.getAndroidOSVersion() < 14) {
+                    mPinnedHeaderListViewForCloud.setSelection(position > 0 ? position : 0);
+                } else {
+                    mPinnedHeaderListViewForCloud.smoothScrollToPositionFromTop(position > 0 ? position : 0, 100, 500);
+                }
+            } else {
+                // 当云视频文件不超过100000个不会出现异常，超过即异常
+                int cloudTotal = 100000;
+                hasShowListViewLine(false);
+                stopQueryTask();
+                queryDeviceRecordFilesAsyncTask = new QueryDeviceRecordFilesAsyncTask(mCameraInfo.getDeviceSerial(),
+                        mCameraInfo.getCameraNo(), recordType, EZPlayBackListActivity.this);
+                queryDeviceRecordFilesAsyncTask.setQueryDate(queryDate);
+                queryDeviceRecordFilesAsyncTask.execute(String.valueOf(cloudTotal));
+            }
+        } else {
+            if (mCloudRecordsAdapter != null) {
+                mCloudRecordsAdapter.minusLocalFileExAll();
             }
         }
-        showDownLoad();
+    }
+
+    @Override
+    public void onSelectedChangeListener(int total) {
     }
 
     private void measure(View view) {
@@ -2170,8 +1852,6 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
 
     private void newSeekPlayUIInit() {
         touchProgressLayout.setVisibility(View.VISIBLE);
-        progressBar.setProgress(0);
-        progressBar.setVisibility(View.GONE);
         exitBtn.setVisibility(View.GONE);
         replayAndNextArea.setVisibility(View.GONE);
         errorTipsVg.setVisibility(View.GONE);
@@ -2184,12 +1864,9 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         mControlDisplaySec = 0;
 
         if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
-            captureBtn.setVisibility(View.GONE);
             videoRecordingBtn.setVisibility(View.VISIBLE);
         } else {
-            captureBtn.setVisibility(View.VISIBLE);
             videoRecordingBtn.setVisibility(View.VISIBLE);
-            captureBtn.setEnabled(false);
             videoRecordingBtn.setEnabled(false);
         }
 
@@ -2207,8 +1884,6 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         loadingImgView.setVisibility(View.VISIBLE);
         loadingPbLayout.setVisibility(View.VISIBLE);
         touchProgressLayout.setVisibility(View.GONE);
-        progressBar.setProgress(0);
-        progressBar.setVisibility(View.GONE);
         exitBtn.setVisibility(View.GONE);
         replayAndNextArea.setVisibility(View.GONE);
         errorTipsVg.setVisibility(View.GONE);
@@ -2221,13 +1896,10 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         mControlDisplaySec = 0;
 
         if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
-            captureBtn.setVisibility(View.GONE);
             videoRecordingBtn.setVisibility(View.VISIBLE);
             mControlBarRL.setVisibility(View.VISIBLE);
         } else {
-            captureBtn.setVisibility(View.VISIBLE);
             videoRecordingBtn.setVisibility(View.VISIBLE);
-            captureBtn.setEnabled(false);
             videoRecordingBtn.setEnabled(false);
             mControlBarRL.setVisibility(View.GONE);
         }
@@ -2237,10 +1909,6 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
     }
 
     private void newPlayInit(boolean resetPause, boolean resetProgress) {
-        if (mShowNetworkTip) {
-            mShowNetworkTip = false;
-        }
-
         initEZPlayer();
         newPlayUIInit();
 
@@ -2248,7 +1916,6 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             resetPauseBtnUI();
         }
         if (resetProgress) {
-            progressBar.setProgress(0);
             progressSeekbar.setProgress(0);
         }
         if (localInfo.isSoundOpen()) {
@@ -2265,7 +1932,6 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             resetPauseBtnUI();
         }
         if (resetProgress) {
-            progressBar.setProgress(0);
             progressSeekbar.setProgress(0);
         }
         if (localInfo.isSoundOpen()) {
@@ -2282,39 +1948,6 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         pauseBtn.setBackgroundResource(R.drawable.ez_remote_list_pause_btn_selector);
     }
 
-    @Override
-    public void onHikMoreClickListener(boolean isExpand) {
-        if (isExpand) {
-            if (mCloudRecordsAdapter != null && mCloudRecordsAdapter.getLocalFileEx() != null) {
-                mCloudRecordsAdapter.addLocalFileExAll();
-                mCloudRecordsAdapter.notifyDataSetChanged();
-                int position = mCloudRecordsAdapter.getCloudFileEx().size() - 1;
-                if (getAndroidOSVersion() < 14) {
-                    pinnedHeaderListView.setSelection(position > 0 ? position : 0);
-                } else {
-                    pinnedHeaderListView.smoothScrollToPositionFromTop(position > 0 ? position : 0, 100, 500);
-                }
-            } else {
-                // 当云视频文件不超过100000个不会出现异常，超过即异常
-                int cloudTotal = 100000;
-                hasShowListViewLine(false);
-                mWaitDlg.show();
-                stopQueryTask();
-                queryDeviceRecordFilesAsyncTask = new QueryDeviceRecordFilesAsyncTask(mCameraInfo.getDeviceSerial(),
-                 mCameraInfo.getCameraNo(), recordType, EZPlayBackListActivity.this);
-                queryDeviceRecordFilesAsyncTask.setQueryDate(queryDate);
-                queryDeviceRecordFilesAsyncTask.setOnlyHasLocal(true);
-                queryDeviceRecordFilesAsyncTask.execute(String.valueOf(cloudTotal));
-            }
-        } else {
-            if (mCloudRecordsAdapter != null) {
-                mCloudRecordsAdapter.minusLocalFileExAll();
-            }
-        }
-
-    }
-
-
     // 暂停按钮实现停止
     private void pauseStop() {
         status = RemoteListContant.STATUS_STOP;
@@ -2324,26 +1957,6 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
 
         loadingPlayBtn.setVisibility(View.VISIBLE);
     }
-
-/*    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-        if (mPlaybackPlayer != null) {
-            mPlaybackPlayer.setSurfaceHold(holder);
-        }
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-        if (mPlaybackPlayer != null) {
-            mPlaybackPlayer.setSurfaceHold(null);
-        }
-    }*/
-
 
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
@@ -2378,7 +1991,6 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
     }
 
     private void onOrientationChanged() {
-        showDownLoad();
         setRemoteListSvLayout();
         if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
             // 显示状态栏
@@ -2390,10 +2002,9 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             // 竖屏处理
             remoteListPage.setBackgroundColor(getResources().getColor(R.color.white));
             mTitleBar.setVisibility(View.VISIBLE);
-            pinnedHeaderListView.setVisibility(View.VISIBLE);
+            mPinnedHeaderListViewForCloud.setVisibility(View.VISIBLE);
             if (controlArea.getVisibility() == View.VISIBLE) {
 //                exitBtn.setVisibility(View.VISIBLE);// 应测试要求，右上角的关闭按钮不显示
-                captureBtn.setVisibility(View.GONE);
                 videoRecordingBtn.setVisibility(View.VISIBLE);
             }
             mControlBarRL.setVisibility(View.VISIBLE);
@@ -2404,9 +2015,8 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             fullScreen(true);
             remoteListPage.setBackgroundColor(getResources().getColor(R.color.black_bg));
             mTitleBar.setVisibility(View.GONE);
-            pinnedHeaderListView.setVisibility(View.GONE);
+            mPinnedHeaderListViewForCloud.setVisibility(View.GONE);
             exitBtn.setVisibility(View.GONE);
-            captureBtn.setVisibility(View.VISIBLE);
             videoRecordingBtn.setVisibility(View.VISIBLE);
             mControlBarRL.setVisibility(View.GONE);
             mLandscapeTitleBar.setVisibility(View.VISIBLE);
@@ -2427,24 +2037,9 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         }
     }
 
-    // 是否显示下载图标
-    private void showDownLoad() {
-        if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
-            downLayout.setVisibility(View.VISIBLE);
-        } else {
-            downLayout.setVisibility(View.INVISIBLE);
-        }
-    }
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.query_exception_ly:
-                startQueryCloudRecordFiles();
-                break;
-            case R.id.cancel_auto_play_btn:
-                autoLayout.setVisibility(View.GONE);
-                break;
             case R.id.loading_play_btn:
                 notPause = true;
                 pauseBtn.setBackgroundResource(R.drawable.remote_list_pause_btn_selector);
@@ -2463,29 +2058,15 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             case R.id.remote_playback_sound_btn:
                 onSoundBtnClick();
                 break;
-            case R.id.remote_playback_capture_btn:
-                onCapturePicBtnClick();
-                break;
             case R.id.remote_playback_video_recording_btn:
                 onRecordBtnClick();
                 break;
             case R.id.exit_btn:
                 onPlayExitBtnOnClick();
                 break;
-            case R.id.control_area:
-                break;
-            case R.id.delete_playback:
-                if (sectionAdapter != null && sectionAdapter.getSelectedCloudFiles().size() < 1) {
-                } else {
-                    showDelDialog();
-                }
-                break;
             default:
                 break;
         }
-    }
-
-    private void showDelDialog() {
     }
 
     // 暂停按钮事件处理
@@ -2596,69 +2177,6 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                 toast("failed to start record!");
             }
         }
-
-    }
-
-    // 抓拍按钮响应函数
-    private void onCapturePicBtnClick() {
-        mControlDisplaySec = 0;
-//        if (!SDCardUtil.isSDCardUseable()) {
-//            // 提示SD卡不可用
-//            showToast(R.string.remoteplayback_SDCard_disable_use);
-//            return;
-//        }
-//        if (SDCardUtil.getSDCardRemainSize() < SDCardUtil.PIC_MIN_MEM_SPACE) {
-//            // 提示内存不足
-//            showToast(R.string.remoteplayback_capture_fail_for_memory);
-//            return;
-//        }
-        Thread thr = new Thread() {
-            @Override
-            public void run() {
-                if (mPlaybackPlayer == null) {
-                    return;
-                }
-                String serial = !TextUtils.isEmpty(mCameraInfo.getDeviceSerial()) ? mCameraInfo.getDeviceSerial() :
-                "123456789";
-                Bitmap bmp = mPlaybackPlayer.capturePicture();
-                if (bmp != null) {
-                    try {
-                        mAudioPlayUtil.playAudioFile(AudioPlayUtil.CAPTURE_SOUND);
-
-                        // 可以采用deviceSerial+时间作为文件命名，demo中简化，只用时间命名
-                        Date date = new Date();
-                        String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + String.format("%tY", date) +
-                                String.format("%tm", date) + String.format("%td", date) + "/" + String.format("%tH", date) +
-                                String.format("%tM", date) + String.format("%tS", date) + String.format("%tL", date) + ".jpg";
-
-                        if (TextUtils.isEmpty(path)) {
-                            bmp.recycle();
-                            bmp = null;
-                            return;
-                        }
-//                        EZUtils.saveCapturePictrue(path, bmp);
-                        EZUtils.savePicture2Album(EZPlayBackListActivity.this, bmp);// 将文件保存至相册
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(EZPlayBackListActivity.this,
-                                        getResources().getString(R.string.already_saved_to_volume), Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    } finally {
-                        if (bmp != null) {
-                            bmp.recycle();
-                            bmp = null;
-                            return;
-                        }
-                    }
-                }
-                super.run();
-            }
-        };
-        thr.start();
     }
 
     // 声音按钮
@@ -2666,7 +2184,6 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         if (mPlaybackPlayer == null) {
             return;
         }
-
         if (localInfo.isSoundOpen()) {
             // 关闭声音
             localInfo.setSoundOpen(false);
@@ -2702,46 +2219,10 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         if (currentClickItemFile != null) {
             reConnectPlay(currentClickItemFile.getType(), startTime);
         }
-
-    }
-
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        switch (v.getId()) {
-            case R.id.remote_playback_area:
-                onPlayAreaTouched();
-                break;
-            case R.id.control_area:
-                break;
-            case R.id.query_exception_ly:
-                startQueryCloudRecordFiles();
-                break;
-            default:
-                break;
-        }
-        return false;
-    }
-
-    @Override
-    public void onSelectedChangeListener(int total) {
-        if (total > 0) {
-            deleteVideoText.setText(getString(R.string.delete) + "(" + total + ")");
-        } else {
-            deleteVideoText.setText(R.string.delete);
-        }
     }
 
     @Override
     public void onDeleteCloudFileCompleteListener(boolean isLocal) {
-        rightEditView.setVisibility(View.GONE);
-        if (isLocal) {
-            onHikMoreClickListener(true);
-            sectionAdapter.setExpand(true);
-        } else {
-            pinnedHeaderListView.setVisibility(View.GONE);
-            hasShowListViewLine(false);
-            queryNoDataUIDisplay();
-        }
 
     }
 
@@ -2774,7 +2255,6 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
             if (mPlaybackPlayer != null) {
                 mPlaybackPlayer.setPlayVerifyCode(DataManager.getInstance().getDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial()));
             }
-
             startRecordOriginVideo();
             mPlaybackPlayer.startPlaybackV2(EZPlaybackStreamParam.createBy(mDeviceRecordInfo));
         } else if (mCloudRecordInfo != null) {
@@ -2857,7 +2337,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
     }
 
     // 记录用户选择的SD卡播放倍数，pause+resume后可以恢复到原倍数状态；每个视频回放前都需要重置为1倍数（云存储不用记录，云存储会自动恢复）
-//    EZConstants.EZPlaybackRate lastDevicePlaybackRate;
+    // EZConstants.EZPlaybackRate lastDevicePlaybackRate;
 
     private OnClickListener mChangePlaybackRateListener = new OnClickListener() {
         @Override
@@ -2936,8 +2416,7 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
                 correct4PtzBtn, correct5PtzBtn, correctFull5PtzBtn,
                 correctLatBtn, correctARCHorBtn, correctARCVerBtn,
                 correctWideAngleBtn, correct180Btn, correct360Btn,
-                correctCycBtn
-        };
+                correctCycBtn};
 
         placeWallBtn.setOnClickListener(mOnFecWndClickListener);
         placeFloorBtn.setOnClickListener(mOnFecWndClickListener);
@@ -3036,7 +2515,6 @@ public class EZPlayBackListActivity extends RootActivity implements QueryPlayBac
         streamTypeTv.setText(streamTypeMsg);
         streamTypeTv.setVisibility(View.VISIBLE);
     }
-
 
     public void checkPermissions() {
         if (Build.VERSION.SDK_INT >= 23) {

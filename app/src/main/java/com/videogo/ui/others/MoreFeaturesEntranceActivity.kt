@@ -128,6 +128,13 @@ class MoreFeaturesEntranceActivity : RootActivity() {
         showToast("p2p已关闭")
     }
 
+    fun onClickCloudRecordSpaceId(view: View) {
+        dialogWithEditText("请输入spaceId") {
+            SpTool.storeValue(ValueKeys.SDK_CLOUD_SPACEID, it)
+            showToast("SpaceId设置成功")
+        }
+    }
+
     /**
      * 用来判断服务是否运行.
      *

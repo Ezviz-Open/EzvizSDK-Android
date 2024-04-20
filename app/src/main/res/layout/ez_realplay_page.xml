@@ -160,11 +160,30 @@
 
     </RelativeLayout>
 
+    <!-- PTZ & 对讲 & 截图 & 录像 -->
     <include
         layout="@layout/ezopen_realplay_operate_bar"
-        android:visibility="gone" />
+        android:visibility="visible" />
 
-    <include
-        layout="@layout/ezopen_realplay_operate_bar2"
-        android:visibility="gone" />
+    <!-- 其他功能扩展 -->
+<!--    <HorizontalScrollView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="100dp"-->
+<!--        android:background="#e0e0e0"-->
+<!--        android:paddingLeft="10dp">-->
+
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+
+<!--            android:orientation="horizontal">-->
+
+<!--            <Button-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="云录制截图上传" />-->
+
+<!--        </LinearLayout>-->
+<!--    </HorizontalScrollView>-->
+
 </LinearLayout>

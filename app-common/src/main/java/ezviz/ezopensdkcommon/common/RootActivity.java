@@ -6,6 +6,8 @@ import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,6 +21,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -332,6 +335,64 @@ public class RootActivity extends Activity {
                 mLastDialog = dialogBuilder.show();
             }
         });
+    }
+
+    /**
+     * 复制弹出框
+     */
+    protected void copyDialog(final String title, final String resString) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                AlertDialog.Builder copyDialog = new AlertDialog.Builder(RootActivity.this);
+                copyDialog.setTitle(title);
+                copyDialog.setMessage(resString);
+                copyDialog.setPositiveButton("Copy", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // 获取剪贴版
+                        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                        ClipData clip = ClipData.newPlainText("text", resString);
+                        clipboard.setPrimaryClip(clip);
+                        Toast.makeText(getApplicationContext(), getString(R.string.copied_to_clipboard), Toast.LENGTH_LONG).show();
+                    }
+                });
+                copyDialog.show();
+            }
+        });
+    }
+
+    public interface EditTextDialogCallback {
+        public void confirm(String value);
+    }
+
+    protected void dialogWithEditText(final String title, final EditTextDialogCallback callback) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(RootActivity.this);
+        builder.setTitle(title);
+
+        final EditText editText = new EditText(RootActivity.this);
+        builder.setView(editText);
+
+        builder.setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String inputText = editText.getText().toString();
+                if (TextUtils.isEmpty(inputText)) {
+                    toast("请输入内容");
+                    return;
+                }
+                if (callback != null) {
+                    callback.confirm(inputText);
+                }
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.create().show();
     }
 
     private static int mNotificationId = 1;

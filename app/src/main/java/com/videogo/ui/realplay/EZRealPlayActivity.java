@@ -120,7 +120,6 @@ import com.videogo.widget.loading.LoadingTextView;
 
 import org.MediaPlayer.PlayM4.Player;
 
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -130,6 +129,7 @@ import java.util.TimerTask;
 import com.videogo.global.DemoConfig;
 import ezviz.ezopensdk.R;
 
+import static com.videogo.EzvizApplication.getOpenSDK;
 import static com.videogo.openapi.EZConstants.MSG_GOT_STREAM_TYPE;
 import static com.videogo.openapi.EZConstants.MSG_VIDEO_SIZE_CHANGED;
 
@@ -204,9 +204,11 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
     private LinearLayout mRealPlayTalkBtnLy;// 对讲
     private LinearLayout mRealPlayCaptureBtnLy;// 截图
     private LinearLayout mRealPlayRecordContainerLy;// 录像
+    private LinearLayout mRealPlayThirdLineLy;// 云录制截图上传
     private ImageButton mRealPlayPtzBtn;// 云台
     private ImageButton mRealPlayTalkBtn;// 对讲
     private ImageButton mRealPlayCaptureBtn;// 截图
+    private ImageButton mRealPlaySnapshotUplaodBtn;// 云录制截图上传
     private View mRealPlayRecordContainer;// 录像容器
     private ImageButton mRealPlayRecordBtn;// 录像未录制状态图标
     private ImageButton mRealPlayRecordStartBtn;// 录像录制中图标
@@ -438,6 +440,9 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             case R.id.realplay_previously_btn2:
             case R.id.realplay_full_previously_btn:// 截图Click
                 onCapturePicBtnClick();
+                break;
+            case R.id.realplay_snapshot_upload_btn:// 云录制截图上传
+                onCapturePicUploadBtnClick();
                 break;
             case R.id.realplay_video_btn:
             case R.id.realplay_video_start_btn:
@@ -848,7 +853,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         mFullscreenFullButton = (CheckTextButton) findViewById(R.id.fullscreen_full_button);
 
         if (mRtspUrl == null) {
-            initOperateBarUI(false);
+            initOperateBarUI();
             initFullOperateBarUI();
             mRealPlayOperateBar.setVisibility(View.VISIBLE);
         } else {
@@ -865,6 +870,9 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
 
         mWaitDialog = new WaitDialog(this, android.R.style.Theme_Translucent_NoTitleBar);
         mWaitDialog.setCancelable(false);
+        if (EzvizAPI.getInstance().isUsingGlobalSDK()) {
+
+        }
     }
 
     private void initPlayer() {
@@ -1010,50 +1018,31 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
 
     /**
      * 初始化操控视图（云台、对讲、截图、录制）
-     * @param bigScreen
      */
-    private void initOperateBarUI(boolean bigScreen) {
-        bigScreen = false;
+    private void initOperateBarUI() {
         if (mRealPlayOperateBar != null) {
             mRealPlayOperateBar.setVisibility(View.GONE);
             mRealPlayOperateBar = null;
         }
-        if (bigScreen) {// 全屏
-            mRealPlayOperateBar = (HorizontalScrollView) findViewById(R.id.ezopen_realplay_operate_bar2);
-            findViewById(R.id.ezopen_realplay_operate_bar).setVisibility(View.GONE);
+        mRealPlayOperateBar = (HorizontalScrollView) findViewById(R.id.ezopen_realplay_operate_bar);
 
-            mRealPlayPtzBtnLy = (LinearLayout) findViewById(R.id.realplay_ptz_btn_ly2);
-            mRealPlayTalkBtnLy = (LinearLayout) findViewById(R.id.realplay_talk_btn_ly2);
-            mRealPlayCaptureBtnLy = (LinearLayout) findViewById(R.id.realplay_previously_btn_ly2);
-            mRealPlayRecordContainerLy = (LinearLayout) findViewById(R.id.realplay_video_container_ly2);
-
-            mRealPlayPtzBtn = (ImageButton) findViewById(R.id.realplay_ptz_btn2);
-            mRealPlayTalkBtn = (ImageButton) findViewById(R.id.realplay_talk_btn2);
-            mRealPlayCaptureBtn = (ImageButton) findViewById(R.id.realplay_previously_btn2);
-            mRealPlayRecordContainer = findViewById(R.id.realplay_video_container2);
-            mRealPlayRecordBtn = (ImageButton) findViewById(R.id.realplay_video_btn2);
-            mRealPlayRecordStartBtn = (ImageButton) findViewById(R.id.realplay_video_start_btn2);
-        } else {// 竖屏
-            mRealPlayOperateBar = (HorizontalScrollView) findViewById(R.id.ezopen_realplay_operate_bar);
-            findViewById(R.id.ezopen_realplay_operate_bar2).setVisibility(View.GONE);
-
-            mRealPlayPtzBtnLy = (LinearLayout) findViewById(R.id.realplay_ptz_btn_ly);
-            mRealPlayTalkBtnLy = (LinearLayout) findViewById(R.id.realplay_talk_btn_ly);
-            mRealPlayCaptureBtnLy = (LinearLayout) findViewById(R.id.realplay_previously_btn_ly);
-            mRealPlayRecordContainerLy = (LinearLayout) findViewById(R.id.realplay_video_container_ly);
-
-            mRealPlayPtzBtn = (ImageButton) findViewById(R.id.realplay_ptz_btn);
-            mRealPlayTalkBtn = (ImageButton) findViewById(R.id.realplay_talk_btn);
-            mRealPlayCaptureBtn = (ImageButton) findViewById(R.id.realplay_previously_btn);
-            mRealPlayRecordContainer = findViewById(R.id.realplay_video_container);
-            mRealPlayRecordBtn = (ImageButton) findViewById(R.id.realplay_video_btn);
-            mRealPlayRecordStartBtn = (ImageButton) findViewById(R.id.realplay_video_start_btn);
+        mRealPlayPtzBtnLy = (LinearLayout) findViewById(R.id.realplay_ptz_btn_ly);
+        mRealPlayTalkBtnLy = (LinearLayout) findViewById(R.id.realplay_talk_btn_ly);
+        mRealPlayCaptureBtnLy = (LinearLayout) findViewById(R.id.realplay_previously_btn_ly);
+        mRealPlayRecordContainerLy = (LinearLayout) findViewById(R.id.realplay_video_container_ly);
+        mRealPlayThirdLineLy = (LinearLayout) findViewById(R.id.realplay_operate_third_line_ll);
+        if (EzvizAPI.getInstance().isUsingGlobalSDK()) {
+            mRealPlayThirdLineLy.setVisibility(View.GONE);
         }
+        mRealPlayPtzBtn = (ImageButton) findViewById(R.id.realplay_ptz_btn);
+        mRealPlayTalkBtn = (ImageButton) findViewById(R.id.realplay_talk_btn);
+        mRealPlayCaptureBtn = (ImageButton) findViewById(R.id.realplay_previously_btn);
+        mRealPlaySnapshotUplaodBtn = (ImageButton) findViewById(R.id.realplay_snapshot_upload_btn);
+        mRealPlayRecordContainer = findViewById(R.id.realplay_video_container);
+        mRealPlayRecordBtn = (ImageButton) findViewById(R.id.realplay_video_btn);
+        mRealPlayRecordStartBtn = (ImageButton) findViewById(R.id.realplay_video_start_btn);
         mRealPlayTalkBtn.setEnabled(false);
         mRealPlayOperateBar.setVisibility(View.VISIBLE);
-    }
-
-    private void setBigScreenOperateBtnLayout() {
     }
 
     private void initFullOperateBarUI() {
@@ -1100,7 +1089,6 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
          * *********************/
         mCameraInfo.setVideoLevel(mCurrentQulityMode.getVideoLevel());
 
-        //
         /**
          *
          * 视频质量，2-高清，1-标清，0-流畅
@@ -1479,7 +1467,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         }
         // 对讲开启前，关闭播放器的声音；否则画面码流和对讲码流中同时播放声音，导致回音
         // Turn off the sound of the player before starting the intercom; Otherwise,
-        // playing sound simultaneously in both the picture stream and the intercom stream may cause echo
+        // playing sound simultaneously in both the picture stream and the intercom stream
         if (mEZPlayer != null) {
             mEZPlayer.closeSound();
         }
@@ -1776,8 +1764,9 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             mTalkBackControlBtn.setEnabled(false);
             mTalkBackControlBtn.setText(R.string.talking);
         }
-        if (!EzvizAPI.getInstance().isUsingGlobalSDK()) {// 对讲变声支持国内，不支持海外
-            layoutView.findViewById(R.id.talk_voice_change_ll).setVisibility(View.VISIBLE);
+        // 海外不支持的功能
+        if (EzvizAPI.getInstance().isUsingGlobalSDK()) {
+            layoutView.findViewById(R.id.talk_voice_change_ll).setVisibility(View.GONE);// 对讲变声支持国内，不支持海外
         }
 
         int height = mLocalInfo.getScreenHeight() - mPortraitTitleBar.getHeight() - mRealPlayPlayRl.getHeight()
@@ -2121,64 +2110,81 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
      * 截图Action
      */
     private void onCapturePicBtnClick() {
-
-        mControlDisplaySec = 0;
-//        if (!SDCardUtil.isSDCardUseable()) {
-//            // 提示SD卡不可用 | Prompt SD card is not available
-//            Utils.showToast(EZRealPlayActivity.this, R.string.remoteplayback_SDCard_disable_use);
-//            return;
-//        }
-//
-//        if (SDCardUtil.getSDCardRemainSize() < SDCardUtil.PIC_MIN_MEM_SPACE) {
-//            // 提示内存不足 | Prompt for insufficient memory
-//            Utils.showToast(EZRealPlayActivity.this, R.string.remoteplayback_capture_fail_for_memory);
-//            return;
-//        }
-
-        if (mEZPlayer != null) {
-            Thread thr = new Thread() {
-                @Override
-                public void run() {
-                    Bitmap bmp = mEZPlayer.capturePicture();
-                    if (bmp != null) {
-                        try {
-                            mAudioPlayUtil.playAudioFile(AudioPlayUtil.CAPTURE_SOUND);
-
-                            final String strCaptureFile = DemoConfig.getCapturesFolder() + "/" + System.currentTimeMillis() + ".jpg";
-                            LogUtil.e(TAG, "captured picture file path is " + strCaptureFile);
-
-                            if (TextUtils.isEmpty(strCaptureFile)) {
-                                bmp.recycle();
-                                bmp = null;
-                                return;
-                            }
-                            // 将截图bitmap保存至文件
-                            EZUtils.saveCapturePictrue(strCaptureFile, bmp);
-                            // TODO 将文件保存至相册，需要申请动态权限WRITE_EXTERNAL_STORAGE，由开发者自行实现
-                            // EZUtils.savePicture2Album(EZRealPlayActivity.this, bmp);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(EZRealPlayActivity.this, getResources().getString(R.string.already_saved_to) + strCaptureFile, Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                        } catch (InnerException e) {
-                            e.printStackTrace();
-                        } finally {
-                            if (bmp != null) {
-                                bmp.recycle();
-                                bmp = null;
-                                return;
-                            }
-                        }
-                    } else {
-                        showToast("抓图失败, 检查是否开启了硬件解码");
-                    }
-                    super.run();
-                }
-            };
-            thr.start();
+        if (mEZPlayer == null) {
+            return;
         }
+        Thread thr = new Thread() {
+            @Override
+            public void run() {
+                Bitmap bmp = mEZPlayer.capturePicture();
+                if (bmp != null) {
+                    try {
+                        mAudioPlayUtil.playAudioFile(AudioPlayUtil.CAPTURE_SOUND);
+
+                        final String strCaptureFile = DemoConfig.getCapturesFolder() + "/" + System.currentTimeMillis() + ".jpg";
+                        LogUtil.e(TAG, "captured picture file path is " + strCaptureFile);
+
+                        if (TextUtils.isEmpty(strCaptureFile)) {
+                            bmp.recycle();
+                            bmp = null;
+                            return;
+                        }
+                        // 将截图bitmap保存至文件
+                        EZUtils.saveCapturePictrue(strCaptureFile, bmp);
+                        // TODO 将文件保存至相册，需要申请动态权限WRITE_EXTERNAL_STORAGE，由开发者自行实现
+                        // EZUtils.savePicture2Album(EZRealPlayActivity.this, bmp);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                toast(getResources().getString(R.string.already_saved_to) + strCaptureFile);
+                            }
+                        });
+                    } catch (InnerException e) {
+                        e.printStackTrace();
+                    } finally {
+                        if (bmp != null) {
+                            bmp.recycle();
+                            bmp = null;
+                            return;
+                        }
+                    }
+                } else {
+                    showToast("抓图失败, 检查是否开启了硬件解码");
+                }
+                super.run();
+            }
+        };
+        thr.start();
+    }
+
+    /**
+     * 云录制截图上传Action
+     */
+    private void onCapturePicUploadBtnClick() {
+        if (mEZPlayer == null) {
+            return;
+        }
+        Thread thr = new Thread() {
+            @Override
+            public void run() {
+                Bitmap bmp = mEZPlayer.capturePicture();
+                if (bmp != null) {
+                    try {
+                        String storageId = EzvizApplication.getOpenSDK().uploadSDKCloudRecordImage(bmp);
+                        if (!TextUtils.isEmpty(storageId)) {
+                            copyDialog("上传成功，storageId:", storageId);
+                        }
+                    } catch (BaseException e) {
+                        showToast("上传失败" + e.getErrorCode());
+                        e.printStackTrace();
+                    }
+                } else {
+                    showToast("抓图失败, 检查是否开启了硬件解码");
+                }
+                super.run();
+            }
+        };
+        thr.start();
     }
 
     /**
@@ -2301,6 +2307,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             mRealPlayQualityBtn.setEnabled(mDeviceInfo.getStatus() == 1);
             mRealPlayPtzBtn.setEnabled(false);
             mRealPlayCaptureBtn.setEnabled(false);
+            mRealPlaySnapshotUplaodBtn.setEnabled(false);
             mRealPlayRecordBtn.setEnabled(false);
 
             mRealPlayFullPlayBtn.setBackgroundResource(R.drawable.play_full_stop_selector);
@@ -2350,6 +2357,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             mRealPlayQualityBtn.setEnabled(mDeviceInfo.getStatus() == 1 && mEZPlayer != null);
             mRealPlayPtzBtn.setEnabled(false);
             mRealPlayCaptureBtn.setEnabled(false);
+            mRealPlaySnapshotUplaodBtn.setEnabled(false);
             mRealPlayRecordBtn.setEnabled(false);
             /// 鱼眼设备专用设置，如果没有鱼眼设备，不需要如下代码
             if (fecViewLayoutHelper != null) {
@@ -2385,6 +2393,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             mRealPlayQualityBtn.setEnabled(mDeviceInfo.getStatus() == 1 && mEZPlayer != null);
             mRealPlayPtzBtn.setEnabled(false);
             mRealPlayCaptureBtn.setEnabled(false);
+            mRealPlaySnapshotUplaodBtn.setEnabled(false);
             mRealPlayRecordBtn.setEnabled(false);
 
             mRealPlayFullPlayBtn.setBackgroundResource(R.drawable.play_full_play_selector);
@@ -2412,6 +2421,7 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             mRealPlayQualityBtn.setEnabled(mDeviceInfo.getStatus() == 1);
             mRealPlayPtzBtn.setEnabled(getSupportPtz() == 1);
             mRealPlayCaptureBtn.setEnabled(true);
+            mRealPlaySnapshotUplaodBtn.setEnabled(true);
             mRealPlayRecordBtn.setEnabled(true);
 
             mRealPlayFullPlayBtn.setBackgroundResource(R.drawable.play_full_stop_selector);
@@ -2637,8 +2647,6 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             mRealPlayPtzBtnLy.setVisibility(View.VISIBLE);
             mRealPlayFullPtzBtn.setVisibility(View.VISIBLE);
         } else {
-            //mRealPlayPtzBtnLy.setVisibility(View.GONE);
-            //mRealPlayFullPtzBtn.setVisibility(View.GONE);
             mRealPlayPtzBtnLy.setEnabled(false);
             mRealPlayFullPtzBtn.setEnabled(false);
         }
@@ -2918,22 +2926,8 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
         // 声音处理  Sound processing
         setRealPlaySound();
 
-        // temp solution for OPENSDK-92
-        // Android 预览3Q10的时候切到流畅之后 视频播放窗口变大了
-        //        if (description.arg1 != 0) {
-        //            mRealRatio = (float) description.arg2 / description.arg1;
-        //        } else {
-        //            mRealRatio = Constant.LIVE_VIEW_RATIO;
-        //        }
-
-        boolean bSupport = true;//(float) mLocalInfo.getScreenHeight() / mLocalInfo.getScreenWidth() >= BIG_SCREEN_RATIO;
-        if (bSupport) {
-            initOperateBarUI(mRealRatio <= Constant.LIVE_VIEW_RATIO);
-            initUI();
-            if (mRealRatio <= Constant.LIVE_VIEW_RATIO) {
-                setBigScreenOperateBtnLayout();
-            }
-        }
+        initOperateBarUI();
+        initUI();
         setRealPlaySvLayout();
         setRealPlaySuccessUI();
         updatePtzUI();
@@ -3177,8 +3171,6 @@ public class EZRealPlayActivity extends RootActivity implements OnClickListener,
             }
         }
     }
-
-    FileOutputStream mOs;
 
     public void checkPermissions() {
         if (Build.VERSION.SDK_INT >= 23) {
