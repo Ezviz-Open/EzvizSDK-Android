@@ -41,7 +41,7 @@
             android:background="@drawable/login_btn_selector"
             android:text="@string/device_reset_ok"
             android:textColor="@color/white"
-            android:textSize="@dimen/realplay_button_text_size" />
+            android:textSize="15dp" />
 
     </LinearLayout>
 

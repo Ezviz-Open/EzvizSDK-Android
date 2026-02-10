@@ -13,18 +13,23 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
+
 import com.ezviz.hcnetsdk.EZLoginDeviceInfo;
 import com.ezviz.hcnetsdk.EZSADPDeviceInfo;
 import com.google.gson.Gson;
 import com.videogo.constant.IntentConsts;
 import com.videogo.exception.BaseException;
+import com.videogo.global.DemoConfig;
 import com.videogo.openapi.EZHCNetDeviceSDK;
 import com.videogo.util.LogUtil;
+import com.videogo.widget.TitleBar;
+
 import ezviz.ezopensdk.R;
+
 import java.util.ArrayList;
 
 public class LanDeviceActivity extends Activity {
-    private static final String TAG = "LanDeviceActivity";
+    private static final String TAG = LanDeviceActivity.class.getSimpleName();
 
     private ListView mListView;
     private ArrayList<EZSADPDeviceInfo> mArrayList = new ArrayList<EZSADPDeviceInfo>();
@@ -42,12 +47,14 @@ public class LanDeviceActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hc);
+        initTitleBar();
         mListView = (ListView) findViewById(R.id.list_device);
+        EZHCNetDeviceSDK.getInstance().setDebugLogEnable(true, DemoConfig.getSadpLogsFolder());
         EZHCNetDeviceSDK.getInstance().startLocalSearch(new EZHCNetDeviceSDK.SadpDeviceFoundListener() {
             @Override
             public void onDeviceFound(final EZSADPDeviceInfo sadp_device_info) {
                 LogUtil.d(TAG,
-                    "onDeviceFound  " + sadp_device_info.getDeviceSerial() + "  " + sadp_device_info.getDeviceSerial());
+                        "onDeviceFound  " + sadp_device_info.getDeviceSerial() + "  " + sadp_device_info.getDeviceSerial());
                 Gson gson = new Gson();
                 LogUtil.d(TAG, "onDeviceFound  " + gson.toJson(sadp_device_info));
                 runOnUiThread(new Runnable() {
@@ -74,7 +81,8 @@ public class LanDeviceActivity extends Activity {
                 mCurrentPosition = position;
                 if (!mLandeviceAdapter.getItem(mCurrentPosition).isActived()) {
                     Intent intent = new Intent(LanDeviceActivity.this, LanDeviceActivateActivity.class);
-                    intent.putExtra(IntentConsts.EXTRA_DEVICE_ID, mLandeviceAdapter.getItem(mCurrentPosition).getDeviceSerial());
+                    intent.putExtra(IntentConsts.EXTRA_DEVICE_ID,
+                            mLandeviceAdapter.getItem(mCurrentPosition).getDeviceSerial());
                     startActivityForResult(intent, REQUEST_ACTIVATE);
                 } else {
                     showLoginDialog(mCurrentPosition);
@@ -90,13 +98,13 @@ public class LanDeviceActivity extends Activity {
     }
 
     private void showNotSupportViewDailog() {
-        new AlertDialog.Builder(this).setMessage(R.string.device_not_support_view)
-            .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
+        new AlertDialog.Builder(this).setMessage(R.string.device_not_support_view).setPositiveButton(R.string.confirm
+                , new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
 
-                }
-            });
+            }
+        });
     }
 
     @Override
@@ -112,7 +120,8 @@ public class LanDeviceActivity extends Activity {
         if (loginDeviceInfo == null || loginDeviceInfo.getLoginId() < 0) {
             if (!mLandeviceAdapter.getItem(mCurrentPosition).isActived()) {
                 Intent intent = new Intent(LanDeviceActivity.this, LanDeviceActivateActivity.class);
-                intent.putExtra(IntentConsts.EXTRA_DEVICE_ID, mLandeviceAdapter.getItem(mCurrentPosition).getDeviceSerial());
+                intent.putExtra(IntentConsts.EXTRA_DEVICE_ID,
+                        mLandeviceAdapter.getItem(mCurrentPosition).getDeviceSerial());
                 startActivityForResult(intent, REQUEST_ACTIVATE);
             } else {
                 showLoginDialog(mCurrentPosition);
@@ -126,7 +135,8 @@ public class LanDeviceActivity extends Activity {
                 @Override
                 public void onCameraItemClick(int playChannelNo) {
                     Intent intent = new Intent(LanDeviceActivity.this, LanDevicePlayActivity.class);
-                    intent.putExtra(IntentConsts.EXTRA_DEVICE_ID, mLandeviceAdapter.getItem(mCurrentPosition).getDeviceSerial());
+                    intent.putExtra(IntentConsts.EXTRA_DEVICE_ID,
+                            mLandeviceAdapter.getItem(mCurrentPosition).getDeviceSerial());
                     intent.putExtra(IntentConsts.EXTRA_CHANNEL_NO, playChannelNo);
                     intent.putExtra("iUserId", loginDeviceInfo.getLoginId());
                     startActivity(intent);
@@ -138,13 +148,15 @@ public class LanDeviceActivity extends Activity {
         } else if (loginDeviceInfo.getByChanNum() + loginDeviceInfo.getByIPChanNum() == 1) {
             if (loginDeviceInfo.getByChanNum() > 0) {
                 Intent intent = new Intent(LanDeviceActivity.this, LanDevicePlayActivity.class);
-                intent.putExtra(IntentConsts.EXTRA_DEVICE_ID, mLandeviceAdapter.getItem(mCurrentPosition).getDeviceSerial());
+                intent.putExtra(IntentConsts.EXTRA_DEVICE_ID,
+                        mLandeviceAdapter.getItem(mCurrentPosition).getDeviceSerial());
                 intent.putExtra(IntentConsts.EXTRA_CHANNEL_NO, loginDeviceInfo.getByStartChan());
                 intent.putExtra("iUserId", loginDeviceInfo.getLoginId());
                 startActivity(intent);
             } else {
                 Intent intent = new Intent(LanDeviceActivity.this, LanDevicePlayActivity.class);
-                intent.putExtra(IntentConsts.EXTRA_DEVICE_ID, mLandeviceAdapter.getItem(mCurrentPosition).getDeviceSerial());
+                intent.putExtra(IntentConsts.EXTRA_DEVICE_ID,
+                        mLandeviceAdapter.getItem(mCurrentPosition).getDeviceSerial());
                 intent.putExtra(IntentConsts.EXTRA_CHANNEL_NO, loginDeviceInfo.getByStartDChan());
                 intent.putExtra("iUserId", loginDeviceInfo.getLoginId());
                 startActivity(intent);
@@ -162,57 +174,53 @@ public class LanDeviceActivity extends Activity {
         View safeview = inflater.inflate(R.layout.lan_device_login_dialog, null);
         final EditText loginName = (EditText) safeview.findViewById(R.id.login_name);
         final EditText loginPwd = (EditText) safeview.findViewById(R.id.login_pwd);
-        mLoginDialog = new AlertDialog.Builder(this).setTitle(R.string.lan_device_login_title)
-            .setView(safeview)
-            .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                }
-            })
-            .setPositiveButton(R.string.certain, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    final String name = loginName.getText().toString();
-                    final String pwd = loginPwd.getText().toString();
-                    if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(pwd)) {
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    final EZLoginDeviceInfo ezLoginDeviceInfo = EZHCNetDeviceSDK.getInstance()
-                                        .loginDeviceWithUerName(name, pwd, mLandeviceAdapter.getItem(mCurrentPosition).getLocalIp(),
-                                            mLandeviceAdapter.getItem(mCurrentPosition).getLocalPort());
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            onLoginSuccess(ezLoginDeviceInfo);
-                                        }
-                                    });
-                                } catch (final BaseException e) {
-                                    e.printStackTrace();
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            onLoaginFailed(e.getErrorCode(), e.getMessage());
-                                        }
-                                    });
-                                }
+        mLoginDialog =
+                new AlertDialog.Builder(this).setTitle(R.string.lan_device_login_title).setView(safeview).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        }).setPositiveButton(R.string.certain, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                final String name = loginName.getText().toString();
+                final String pwd = loginPwd.getText().toString();
+                if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(pwd)) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                final EZLoginDeviceInfo ezLoginDeviceInfo =
+                                        EZHCNetDeviceSDK.getInstance().loginDeviceWithUerName(name, pwd,
+                                                mLandeviceAdapter.getItem(mCurrentPosition).getLocalIp(),
+                                                mLandeviceAdapter.getItem(mCurrentPosition).getLocalPort());
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        onLoginSuccess(ezLoginDeviceInfo);
+                                    }
+                                });
+                            } catch (final BaseException e) {
+                                e.printStackTrace();
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        onLoaginFailed(e.getErrorCode(), e.getMessage());
+                                    }
+                                });
                             }
-                        }).start();
-                    } else {
-                        Toast.makeText(LanDeviceActivity.this, "username or passwor is null", Toast.LENGTH_LONG).show();
-                        showLoginDialog(mCurrentPosition);
-                    }
+                        }
+                    }).start();
+                } else {
+                    Toast.makeText(LanDeviceActivity.this, "username or passwor is null", Toast.LENGTH_LONG).show();
+                    showLoginDialog(mCurrentPosition);
                 }
-            })
-            .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                @Override
-                public void onCancel(DialogInterface dialog) {
+            }
+        }).setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
 
-                }
-            })
-            .setCancelable(false)
-            .create();
+            }
+        }).setCancelable(false).create();
         TextWatcher textWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -226,8 +234,7 @@ public class LanDeviceActivity extends Activity {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if (!TextUtils.isEmpty(loginName.getText().toString().trim()) && !TextUtils.isEmpty(
-                    loginPwd.getText().toString().trim())) {
+                if (!TextUtils.isEmpty(loginName.getText().toString().trim()) && !TextUtils.isEmpty(loginPwd.getText().toString().trim())) {
                     mLoginDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
                 } else {
                     mLoginDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
@@ -244,29 +251,30 @@ public class LanDeviceActivity extends Activity {
     }
 
     public void onLoaginFailed(int errorCode, String errorMsg) {
-        int ERROR_NET_DVR_PASSWORD_ERROR =
-            1; //username or password is incorrect. The user name or password entered when registering is incorrect.
-        int ERROR_NET_DVR_PASSWORD_ERROR2 =
-            1100; //username or password is incorrect. The user name or password entered when registering is incorrect.
+        int ERROR_NET_DVR_PASSWORD_ERROR = 1; //username or password is incorrect. The user name or password entered
+        // when registering is incorrect.
+        int ERROR_NET_DVR_PASSWORD_ERROR2 = 1100; //username or password is incorrect. The user name or password
+        // entered when registering is incorrect.
         if (errorCode == ERROR_NET_DVR_PASSWORD_ERROR || errorCode == ERROR_NET_DVR_PASSWORD_ERROR2) {
-            new AlertDialog.Builder(this).setMessage(R.string.hc_net_account_pwd_error)
-                .setNegativeButton(R.string.cancel, null)
-                .setPositiveButton(R.string.retry, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        showLoginDialog(mCurrentPosition);
-                    }
-                })
-                .show();
+            new AlertDialog.Builder(this).setMessage(R.string.hc_net_account_pwd_error).setNegativeButton(R.string.cancel, null).setPositiveButton(R.string.retry, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    showLoginDialog(mCurrentPosition);
+                }
+            }).show();
         } else {
-            new AlertDialog.Builder(this).setMessage(getString(R.string.hc_net_error) + errorCode)
-                .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                })
-                .show();
+            new AlertDialog.Builder(this).setMessage(getString(R.string.hc_net_error) + errorCode).setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                }
+            }).show();
         }
+    }
+
+    private void initTitleBar() {
+        TitleBar mTitleBar = (TitleBar) findViewById(R.id.title_bar);
+        mTitleBar.addBackButton(view -> finish());
+        mTitleBar.setTitle("设备发现");
     }
 }

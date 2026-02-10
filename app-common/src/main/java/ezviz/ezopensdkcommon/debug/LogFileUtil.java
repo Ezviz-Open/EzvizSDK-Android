@@ -1,10 +1,6 @@
 package ezviz.ezopensdkcommon.debug;
 
-import android.Manifest;
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.os.Build;
-import android.os.Environment;
 import android.util.Log;
 
 import java.util.Calendar;
@@ -17,10 +13,10 @@ public class LogFileUtil {
     /**
      * 保存日志文件：启动
      */
-    public static void startSaveLogToFile(Context context){
+    public static void startSaveLogToFile(Context context, String logsFolderPath) {
         Calendar calendar = Calendar.getInstance();
         String time = String.format(Locale.CHINA, "log_%04d%02d%02d_%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.HOUR_OF_DAY));
-        final String logFileNameWithPath = context.getExternalFilesDir(null).getPath() + "/0_OpenSDK/" + time + ".txt";
+        final String logFileNameWithPath = logsFolderPath + "/" + time + ".txt";
         Log.d(TAG, "logFileNameWithPath = " + logFileNameWithPath);
         LogFileService.start(logFileNameWithPath);
     }

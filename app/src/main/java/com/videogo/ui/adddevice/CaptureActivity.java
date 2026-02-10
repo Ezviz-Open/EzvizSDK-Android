@@ -10,8 +10,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.provider.Settings;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Window;
@@ -110,7 +111,7 @@ public class CaptureActivity extends RootActivity implements QRCodeView.Delegate
         LogUtil.e(TAG, "scan resultString = " + resultString);
         Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         vibrator.vibrate(200);
-        mZXingView.startSpotDelay(500); // 延迟0.5秒后开始识别
+        mZXingView.startSpot();
 
         // 初始化数据
         String mSerialNoStr = "";

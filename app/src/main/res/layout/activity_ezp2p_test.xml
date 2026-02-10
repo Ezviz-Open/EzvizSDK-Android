@@ -44,9 +44,9 @@
                 android:layout_height="40dp"
                 android:layout_marginLeft="10dp"
                 android:background="@drawable/selector_orange_corner20"
-                android:text="刷新"
-                android:textColor="@color/white"
-                android:visibility="gone" />
+                android:onClick="isPreConnectionSucceedAction"
+                android:text="预连接结果"
+                android:textColor="@color/white" />
 
         </LinearLayout>
 

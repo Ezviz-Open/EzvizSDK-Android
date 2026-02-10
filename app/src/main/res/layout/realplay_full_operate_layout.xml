@@ -86,7 +86,7 @@
 			android:layout_height="wrap_content"
 			android:layout_marginRight="74dp"
 			android:layout_alignParentRight="true"
-			android:background="@anim/play_full_multiple_anim_bg"
+			android:background="@drawable/play_full_multiple_anim_bg"
 			android:gravity="center"
 			android:orientation="vertical" >
 

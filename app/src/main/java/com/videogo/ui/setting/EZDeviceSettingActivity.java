@@ -15,22 +15,28 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import com.videogo.EzvizApplication;
+
+import com.ezviz.bandwidthcheck.BWCToolSelectActivity;
 import com.videogo.constant.IntentConsts;
 import com.videogo.errorlayer.ErrorInfo;
 import com.videogo.exception.BaseException;
 import com.videogo.exception.ErrorCode;
+import com.videogo.global.ValueKeys;
 import com.videogo.openapi.EZConstants;
 import com.videogo.openapi.bean.EZDeviceInfo;
 import com.videogo.openapi.bean.EZDeviceVersion;
-import com.videogo.ui.cameralist.EZCameraListActivity;
+import com.videogo.ui.devicelist.EZDeviceListActivity;
 import com.videogo.util.ActivityUtils;
 import com.videogo.util.ConnectionDetector;
 import com.videogo.util.LogUtil;
+import com.videogo.util.SpTool;
 import com.videogo.widget.TitleBar;
 import com.videogo.widget.WaitDialog;
+
 import ezviz.ezopensdk.R;
 import ezviz.ezopensdkcommon.common.RootActivity;
+
+import static com.videogo.EzvizApplication.getOpenSDK;
 
 public class EZDeviceSettingActivity extends RootActivity {
     private final String TAG = "EZDeviceSettingActivity";
@@ -50,16 +56,11 @@ public class EZDeviceSettingActivity extends RootActivity {
     private TextView mDeviceTypeSnView;
 
     private ViewGroup mDeviceSNLayout;
-    
+
     private ViewGroup mDefenceLayout;
     private TextView mDefenceView;
     private TextView mDefenceStateView;
 
-    private ViewGroup mDefencePlanParentLayout;
-    private View mDefencePlanArrowView;
-
-    private ViewGroup mStorageLayout;
-    private View mStorageNoticeView;
     private ViewGroup mVersionLayout;
     private TextView mVersionView;
     private View mVersionNewestView;
@@ -68,7 +69,10 @@ public class EZDeviceSettingActivity extends RootActivity {
 
     private ViewGroup mEncryptParentLayout;
     private Button mEncryptButton;
-    private ViewGroup mModifyPasswordLayout;
+
+    private Button mHardDecodeButton;
+
+    private View mBWCheckView;
 
     /* 设备删除 */
     private View mDeviceDeleteView;
@@ -106,13 +110,8 @@ public class EZDeviceSettingActivity extends RootActivity {
         mDefenceView = (TextView) findViewById(R.id.defence);
         mDefenceStateView = (TextView) findViewById(R.id.defence_state);
 
-        mDefencePlanParentLayout = (ViewGroup) findViewById(R.id.defence_plan_parent_layout);
-        mDefencePlanArrowView = findViewById(R.id.defence_plan_arrow);
         mDefenceToggleButton = (Button) findViewById(R.id.defence_toggle_button);
 
-
-        mStorageLayout = (ViewGroup) findViewById(R.id.storage_layout);
-        mStorageNoticeView = findViewById(R.id.storage_notice);
         mVersionLayout = (ViewGroup) findViewById(R.id.version_layout);
         mVersionView = (TextView) findViewById(R.id.version);
         mVersionNewestView = findViewById(R.id.version_newest);
@@ -122,7 +121,10 @@ public class EZDeviceSettingActivity extends RootActivity {
 
         mEncryptParentLayout = (ViewGroup) findViewById(R.id.encrypt_parent_layout);
         mEncryptButton = (Button) findViewById(R.id.encrypt_button);
-        mModifyPasswordLayout = (ViewGroup) findViewById(R.id.modify_password_layout);
+
+        mHardDecodeButton = (Button) findViewById(R.id.hard_decode_button);
+
+        mBWCheckView = findViewById(R.id.ez_bw_check);
 
         mDeviceDeleteView = findViewById(R.id.device_delete);
         mDeviceSerialTextView = (TextView) findViewById(R.id.ez_device_serial);
@@ -151,73 +153,35 @@ public class EZDeviceSettingActivity extends RootActivity {
 
     private void initViews() {
         if (mEZDeviceInfo != null) {
-            mOnClickListener = new OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    Intent intent;
-                    switch (v.getId()) {
-                        case R.id.device_info_layout:
-                            intent = new Intent(EZDeviceSettingActivity.this, ModifyDeviceNameActivity.class);
-                            intent.putExtra(IntentConsts.EXTRA_NAME, mEZDeviceInfo.getDeviceName());
-                            intent.putExtra(IntentConsts.EXTRA_DEVICE_ID,mEZDeviceInfo.getDeviceSerial());
-                            startActivityForResult(intent, REQUEST_CODE_MODIFY_DEVICE_NAME);
-                            break;
-                        case R.id.defence_layout:
-                        case R.id.defence_toggle_button:
-                        	new SetDefenceTask().execute(!(mEZDeviceInfo.getDefence() != 0));
-                        	break;
-
-                        case R.id.defence_plan_button:
-                            setDefencePlanNew(false);
-                            break;
-
-                        case R.id.defence_plan_status_retry:
-                            setDefencePlanNew(false);
-                            break;
-
-                        case R.id.defence_plan_set_layout:
-                            if (mDefencePlanArrowView.getVisibility() == View.VISIBLE) {
-                            }
-                            setDefencePlanNew(false);
-                            break;
-
-                        case R.id.defence_plan_retry:
-                            setDefencePlanNew(false);
-                            break;
-
-                        case R.id.storage_layout:
-                            break;
-
-                        case R.id.version_layout:
-                            intent = new Intent(EZDeviceSettingActivity.this, EZUpgradeDeviceActivity.class);
-                            intent.putExtra("deviceSerial", mEZDeviceInfo.getDeviceSerial());
-                            startActivity(intent);
-                            break;
-
-                        case R.id.encrypt_button:
-                            gotoSetSafeMode();
-                            break;
-
-                        case R.id.modify_password_layout:
-                            gotoModifyPassword();
-                            break;
-                            
-                        case R.id.device_delete:
-                            showDialog(SHOW_DIALOG_DEL_DEVICE);
-                            break;
-
-                        default:
-                            break;
-                    }
+            mOnClickListener = v -> {
+                Intent intent;
+                int id = v.getId();
+                if (id == R.id.device_info_layout) {
+                    intent = new Intent(EZDeviceSettingActivity.this, ModifyDeviceNameActivity.class);
+                    String typeSn = TextUtils.isEmpty(mEZDeviceInfo.getDeviceName()) ?
+                            String.format("%s(%s)", mEZDeviceInfo.getCategory(), mEZDeviceInfo.getDeviceSerial()) : mEZDeviceInfo.getDeviceName();
+                    intent.putExtra(IntentConsts.EXTRA_NAME, typeSn);
+                    intent.putExtra(IntentConsts.EXTRA_DEVICE_ID, mEZDeviceInfo.getDeviceSerial());
+                    startActivityForResult(intent, REQUEST_CODE_MODIFY_DEVICE_NAME);
+                } else if (id == R.id.defence_layout || id == R.id.defence_toggle_button) {
+                    new SetDefenceTask().execute(!(mEZDeviceInfo.getDefence() != 0));
+                } else if (id == R.id.version_layout) {
+                    intent = new Intent(EZDeviceSettingActivity.this, EZUpgradeDeviceActivity.class);
+                    intent.putExtra("deviceSerial", mEZDeviceInfo.getDeviceSerial());
+                    startActivity(intent);
+                } else if (id == R.id.encrypt_button) {
+                    gotoSetSafeMode();
+                } else if (id == R.id.hard_decode_button) {
+                    boolean hardDecodeStatus = SpTool.obtainBooleanValue(ValueKeys.VideoPlayHardDecodingStatus + "_" + mEZDeviceInfo.getDeviceSerial());
+                    SpTool.storeBooleanValue(ValueKeys.VideoPlayHardDecodingStatus + "_" + mEZDeviceInfo.getDeviceSerial(), !hardDecodeStatus);
+                    mHardDecodeButton.setBackgroundResource(!hardDecodeStatus ? R.drawable.autologin_on : R.drawable.autologin_off);
+                } else if (id == R.id.ez_bw_check) {
+                    BWCToolSelectActivity.launch(EZDeviceSettingActivity.this, mEZDeviceInfo.getDeviceSerial(), 1);
+                } else if (id == R.id.device_delete) {
+                    showDialog(SHOW_DIALOG_DEL_DEVICE);
                 }
             };
-
             new GetDeviceInfoTask().execute();
-
-            // 防护计划设置
-            setupSafeModePlan(true);
-
             mDeviceDeleteView.setOnClickListener(mOnClickListener);
         }
     }
@@ -225,7 +189,6 @@ public class EZDeviceSettingActivity extends RootActivity {
     @Override
     protected void onResume() {
         super.onResume();
-//        mCloudStateHelper.onResume();
         setupDeviceInfo();
         setupParentLayout();
     }
@@ -233,7 +196,6 @@ public class EZDeviceSettingActivity extends RootActivity {
     @Override
     protected void onPause() {
         super.onPause();
-//        mCloudStateHelper.onPause();
     }
 
     @Override
@@ -258,24 +220,21 @@ public class EZDeviceSettingActivity extends RootActivity {
         if (mEZDeviceInfo != null) {
             // 设备图片部分
             // 设备名字部分
-//            String typeSn = String.format("%s(%s)",
-//                    TextUtils.isEmpty(mDeviceModel.getDisplay()) ? mDevice.getFullModel() : mDeviceModel.getDisplay(),
-//                    mDevice.getDeviceID());
-            String typeSn = mEZDeviceInfo.getDeviceName();
+            String typeSn = TextUtils.isEmpty(mEZDeviceInfo.getDeviceName()) ?
+                    String.format("%s(%s)", mEZDeviceInfo.getCategory(), mEZDeviceInfo.getDeviceSerial()) : mEZDeviceInfo.getDeviceName();
+//            String typeSn = mEZDeviceInfo.getDeviceName();
             mDeviceSerialTextView.setText(mEZDeviceInfo.getDeviceSerial());
 
-            mDeviceNameView.setText(TextUtils.isEmpty(typeSn)?"":typeSn);
+            mDeviceNameView.setText(TextUtils.isEmpty(typeSn) ? "" : typeSn);
 
             mDeviceTypeSnView.setVisibility(View.GONE);
 
             mDeviceInfoLayout.setOnClickListener(mOnClickListener);
             mDeviceSNLayout.setOnClickListener(mOnClickListener);
 
-            mDefencePlanParentLayout.setVisibility(View.GONE);
-
             boolean bSupportDefence = true;
             if(bSupportDefence) {
-            	mDefenceView.setText(R.string.detail_defend_c1_c2_f1);
+                mDefenceView.setText(R.string.detail_defend_c1_c2_f1);
                 mDefenceStateView.setTextColor(getResources().getColorStateList(R.color.on_off_text_selector));
 //                mDefenceStateView.setText(mDevice.isDefenceOn() ? R.string.on : R.string.off);
 //                mDefenceStateView.setEnabled(mEZCameraInfo.getDefence() == 1);
@@ -283,21 +242,10 @@ public class EZDeviceSettingActivity extends RootActivity {
                 mDefenceToggleButton.setBackgroundResource(isDefenceEnable ? R.drawable.autologin_on
                         : R.drawable.autologin_off);
                 mDefenceToggleButton.setOnClickListener(mOnClickListener);
-            
-				mDefenceLayout.setVisibility(View.VISIBLE);
+
+                mDefenceLayout.setVisibility(View.VISIBLE);
 //				mDefenceLayout.setTag(supportMode);
 //				mDefenceLayout.setOnClickListener(mOnClickListener); // dont allow to click the list
-           }
-
-            // 存储状态部分
-
-            {
-
-                mStorageNoticeView.setVisibility(View.VISIBLE);
-
-                // TODO
-                mStorageLayout.setVisibility(View.VISIBLE);
-                mStorageLayout.setOnClickListener(mOnClickListener);
             }
 
             // 版本部分
@@ -327,28 +275,16 @@ public class EZDeviceSettingActivity extends RootActivity {
             }
 
             // 视频图片加密部分
-            boolean bSupportEncrypt = true;
-            //if (mDevice.getSupportEncrypt() == DeviceConsts.NOT_SUPPORT || !mDevice.isOnline()) {
-            if(!bSupportEncrypt) {
-                mEncryptParentLayout.setVisibility(View.GONE);
-            } else {
-                mEncryptButton
-                        .setBackgroundResource((mEZDeviceInfo.getIsEncrypt() == 1) ? R.drawable.autologin_on
-                                : R.drawable.autologin_off);
-                mEncryptButton.setOnClickListener(mOnClickListener);
+            mEncryptButton.setBackgroundResource((mEZDeviceInfo.getIsEncrypt() == 1) ?
+                    R.drawable.autologin_on : R.drawable.autologin_off);
+            mEncryptButton.setOnClickListener(mOnClickListener);
+            mEncryptParentLayout.setVisibility(View.VISIBLE);
 
-                mModifyPasswordLayout.setOnClickListener(mOnClickListener);
-                boolean bSupportChangePwd = false;
-//                if ((mEZCameraInfo.getEncryptStatus() != 1))
-                       // || mDevice.getSupportChangeSafePasswd() == DeviceConsts.NOT_SUPPORT) {
-                if(!bSupportChangePwd) {
-                    mModifyPasswordLayout.setVisibility(View.GONE);
-                } else {
-                    mModifyPasswordLayout.setVisibility(View.VISIBLE);
-                }
+            boolean hardDecodeStatus = SpTool.obtainBooleanValue(ValueKeys.VideoPlayHardDecodingStatus + "_" + mEZDeviceInfo.getDeviceSerial());
+            mHardDecodeButton.setBackgroundResource(hardDecodeStatus ? R.drawable.autologin_on : R.drawable.autologin_off);
+            mHardDecodeButton.setOnClickListener(mOnClickListener);
 
-                mEncryptParentLayout.setVisibility(View.VISIBLE);
-            }
+            mBWCheckView.setOnClickListener(mOnClickListener);
         }
     }
 
@@ -357,15 +293,7 @@ public class EZDeviceSettingActivity extends RootActivity {
 //        mOnlineParentLayout.setVisibility(mOnlineTimeLayout.getVisibility() & mOfflineNotifyLayout.getVisibility());
     }
 
-    private void setupSafeModePlan(boolean fromServer) {}
-
-    private void setDefencePlanNew(boolean visible) {
-    }
-
     private void setupBaiduDeviceInfo(boolean fromServer, boolean reload) {}
-
-    private void gotoModifyPassword() {
-    }
 
     private void gotoSetSafeMode() {
         if (mEZDeviceInfo.getIsEncrypt() == 1) {
@@ -389,7 +317,7 @@ public class EZDeviceSettingActivity extends RootActivity {
 //        } else {
 //            new OpenEncryptTask().execute();
 //        }
-            new OpenEncryptTask().execute(true);
+        new OpenEncryptTask().execute(true);
     }
 
 
@@ -417,7 +345,7 @@ public class EZDeviceSettingActivity extends RootActivity {
 
                 dialog = builder.create();
             }
-                break;
+            break;
             case SHOW_DIALOG_CLOSE_SAFE_MODE: {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this).setNegativeButton(R.string.cancel,
                         new DialogInterface.OnClickListener() {
@@ -436,8 +364,8 @@ public class EZDeviceSettingActivity extends RootActivity {
                 builder.setMessage(getString(R.string.detail_safe_close_btn_tip));
 
                 dialog = builder.create();
-            	}
-                break;
+            }
+            break;
 
             case SHOW_DIALOG_DEL_DEVICE:
                 dialog = new AlertDialog.Builder(this).setMessage(getString(R.string.detail_del_device_btn_tip))
@@ -505,27 +433,27 @@ public class EZDeviceSettingActivity extends RootActivity {
         ViewGroup smsVerifyView = (ViewGroup) mLayoutInflater.inflate(R.layout.device_video_encrypt_dialog, null, true);
         final EditText etSmsCode = (EditText) smsVerifyView.findViewById(R.id.ez_sms_code_et);
 
-        new  AlertDialog.Builder(EZDeviceSettingActivity.this)  
-        .setTitle(R.string.input_device_verify_code)
-        .setIcon(android.R.drawable.ic_dialog_info)   
-        .setView(smsVerifyView)
-        .setPositiveButton(R.string.ez_dialog_btn_disable_video_encrypt, new DialogInterface.OnClickListener() {
+        new  AlertDialog.Builder(EZDeviceSettingActivity.this)
+                .setTitle(R.string.input_device_verify_code)
+                .setIcon(android.R.drawable.ic_dialog_info)
+                .setView(smsVerifyView)
+                .setPositiveButton(R.string.ez_dialog_btn_disable_video_encrypt, new DialogInterface.OnClickListener() {
 
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-            	String sms = null;
-            	if(etSmsCode != null) {
-            		sms = etSmsCode.getEditableText().toString();
-            	}
-            	mValidateCode = sms;
-            	if(!TextUtils.isEmpty(mValidateCode)) {
-            		new OpenEncryptTask().execute(false); //disable video encryption
-            	}
-            }
-            
-        })   
-        .setNegativeButton(R.string.cancel, null)
-        .show();  
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String sms = null;
+                        if(etSmsCode != null) {
+                            sms = etSmsCode.getEditableText().toString();
+                        }
+                        mValidateCode = sms;
+                        if(!TextUtils.isEmpty(mValidateCode)) {
+                            new OpenEncryptTask().execute(false); //disable video encryption
+                        }
+                    }
+
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
     }
 
     @Override
@@ -542,14 +470,14 @@ public class EZDeviceSettingActivity extends RootActivity {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-        	try {
-        		mDeviceVersion = EzvizApplication.getOpenSDK().getDeviceVersion(mEZDeviceInfo.getDeviceSerial());
-        		return true;
-        	} catch (BaseException e) {;
+            try {
+                mDeviceVersion = getOpenSDK().getDeviceVersion(mEZDeviceInfo.getDeviceSerial());
+                return true;
+            } catch (BaseException e) {;
                 ErrorInfo errorInfo = (ErrorInfo) e.getObject();
                 mErrorCode = errorInfo.errorCode;
                 LogUtil.d(TAG, errorInfo.toString());
-        	}
+            }
             return false;
         }
 
@@ -618,55 +546,55 @@ public class EZDeviceSettingActivity extends RootActivity {
         private int mErrorCode = 0;
         boolean bSetDefence;
 
-		@Override
-		protected void onPreExecute() {
-			super.onPreExecute();
-			mWaitDialog = new WaitDialog(EZDeviceSettingActivity.this, android.R.style.Theme_Translucent_NoTitleBar);
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mWaitDialog = new WaitDialog(EZDeviceSettingActivity.this, android.R.style.Theme_Translucent_NoTitleBar);
             mWaitDialog.setCancelable(false);
             mWaitDialog.show();
-		}
+        }
 
-		@Override
-		protected Boolean doInBackground(Boolean... params) {
-			bSetDefence = (Boolean) params[0];
-			Boolean result = false;
-			try {
-				result = EzvizApplication.getOpenSDK().setDefence(mEZDeviceInfo.getDeviceSerial(), bSetDefence?EZConstants.EZDefenceStatus.EZDefence_IPC_OPEN:
+        @Override
+        protected Boolean doInBackground(Boolean... params) {
+            bSetDefence = (Boolean) params[0];
+            Boolean result = false;
+            try {
+                result = getOpenSDK().setDefence(mEZDeviceInfo.getDeviceSerial(), bSetDefence?EZConstants.EZDefenceStatus.EZDefence_IPC_OPEN:
                         EZConstants.EZDefenceStatus.EZDefence_IPC_CLOSE);
-			} catch (BaseException e) {
+            } catch (BaseException e) {
                 ErrorInfo errorInfo = (ErrorInfo) e.getObject();
                 mErrorCode = errorInfo.errorCode;
                 LogUtil.d(TAG, errorInfo.toString());
 
-				e.printStackTrace();
-			}
-			return result;
-		}
+                e.printStackTrace();
+            }
+            return result;
+        }
 
-		@Override
-		protected void onPostExecute(Boolean result) {
-			super.onPostExecute(result);
-			mWaitDialog.dismiss();
-			if(result) {
-				mEZDeviceInfo.setDefence(bSetDefence ? 1 : 0);
-				setupDeviceInfo();
-			} else {
-				switch (mErrorCode) {
-                case ErrorCode.ERROR_WEB_NET_EXCEPTION:
-                    showToast(R.string.encrypt_password_open_fail_networkexception);
-                    break;
-                case ErrorCode.ERROR_WEB_SESSION_ERROR:
-                    ActivityUtils.handleSessionException(EZDeviceSettingActivity.this);
-                    break;
-                case ErrorCode.ERROR_WEB_HARDWARE_SIGNATURE_ERROR:
-                    ActivityUtils.handleSessionException(EZDeviceSettingActivity.this);
-                    break;
-                default:
-                    showToast(R.string.encrypt_password_open_fail, mErrorCode);
-                    break;
-				}
-			}
-		}
+        @Override
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            mWaitDialog.dismiss();
+            if(result) {
+                mEZDeviceInfo.setDefence(bSetDefence ? 1 : 0);
+                setupDeviceInfo();
+            } else {
+                switch (mErrorCode) {
+                    case ErrorCode.ERROR_WEB_NET_EXCEPTION:
+                        showToast(R.string.encrypt_password_open_fail_networkexception);
+                        break;
+                    case ErrorCode.ERROR_WEB_SESSION_ERROR:
+                        ActivityUtils.handleSessionException(EZDeviceSettingActivity.this);
+                        break;
+                    case ErrorCode.ERROR_WEB_HARDWARE_SIGNATURE_ERROR:
+                        ActivityUtils.handleSessionException(EZDeviceSettingActivity.this);
+                        break;
+                    default:
+                        showToast(R.string.encrypt_password_open_fail, mErrorCode);
+                        break;
+                }
+            }
+        }
 
     }
     private class OpenEncryptTask extends AsyncTask<Boolean, Void, Boolean> {
@@ -685,10 +613,10 @@ public class EZDeviceSettingActivity extends RootActivity {
 
         @Override
         protected Boolean doInBackground(Boolean... params) {
-        	boolean isEnableEncrypt = params[0];
+            boolean isEnableEncrypt = params[0];
             bAction = isEnableEncrypt;
             try {
-            	EzvizApplication.getOpenSDK().setDeviceEncryptStatus(mEZDeviceInfo.getDeviceSerial(),mValidateCode,isEnableEncrypt);
+                getOpenSDK().setDeviceEncryptStatus(mEZDeviceInfo.getDeviceSerial(),mValidateCode,isEnableEncrypt);
 
                 return true;
             } catch (BaseException e) {
@@ -756,7 +684,7 @@ public class EZDeviceSettingActivity extends RootActivity {
 
             try {
 //            	EZCameraInfo cameraInfo = params[0];
-                EzvizApplication.getOpenSDK().deleteDevice(mEZDeviceInfo.getDeviceSerial());
+                getOpenSDK().deleteDevice(mEZDeviceInfo.getDeviceSerial());
                 return true;
             } catch (BaseException e) {
                 ErrorInfo errorInfo = (ErrorInfo) e.getObject();
@@ -774,7 +702,7 @@ public class EZDeviceSettingActivity extends RootActivity {
 
             if (result) {
                 showToast(R.string.detail_del_device_success);
-                Intent intent = new Intent(EZDeviceSettingActivity.this, EZCameraListActivity.class);
+                Intent intent = new Intent(EZDeviceSettingActivity.this, EZDeviceListActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 finish();

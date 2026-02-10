@@ -19,8 +19,6 @@ public class ClickedListItem {
 
     private long endTime;
 
-    private Calendar uiPlayTimeOnStop = null;
-
     private int position;
     
     private long fileSize;
@@ -64,14 +62,6 @@ public class ClickedListItem {
 
     public void setEndTime(long endTime) {
         this.endTime = endTime;
-    }
-
-    public Calendar getUiPlayTimeOnStop() {
-        return uiPlayTimeOnStop;
-    }
-
-    public void setUiPlayTimeOnStop(Calendar uiPlayTimeOnStop) {
-        this.uiPlayTimeOnStop = uiPlayTimeOnStop;
     }
 
     public int getPosition() {

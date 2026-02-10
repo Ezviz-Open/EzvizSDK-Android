@@ -226,7 +226,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="50dp"
             android:text="@string/please_connect_the_power"
             android:textColor="@color/auto_tip_text"
             android:textSize="@dimen/content_text_size" />
@@ -280,19 +280,35 @@
             android:layout_width="150dp"
             android:layout_height="165dp"
             android:layout_marginTop="35dp"
-            android:background="@anim/device_search_bg" />
+            android:background="@drawable/device_search_bg" />
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/touchAP"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="20dp"
-        android:onClick="onTouchClick"
-        android:text="接触式配网"
-        android:visibility="gone" />
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/touchAP"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onTouchAPClick"
+            android:text="接触式配网"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/bluetoothConfig"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:onClick="onBluetoothConfigClick"
+            android:text="霍曼蓝牙配网"
+            android:visibility="gone" />
+    </LinearLayout>
+
 
 </RelativeLayout>

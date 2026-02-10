@@ -3,28 +3,26 @@ package ezviz.ezopensdkcommon.common;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.BitmapFactory;
+import android.graphics.Insets;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
-import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowInsets;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,107 +36,75 @@ public class RootActivity extends Activity {
 
     protected static Context mContext;
 
-    private Toast mToast = null;
-
-    private boolean mIsTip = true;
-
-    protected int pageKey = -1;
     private WaitDialog mWaitDlg;
 
-    protected void showToast(int id) {
-        if (!mIsTip) {
-            return;
-        }
-
-        if (isFinishing()) {
-            return;
-        }
-        String text = getString(id);
-        if (text != null && !text.equals("")) {
-            if (mToast == null) {
-                mToast = Toast.makeText(this, text, Toast.LENGTH_LONG);
-                mToast.setGravity(Gravity.CENTER, 0, 0);
-            } else {
-                mToast.setText(text);
+    protected void showToast(final int id) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (isFinishing()) {
+                    return;
+                }
+                String text = getString(id);
+                if (text != null && !text.equals("")) {
+                    Toast.makeText(mContext, text, Toast.LENGTH_LONG).show();
+                }
             }
-            mToast.show();
-        }
+        });
     }
 
-    protected void showToast(int id, int errCode) {
-        if (!mIsTip) {
-            return;
-        }
+    protected void showToast(final int id, final int errCode) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (isFinishing()) {
+                    return;
+                }
 
-        if (isFinishing()) {
-            return;
-        }
-
-        String text = getString(id);
-        if (errCode != 0) {
-            int errorId = getErrorId(errCode);
-        if (errorId != 0) {
-            text = getString(errorId);
-        } else {
-            text = text + " (" + errCode + ")";
-        }
-    }
-        if (text != null && !text.equals("")) {
-            if (mToast == null) {
-                mToast = Toast.makeText(this, text, Toast.LENGTH_LONG);
-                mToast.setGravity(Gravity.CENTER, 0, 0);
-            } else {
-                mToast.setText(text);
+                String text = getString(id);
+                if (errCode != 0) {
+                    int errorId = getErrorId(errCode);
+                    if (errorId != 0) {
+                        text = getString(errorId);
+                    } else {
+                        text = text + " (" + errCode + ")";
+                    }
+                }
+                if (text != null && !text.equals("")) {
+                    Toast.makeText(mContext, text, Toast.LENGTH_LONG).show();
+                }
             }
-            mToast.show();
-        }
+        });
+
     }
 
-    protected void showToast(int id, String msg) {
-        if (!mIsTip) {
-            return;
-        }
+    protected void showToast(final int id, final String msg) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (isFinishing()) {
+                    return;
+                }
 
-        if (isFinishing()) {
-            return;
-        }
-
-        String text = getString(id);
-        if (!TextUtils.isEmpty(msg)) {
-            text = text + " (" + msg + ")";
-        }
-        if (text != null && !text.equals("")) {
-            if (mToast == null) {
-                mToast = Toast.makeText(this, text, Toast.LENGTH_LONG);
-                mToast.setGravity(Gravity.CENTER, 0, 0);
-            } else {
-                mToast.setText(text);
+                String text = getString(id);
+                if (!TextUtils.isEmpty(msg)) {
+                    text = text + " (" + msg + ")";
+                }
+                if (text != null && !text.equals("")) {
+                    Toast.makeText(mContext, text, Toast.LENGTH_LONG).show();
+                }
             }
-            mToast.show();
-        }
+        });
     }
 
     protected void showToast(final CharSequence text) {
         LogUtil.d(TAG, text.toString());
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (!mIsTip) {
-                    return;
-                }
-
-                if (isFinishing()) {
-                    return;
-                }
-                if (text != null && !text.equals("")) {
-                    if (mToast == null) {
-                        mToast = Toast.makeText(mContext, text, Toast.LENGTH_LONG);
-                        mToast.setGravity(Gravity.CENTER, 0, 0);
-                    } else {
-                        mToast.setText(text);
-                    }
-                    mToast.show();
-                }
+        runOnUiThread(() -> {
+            if (isFinishing()) {
+                return;
+            }
+            if (text != null && !text.equals("")) {
+                Toast.makeText(mContext, text, Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -158,32 +124,27 @@ public class RootActivity extends Activity {
         return errorId;
     }
 
-    protected void showToast(int res1, int res2, int errCode) {
-        String text = res1 != 0 ? getString(res1) : "";
-        if (res2 != 0) {
-            text = text + ", " + getString(res2);
-        }
-        if (errCode != 0) {
-            int errorId = getErrorId(errCode);
-            if (errorId != 0) {
-                text = getString(errorId);
-            } else {
-                text = text + " (" + errCode + ")";
+    protected void showToast(final int res1, final int res2, final int errCode) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                String text = res1 != 0 ? getString(res1) : "";
+                if (res2 != 0) {
+                    text = text + ", " + getString(res2);
+                }
+                if (errCode != 0) {
+                    int errorId = getErrorId(errCode);
+                    if (errorId != 0) {
+                        text = getString(errorId);
+                    } else {
+                        text = text + " (" + errCode + ")";
+                    }
+                }
+                if (text != null) {
+                    Toast.makeText(mContext, text, Toast.LENGTH_LONG).show();
+                }
             }
-        }
-        if (text != null) {
-            if (mToast == null) {
-                mToast = Toast.makeText(this, text, Toast.LENGTH_LONG);
-                mToast.setGravity(Gravity.CENTER, 0, 0);
-            } else {
-                mToast.setText(text);
-            }
-            mToast.show();
-        }
-    }
-
-    protected void setPageKey(int argPageKey) {
-        this.pageKey = argPageKey;
+        });
     }
 
     protected void showWaitDialog(String content) {
@@ -228,17 +189,6 @@ public class RootActivity extends Activity {
         }
     }
 
-    /**
-     * @return the isResumed
-     */
-    // public static boolean isResumed() {
-    // return isResumed;
-    // }
-
-    // public static void setResumed(boolean isResumed) {
-    // RootActivity.isResumed = isResumed;
-    // }
-
     protected String getErrorTip(int id, int errCode) {
         StringBuffer errorTip = new StringBuffer();
 
@@ -280,57 +230,68 @@ public class RootActivity extends Activity {
 
 
     @Override
+    public void setContentView(int layoutResID) {
+        super.setContentView(layoutResID);
+        applySystemWindowsInsets();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         mActivityList.remove(this);
     }
 
-    protected void toast(final String msg){
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
-    protected static void toastMsg(final String msg){
-        if (mContext == null){
-            return;
-        }
-        if (mContext instanceof RootActivity){
-            final RootActivity rootActivity = (RootActivity) mContext;
-            rootActivity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    rootActivity.toast(msg);
+    private void applySystemWindowsInsets() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            final View rootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
+            if (rootView != null) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    rootView.setOnApplyWindowInsetsListener((v, insets) -> {
+                        Insets systemBars = insets.getInsets(WindowInsets.Type.systemBars());
+                        v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+                        return insets;
+                    });
+                } else {
+                    rootView.setOnApplyWindowInsetsListener((v, insets) -> {
+                        v.setPadding(
+                                insets.getSystemWindowInsetLeft(),
+                                insets.getSystemWindowInsetTop(),
+                                insets.getSystemWindowInsetRight(),
+                                insets.getSystemWindowInsetBottom()
+                        );
+                        return insets;
+                    });
                 }
-            });
+            }
         }
     }
 
     private AlertDialog mLastDialog = null;
-    protected void dialog(final String title, final String msg){
+
+    protected void dialog(final String title, final String msg) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (mLastDialog != null && mLastDialog.isShowing()){
+                if (mLastDialog != null && mLastDialog.isShowing()) {
                     mLastDialog.dismiss();
                 }
                 AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(RootActivity.this);
                 dialogBuilder.setTitle(title);
-                ViewGroup msgLayoutVg = (ViewGroup) LayoutInflater.from(getApplicationContext()).inflate(R.layout.layout_dialog_tip, null);
+                ViewGroup msgLayoutVg =
+                        (ViewGroup) LayoutInflater.from(getApplicationContext()).inflate(R.layout.layout_dialog_tip,
+                                null);
                 TextView msgTv = (TextView) msgLayoutVg.findViewById(R.id.tv_tip);
-                if (msgTv != null){
+                if (msgTv != null) {
                     msgTv.setText(msg);
                 }
                 dialogBuilder.setView(msgLayoutVg);
-                dialogBuilder.setPositiveButton(getApplicationContext().getString(R.string.btn_ensure), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+                dialogBuilder.setPositiveButton(getApplicationContext().getString(R.string.btn_ensure),
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
                 dialogBuilder.setCancelable(false);
                 mLastDialog = dialogBuilder.show();
             }
@@ -354,7 +315,8 @@ public class RootActivity extends Activity {
                         ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                         ClipData clip = ClipData.newPlainText("text", resString);
                         clipboard.setPrimaryClip(clip);
-                        Toast.makeText(getApplicationContext(), getString(R.string.copied_to_clipboard), Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), getString(R.string.copied_to_clipboard),
+                                Toast.LENGTH_LONG).show();
                     }
                 });
                 copyDialog.show();
@@ -378,7 +340,7 @@ public class RootActivity extends Activity {
             public void onClick(DialogInterface dialog, int which) {
                 String inputText = editText.getText().toString();
                 if (TextUtils.isEmpty(inputText)) {
-                    toast("请输入内容");
+                    showToast("请输入内容");
                     return;
                 }
                 if (callback != null) {
@@ -396,30 +358,34 @@ public class RootActivity extends Activity {
     }
 
     private static int mNotificationId = 1;
-    protected static int getUniqueNotificationId(){
+
+    protected static int getUniqueNotificationId() {
         return mNotificationId++;
     }
 
-    protected void initUi(){}
+    protected void initUi() {
+    }
 
     private static TaskManager mTaskManager = null;
-    protected synchronized static TaskManager getTaskManager(){
-        if (mTaskManager == null){
+
+    protected synchronized static TaskManager getTaskManager() {
+        if (mTaskManager == null) {
             mTaskManager = new TaskManager();
         }
         return mTaskManager;
     }
 
-    public static void exitApp(){
-        for (Activity activity: mActivityList){
-            if (!activity.isFinishing()){
+    public static void exitApp() {
+        for (Activity activity : mActivityList) {
+            if (!activity.isFinishing()) {
                 activity.finish();
             }
         }
         System.exit(0);
     }
 
-    protected void initPresenter(){}
+    protected void initPresenter() {
+    }
 
     protected void dismissPopWindow(PopupWindow popupWindow) {
         if (popupWindow != null && !isFinishing()) {
@@ -429,6 +395,12 @@ public class RootActivity extends Activity {
                 // TODO: handle exception
             }
         }
+    }
+
+    protected void measure(View view) {
+        int width = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+        int height = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+        view.measure(width, height);
     }
 
 }

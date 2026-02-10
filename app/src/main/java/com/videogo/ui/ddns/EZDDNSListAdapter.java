@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EZDDNSListAdapter extends BaseAdapter {
-    private static final String TAG = "CameraListAdapter";
+    private static final String TAG = EZDDNSListAdapter.class.getSimpleName();
 
     private Context mContext = null;
     private List<EZHiddnsDeviceInfo> mCameraInfoList = null;

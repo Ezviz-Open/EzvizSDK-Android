@@ -1,16 +1,16 @@
-/* 
+/*
  * @ProjectName VideoGo
  * @Copyright null
- * 
+ *
  * @FileName RemotePlayBackActivity.java
  * @Description 这里对文件进行描述
- * 
+ *
  * @author chenxingyf1
  * @data 2014-7-1
- * 
+ *
  * @note 这里写本文件的详细功能描述和注释
  * @note 历史记录
- * 
+ *
  * @warning 这里写本文件的相关警告
  */
 package com.videogo.ui.message.remoteplayback;
@@ -74,6 +74,8 @@ import com.videogo.ui.common.ScreenOrientationHelper;
 import com.videogo.util.ActivityUtils;
 import com.videogo.util.AudioPlayUtil;
 import com.videogo.util.DataManager;
+import com.videogo.util.DateTimeUtil;
+import com.videogo.util.EZDateTimeUtil;
 import com.videogo.util.EZUtils;
 import com.videogo.util.VerifyCodeInput;
 import com.videogo.util.ConnectionDetector;
@@ -99,7 +101,7 @@ import ezviz.ezopensdk.R;
 
 public class EZRemotePlayBackActivity extends Activity implements OnClickListener, SurfaceHolder.Callback,
         Handler.Callback, TimeScrollBarScrollListener, VerifyCodeInput.VerifyCodeInputListener {
-    private static final String TAG = "EZRemotePlayBackActivity";
+    private static final String TAG = EZRemotePlayBackActivity.class.getSimpleName();
     public static final int MSG_PLAY_UI_UPDATE = 100;
     public static final int MSG_SEARCH_CLOUD_FILE_SUCCUSS = 101;
     public static final int MSG_SEARCH_CLOUD_FILE_FAIL = 102;
@@ -253,10 +255,10 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
                 finish();
                 return;
             }
-            mAlarmStartTime = Utils.parseTimeToCalendar(mEZAlarmInfo.getAlarmStartTime());
+            mAlarmStartTime = DateTimeUtil.parseYMDHMSStringToCalendar(mEZAlarmInfo.getAlarmStartTime());
         }
         if (mAlarmStartTime != null) {
-            mAlarmStartTime.add(Calendar.SECOND, -5);
+            mAlarmStartTime.add(Calendar.SECOND, 0);
             mAlarmStopTime = (Calendar) mAlarmStartTime.clone();
             mAlarmStopTime.add(Calendar.SECOND, ALARM_MAX_DURATION);
         } else {
@@ -321,7 +323,7 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
             }
         });
         if (mAlarmStartTime == null) {
-            mTitleBar.setTitle(Utils.date2String(mStartTime.getTime()));
+            mTitleBar.setTitle(DateTimeUtil.formatDateToYMDString(mStartTime.getTime()));
             mTitleBar.addTitleButton(R.drawable.remote_cal_selector, new OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -374,18 +376,18 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
             }
 
             @Override
-            public void onZoom(float scale) {
+            public void onZoom(View view, float scale) {
             }
             @Override
             public void onDrag(int direction, float distance, float rate) {
                 LogUtil.d(TAG, "onDrag:" + direction);
             }
             @Override
-            public void onEnd(int mode) {
+            public void onEnd(View view, int mode) {
                 LogUtil.d(TAG, "onEnd:" + mode);
             }
             @Override
-            public void onZoomChange(float scale, CustomRect oRect, CustomRect curRect) {
+            public void onZoomChange(View view, float scale, CustomRect oRect, CustomRect curRect) {
                 LogUtil.d(TAG, "onZoomChange:" + scale);
             }
 
@@ -452,9 +454,6 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
         if (mAlarmStartTime != null) {
             mRemotePlayBackTimeBarRl.setVisibility(View.GONE);
             mRemotePlayBackProgressLy.setVisibility(View.VISIBLE);
-            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-//            mRemotePlayBackBeginTimeTv.setText(sdf.format(mAlarmStartTime.getTimeInMillis()));
-//            mRemotePlayBackEndTimeTv.setText(sdf.format(mAlarmStopTime.getTimeInMillis()));
             mRemotePlayBackProgressBar.setMax(ALARM_MAX_DURATION);
             mRemotePlayBackProgressBar.setProgress(0);
             mRemotePlayBackSeekBar.setMax(ALARM_MAX_DURATION);
@@ -559,7 +558,7 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
                         mEndTime = Calendar.getInstance();
                         mEndTime.set(Calendar.AM_PM, 0);
                         mEndTime.set(dp.getYear(), dp.getMonth(), dp.getDayOfMonth(), 23, 59, 59);
-                        mTitleBar.setTitle(Utils.date2String(mStartTime.getTime()));
+                        mTitleBar.setTitle(DateTimeUtil.formatDateToYMDString(mStartTime.getTime()));
 
                         startRemotePlayBack(null);
                     }
@@ -696,7 +695,7 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
             } else {
                 //RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams)mRemotePlayBackProgressLy.getLayoutParams();
                 //lp.setMargins(0, 0, 0, 0);
-                //mRemotePlayBackProgressLy.setLayoutParams(lp);               
+                //mRemotePlayBackProgressLy.setLayoutParams(lp);
             }
         } else {
             float pos = mRemoteFileTimeBar.getScrollPosByPlayTime(mPlayTime, mOrientation);
@@ -867,7 +866,7 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
                 break;
             case RemotePlayBackMsg.MSG_REMOTEPLAYBACK_SEARCH_FILE_SUCCUSS:
                 updateLoadingProgress(40);
-                //handleSearchDeviceFileSuccess();
+//                handleSearchDeviceFileSuccess();
 //                handleSearchEZDeviceFileSuccess();
                 break;
             case RemotePlayBackMsg.MSG_REMOTEPLAYBACK_SEARCH_NO_FILE:
@@ -886,32 +885,7 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
     }
 
     private void handleSearchDeviceFileSuccess() {
-        /*mDeviceFileList = mEZMediaPlayer.getRemoteFileInfoList();
-        if((mCloudFileList != null && mCloudFileList.size() > 0) || (mDeviceFileList != null && mDeviceFileList.size() > 0)) {
-            if(mAlarmStartTime != null) {
-                if(mRemotePlayBackBeginTimeTv.getTag() == null) {
-                    Calendar fileStartTime = getFileStartTime();
-                    Calendar beginTime = (fileStartTime != null && fileStartTime.getTimeInMillis() > mAlarmStartTime.getTimeInMillis()) ? fileStartTime:mAlarmStartTime;
-                    Calendar lastStopTime = getFileStopTime();
-                    Calendar endTime = (lastStopTime != null && lastStopTime.getTimeInMillis()  < mAlarmStopTime.getTimeInMillis()) ?lastStopTime:mAlarmStopTime;
-                    if(beginTime.getTimeInMillis() > endTime.getTimeInMillis()) {
-                        endTime = (Calendar)beginTime.clone();
-                        endTime.add(Calendar.SECOND, ALARM_MAX_DURATION); 
-                    }
-                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-                    mRemotePlayBackBeginTimeTv.setText(sdf.format(beginTime.getTimeInMillis()));
-                    mRemotePlayBackEndTimeTv.setText(sdf.format(endTime.getTimeInMillis()));
-                    int duration = (int)(endTime.getTimeInMillis() - beginTime.getTimeInMillis())/1000;
-                    mRemotePlayBackProgressBar.setMax(duration);
-                    mRemotePlayBackSeekBar.setMax(duration);
-                    mRemotePlayBackBeginTimeTv.setTag(mAlarmStartTime);
-                }
-            } else {
-                mRemoteFileTimeBar.drawFileLayout(mDeviceFileList, mCloudFileList, mStartTime, mEndTime);
-            }  
-        } else {
-            handleSearchNoFile();
-        }*/
+
     }
 
     private Calendar getFileStartTime() {
@@ -1017,11 +991,8 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
                         endTime = (Calendar) beginTime.clone();
                         endTime.add(Calendar.SECOND, ALARM_MAX_DURATION);
                     }
-                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-                    mRemotePlayBackBeginTimeTv.setText(sdf.format(beginTime
-                            .getTimeInMillis()));
-                    mRemotePlayBackEndTimeTv.setText(sdf.format(endTime
-                            .getTimeInMillis()));
+                    mRemotePlayBackBeginTimeTv.setText(DateTimeUtil.calendarToHMSString(beginTime));
+                    mRemotePlayBackEndTimeTv.setText(DateTimeUtil.calendarToHMSString(endTime));
                     int duration = (int) (endTime.getTimeInMillis() - beginTime
                             .getTimeInMillis()) / 1000;
                     mRemotePlayBackProgressBar.setMax(duration);
@@ -1166,54 +1137,38 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
      */
     @Override
     public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.remoteplayback_loading_play_btn:
-                startRemotePlayBack(getTimeBarSeekTime());
-                break;
-            case R.id.remoteplayback_play_btn:
-            case R.id.remoteplayback_full_play_btn:
-                if (mStatus == STATUS_START || mStatus == STATUS_PLAY) {
-                    if (mStatus == STATUS_PLAY) {
-                        pauseRemotePlayBack();
-                    } else {
-                        stopRemotePlayBack();
-                    }
-                    setRemotePlayBackStopUI();
+        int id = view.getId();
+        if (id == R.id.remoteplayback_loading_play_btn) {
+            startRemotePlayBack(getTimeBarSeekTime());
+        } else if (id == R.id.remoteplayback_play_btn || id == R.id.remoteplayback_full_play_btn) {
+            if (mStatus == STATUS_START || mStatus == STATUS_PLAY) {
+                if (mStatus == STATUS_PLAY) {
+                    pauseRemotePlayBack();
                 } else {
-                    startRemotePlayBack(getTimeBarSeekTime());
-                }
-                break;
-            case R.id.remoteplayback_replay_btn:
-                if (mStatus != STATUS_STOP) {
                     stopRemotePlayBack();
                 }
-                startRemotePlayBack(null);
-                break;
-            case R.id.remoteplayback_sound_btn:
-            case R.id.remoteplayback_full_sound_btn:
-                onSoundBtnClick();
-                break;
-            case R.id.remoteplayback_previously_btn:
-            case R.id.remoteplayback_full_previously_btn:
-            case R.id.remoteplayback_small_previously_btn:
-                onCapturePicBtnClick();
-                break;
-            case R.id.remoteplayback_capture_rl:
-                onCaptureRlClick();
-                break;
-            case R.id.remoteplayback_video_btn:
-            case R.id.remoteplayback_full_video_btn:
-            case R.id.remoteplayback_small_video_btn:
-            case R.id.remoteplayback_video_start_btn:
-            case R.id.remoteplayback_full_video_start_btn:
-            case R.id.remoteplayback_small_video_start_btn:
-                onRecordBtnClick();
-                break;
-            case R.id.remoteplayback_full_down_btn:
-                onTimeBarDownBtnClick();
-                break;
-            default:
-                break;
+                setRemotePlayBackStopUI();
+            } else {
+                startRemotePlayBack(getTimeBarSeekTime());
+            }
+        } else if (id == R.id.remoteplayback_replay_btn) {
+            if (mStatus != STATUS_STOP) {
+                stopRemotePlayBack();
+            }
+            startRemotePlayBack(null);
+        } else if (id == R.id.remoteplayback_sound_btn || id == R.id.remoteplayback_full_sound_btn) {
+            onSoundBtnClick();
+        } else if (id == R.id.remoteplayback_previously_btn || id == R.id.remoteplayback_full_previously_btn
+                || id == R.id.remoteplayback_small_previously_btn) {
+            onCapturePicBtnClick();
+        } else if (id == R.id.remoteplayback_capture_rl) {
+            onCaptureRlClick();
+        } else if (id == R.id.remoteplayback_video_btn || id == R.id.remoteplayback_full_video_btn
+                || id == R.id.remoteplayback_small_video_btn || id == R.id.remoteplayback_video_start_btn
+                || id == R.id.remoteplayback_full_video_start_btn || id == R.id.remoteplayback_small_video_start_btn) {
+            onRecordBtnClick();
+        } else if (id == R.id.remoteplayback_full_down_btn) {
+            onTimeBarDownBtnClick();
         }
     }
 
@@ -1238,18 +1193,6 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
             bIsRecording = !bIsRecording;
             return;
         }
-
-//        if (!SDCardUtil.isSDCardUseable()) {
-//            // 提示SD卡不可用
-//            Utils.showToast(this, R.string.remoteplayback_SDCard_disable_use);
-//            return;
-//        }
-//
-//        if (SDCardUtil.getSDCardRemainSize() < SDCardUtil.PIC_MIN_MEM_SPACE) {
-//            // 提示内存不足
-//            Utils.showToast(this, R.string.remoteplayback_record_fail_for_memory);
-//            return;
-//        }
 
         if (mEZMediaPlayer != null) {
             mCaptureDisplaySec = 4;
@@ -1382,18 +1325,6 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
 
     private void onCapturePicBtnClick() {
         mControlDisplaySec = 0;
-//        if (!SDCardUtil.isSDCardUseable()) {
-//            // 提示SD卡不可用
-//            Utils.showToast(this, R.string.remoteplayback_SDCard_disable_use);
-//            return;
-//        }
-//
-//        if (SDCardUtil.getSDCardRemainSize() < SDCardUtil.PIC_MIN_MEM_SPACE) {
-//            // 提示内存不足
-//            Utils.showToast(this, R.string.remoteplayback_capture_fail_for_memory);
-//            return;
-//        }
-
         if (mEZMediaPlayer != null) {
             mCaptureDisplaySec = 4;
             updateCaptureUI();
@@ -1498,13 +1429,14 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
                 Calendar endtime = null;
                 try {
                     if (mAlarmStartTime != null) {
-                       starttime = mAlarmStartTime;
+                        starttime = mAlarmStartTime;
                         endtime = mAlarmStopTime;
                     } else {
                         starttime = mStartTime;
                         endtime = mEndTime;
                     }
-                    mCloudFileList = EzvizApplication.getOpenSDK().searchRecordFileFromCloud(mEZAlarmInfo.getDeviceSerial(),mEZAlarmInfo.getCameraNo(),starttime,endtime);
+                    mCloudFileList = EzvizApplication.getOpenSDK().searchRecordFileFromCloud(mEZAlarmInfo.getDeviceSerial(),
+                            mEZAlarmInfo.getCameraNo(),starttime,endtime);
                     sendMessage(MSG_SEARCH_CLOUD_FILE_SUCCUSS, 0, seletedTime);
                 } catch (BaseException e) {
                     e.printStackTrace();
@@ -1519,7 +1451,8 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
             @Override
             public void run() {
                 try {
-                    mEZCloudFileList = EzvizApplication.getOpenSDK().searchRecordFileFromCloud(mEZAlarmInfo.getDeviceSerial(),mEZAlarmInfo.getCameraNo(), mStartTime, mEndTime);
+                    mEZCloudFileList = EzvizApplication.getOpenSDK().searchRecordFileFromCloud(mEZAlarmInfo.getDeviceSerial(),
+                            mEZAlarmInfo.getCameraNo(), mStartTime, mEndTime);
                     LogUtil.d(TAG, "searchEZCloudFileList ends: " + mEZCloudFileList);
                     sendMessage(MSG_SEARCH_CLOUD_FILE_SUCCUSS, 0, seletedTime);
                 } catch (BaseException e) {
@@ -1550,7 +1483,8 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
                     int size = 0;
 
                     LogUtil.i(TAG, "searchEZAlarmFile seletedTime:" + seletedTime.getTime());
-                    mEZDeviceFileList = EzvizApplication.getOpenSDK().searchRecordFileFromDevice(mEZAlarmInfo.getDeviceSerial(),mEZAlarmInfo.getCameraNo(), startTime, endTime);
+                    mEZDeviceFileList = EzvizApplication.getOpenSDK().searchRecordFileFromDevice(mEZAlarmInfo.getDeviceSerial(),
+                            mEZAlarmInfo.getCameraNo(), startTime, endTime);
                     if (mEZDeviceFileList != null && mEZDeviceFileList.size() > 0) {
                         size = mEZDeviceFileList.size();
                         LogUtil.i(TAG, "searchEZDeviceFileList size:" + size);
@@ -1573,7 +1507,8 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
                         LogUtil.d(TAG, "no matching device record file for alarm");
                     }
 
-                    mEZCloudFileList = EzvizApplication.getOpenSDK().searchRecordFileFromCloud(mEZAlarmInfo.getDeviceSerial(),mEZAlarmInfo.getCameraNo(), startTime, endTime);
+                    mEZCloudFileList = EzvizApplication.getOpenSDK().searchRecordFileFromCloud(mEZAlarmInfo.getDeviceSerial(),
+                            mEZAlarmInfo.getCameraNo(), startTime, endTime);
                     if (mEZCloudFileList != null && mEZCloudFileList.size() > 0) {
                         size = mEZCloudFileList.size();
                         LogUtil.d(TAG, "searchEZCloudFileList size:" + size);
@@ -1585,10 +1520,6 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
 
                             if (seletedTime.compareTo(tmpStartTime) >= 0 && seletedTime.compareTo(tmpEndTime) <= 0) {
                                 mAlarmRecordFile = ezCloudFile;
-//                    			mAlarmRecordFile.setStartTime(mAlarmStartTime);
-//                    			mAlarmRecordFile.setStopTime(mAlarmStopTime);
-//                    			String startT = new SimpleDateFormat("yyyyMMddHHmmss").format(mAlarmStartTime.getTime());
-//                    			String endT = new SimpleDateFormat("yyyyMMddHHmmss").format(mAlarmStopTime.getTime());
                                 mAlarmRecordFile.setStartTime(tmpStartTime);
                                 mAlarmRecordFile.setStopTime(tmpEndTime);
 
@@ -1763,7 +1694,7 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
         mRemotePlayBackLoadingPlayBtn.setVisibility(View.VISIBLE);
 //        if (mTotalStreamFlow > 0) {
 //            mRemotePlayBackFlowTv.setVisibility(View.VISIBLE);
-//            mRemotePlayBackFullFlowLy.setVisibility(View.VISIBLE);    
+//            mRemotePlayBackFullFlowLy.setVisibility(View.VISIBLE);
 //            updateRemotePlayBackFlowTv(mStreamFlow);
 //        } else {
 //            mRemotePlayBackFlowTv.setVisibility(View.GONE);
@@ -1970,7 +1901,7 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
         // 播放抓拍音频
         mAudioPlayUtil.playAudioFile(AudioPlayUtil.CAPTURE_SOUND);
 
-//        mRemotePlayBackCaptureRl.setVisibility(View.VISIBLE);   
+//        mRemotePlayBackCaptureRl.setVisibility(View.VISIBLE);
         mCaptureDisplaySec = 0;
         try {
             mRemotePlayBackCaptureIv.setImageURI(Uri.parse(filePath));
@@ -2015,14 +1946,13 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
                         + " mAlarmStartTime:" + mAlarmStartTime.getTimeInMillis() + " startPlayTime:" + mPlayStartTime.getTimeInMillis());
                 LogUtil.i(TAG, "updateRemotePlayBackUI progress:" + progress);
                 handlePlayProgress(OSDTime);
-//                if(mPlayTime + 1000 > mAlarmStopTime.getTimeInMillis()) {
-//                    handlePlayFinish();
-//                }
+                if (mPlayTime + 1000 > mAlarmStopTime.getTimeInMillis()) {
+                    handlePlayFinish();
+                }
             } else {
                 float pos = mRemoteFileTimeBar.getScrollPosByPlayTime(mPlayTime, mOrientation);
                 mRemotePlayBackTimeBar.smoothScrollTo((int) pos, 0);
-                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-                mRemotePlayBackTimeTv.setText(sdf.format(mPlayTime));
+                mRemotePlayBackTimeTv.setText(DateTimeUtil.formatTimeToHMSString(mPlayTime));
             }
         }
     }
@@ -2092,14 +2022,8 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
         } else {
             mRemotePlayBackRecordIv.setVisibility(View.VISIBLE);
         }
-        // 计算分秒
-        int leftSecond = mRecordSecond % 3600;
-        int minitue = leftSecond / 60;
-        int second = leftSecond % 60;
-
         // 显示录像时间
-        String recordTime = String.format("%02d:%02d", minitue, second);
-        mRemotePlayBackRecordTv.setText(recordTime);
+        mRemotePlayBackRecordTv.setText(EZDateTimeUtil.convToMinSec(mRecordSecond));
     }
 
     // 处理密码错误
@@ -2274,7 +2198,7 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
                     // 更新录像时间
                     Calendar OSDTime = mEZMediaPlayer.getOSDTime();
                     if (OSDTime != null) {
-                        String playtime = Utils.OSD2Time(OSDTime);
+                        String playtime = DateTimeUtil.calendarToHMSString(OSDTime);
                         if (!TextUtils.equals(playtime, mRecordTime)) {
                             mRecordSecond++;
                             mRecordTime = playtime;
@@ -2342,8 +2266,7 @@ public class EZRemotePlayBackActivity extends Activity implements OnClickListene
         Calendar startCalendar = mRemoteFileTimeBar.pos2Calendar(left, mOrientation);
         if (startCalendar != null) {
             mPlayTime = startCalendar.getTimeInMillis();
-            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-            mRemotePlayBackTimeTv.setText(sdf.format(mPlayTime));
+            mRemotePlayBackTimeTv.setText(DateTimeUtil.formatTimeToHMSString(mPlayTime));
         }
     }
 

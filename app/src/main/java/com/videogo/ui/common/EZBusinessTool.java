@@ -1,19 +1,23 @@
 package com.videogo.ui.common;
 
+import android.content.res.Resources;
 import android.text.TextUtils;
+import android.view.ContextThemeWrapper;
 
 import com.videogo.openapi.EZConstants;
 import com.videogo.openapi.bean.EZCameraInfo;
 import com.videogo.openapi.bean.EZCloudRecordFile;
+import com.videogo.openapi.bean.EZDeviceDetailPublicInfo;
 import com.videogo.openapi.bean.EZDeviceInfo;
 import com.videogo.openapi.bean.EZDeviceRecordFile;
 import com.videogo.openapi.bean.EZSubDeviceInfo;
 import com.videogo.openapi.bean.resp.CloudPartInfoFile;
+import com.videogo.util.DateTimeUtil;
 import com.videogo.util.Utils;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import ezviz.ezopensdk.R;
 
 /**
  * Copyright (C) 2022 HIKVISION Inc.
@@ -25,7 +29,102 @@ import java.util.Date;
 public class EZBusinessTool {
 
     /**
+     * 根据videoLevel获取设备视频质量名，0-流畅，1-均衡，2-高清，3-超清，4-极清，5-3K，6-4K
+     *
+     * @return
+     */
+    public static String getDeviceQualityTitle(ContextThemeWrapper context, int videoLevel) {
+        Resources res = context.getResources();
+        String qualityTitle;
+        switch (videoLevel) {
+            case 0:// 流畅
+                qualityTitle = res.getString(R.string.quality_flunet);
+                break;
+            case 1:// 均衡
+                qualityTitle = res.getString(R.string.quality_balanced);
+                break;
+            case 2:// 高清
+                qualityTitle = res.getString(R.string.quality_hd);
+                break;
+            case 3:// 超清
+                qualityTitle = res.getString(R.string.quality_super_hd);
+                break;
+            case 4:// 极清
+                qualityTitle = res.getString(R.string.quality_extreme_hd);
+                break;
+            case 5:// 3K
+                qualityTitle = res.getString(R.string.quality_3K);
+                break;
+            case 6:// 4K
+                qualityTitle = res.getString(R.string.quality_4K);
+                break;
+            default:
+                qualityTitle = "unknown";
+                break;
+        }
+
+        return qualityTitle;
+    }
+
+    /**
+     * 获取比当前清晰度高一级的清晰度
+     * @param currentQulityMode 当前清晰度
+     * @param deviceDetailPublicInfo 设备详情
+     * @return
+     */
+    public static EZConstants.EZVideoLevel getHigherVideoLevel(EZConstants.EZVideoLevel currentQulityMode, EZDeviceDetailPublicInfo deviceDetailPublicInfo) {
+        if (deviceDetailPublicInfo != null && deviceDetailPublicInfo.videoQualityInfos != null) {
+            int targetVideoLevel = 0;
+            int dif = 100;
+            for (int i = 0; i < deviceDetailPublicInfo.videoQualityInfos.size(); i++) {
+                int videoLevel = deviceDetailPublicInfo.videoQualityInfos.get(i).getVideoLevel();
+                // 遍历找出比当前videoLevel大 且 最接近 的清晰度值
+                if (videoLevel > currentQulityMode.getVideoLevel() && videoLevel - currentQulityMode.getVideoLevel() < dif) {
+                    targetVideoLevel = videoLevel;
+                    dif = videoLevel - currentQulityMode.getVideoLevel();
+                }
+            }
+            if (targetVideoLevel > 0) {
+                EZCameraInfo cameraInfo = new EZCameraInfo();
+                cameraInfo.setVideoLevel(targetVideoLevel);
+                return cameraInfo.getVideoLevel();
+            }
+        }
+
+        return currentQulityMode;
+    }
+
+    /**
+     * 获取比当前清晰度低一级的清晰度
+     * @param currentQulityMode 当前清晰度
+     * @param deviceDetailPublicInfo 设备详情
+     * @return
+     */
+    public static EZConstants.EZVideoLevel getLowerVideoLevel(EZConstants.EZVideoLevel currentQulityMode, EZDeviceDetailPublicInfo deviceDetailPublicInfo) {
+        if (deviceDetailPublicInfo != null && deviceDetailPublicInfo.videoQualityInfos != null) {
+            int targetVideoLevel = 0;
+            int dif = 100;
+            for (int i = 0; i < deviceDetailPublicInfo.videoQualityInfos.size(); i++) {
+                int videoLevel = deviceDetailPublicInfo.videoQualityInfos.get(i).getVideoLevel();
+                // 遍历找出比当前videoLevel大 且 最接近 的清晰度值
+                if (videoLevel < currentQulityMode.getVideoLevel() && currentQulityMode.getVideoLevel() - videoLevel < dif) {
+                    targetVideoLevel = videoLevel;
+                    dif = currentQulityMode.getVideoLevel() - videoLevel;
+                }
+            }
+            if (targetVideoLevel > 0) {
+                EZCameraInfo cameraInfo = new EZCameraInfo();
+                cameraInfo.setVideoLevel(targetVideoLevel);
+                return cameraInfo.getVideoLevel();
+            }
+        }
+
+        return currentQulityMode;
+    }
+
+    /**
      * 获取变声类型
+     *
      * @param tag
      * @return
      */
@@ -104,6 +203,58 @@ public class EZBusinessTool {
     }
 
     /**
+     * 根据type获取视频编码格式
+     *
+     * @param videoEncodeType
+     */
+    public static String getVideoEncodeType(int videoEncodeType) {
+        String strVideoEncodeType;
+        switch (videoEncodeType) {
+            case 0:
+                strVideoEncodeType = "无编码";
+                break;
+            case 1:
+                strVideoEncodeType = "HIK264";
+                break;
+            case 2:
+                strVideoEncodeType = "MPEG2";
+                break;
+            case 3:
+                strVideoEncodeType = "MPEG4";
+                break;
+            case 4:
+                strVideoEncodeType = "MJPEG";
+                break;
+            case 5:
+                strVideoEncodeType = "H265";
+                break;
+            case 6:
+                strVideoEncodeType = "SVAC";
+                break;
+            case 256:
+                strVideoEncodeType = "H264";
+                break;
+            default:
+                strVideoEncodeType = "unknown(" + videoEncodeType + ")";
+                break;
+        }
+        return strVideoEncodeType;
+    }
+
+    /**
+     * 显示解码方式，软解或硬解
+     */
+    public static String getDecodeType(int type) {
+        String decodeTypeName;
+        if (type == 1) {
+            decodeTypeName = "hard";
+        } else {
+            decodeTypeName = "soft";
+        }
+        return decodeTypeName;
+    }
+
+    /**
      * 根据设备型号判断是否是HUB设备
      */
     public static boolean isHubDevice(String deviceType) {
@@ -129,6 +280,7 @@ public class EZBusinessTool {
         dst.setDeviceSerial(src.getDeviceSerial());
         dst.setCameraNo(src.getCameraNo());
         dst.setVideoType(src.getVideoType());
+        dst.setCloudType(src.getCloudType());
         dst.setiStorageVersion(src.getiStorageVersion());
         dst.setFileSize(src.getFileSize());
         dst.setSpaceId(src.getSpaceId());
@@ -140,14 +292,7 @@ public class EZBusinessTool {
     }
 
     public static Date getMinDate() {
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            Date date = sdf.parse("2012-01-01");
-            return date;
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return DateTimeUtil.parseYMDStringToDate("2020-01-01");
     }
 
     /**
@@ -156,7 +301,7 @@ public class EZBusinessTool {
     public static EZConstants.EZTalkbackCapability isSupportTalk(EZDeviceInfo deviceInfo, EZCameraInfo cameraInfo) {
         // 网关下子设备的能力集挂载在自己的对象上
         if (cameraInfo instanceof EZSubDeviceInfo) {
-            EZSubDeviceInfo subDeviceInfo = (EZSubDeviceInfo)cameraInfo;
+            EZSubDeviceInfo subDeviceInfo = (EZSubDeviceInfo) cameraInfo;
             return subDeviceInfo.isSupportTalk();
         }
         return deviceInfo.isSupportTalk();
@@ -167,7 +312,7 @@ public class EZBusinessTool {
      */
     public static boolean isSupportPTZ(EZDeviceInfo deviceInfo, EZCameraInfo cameraInfo) {
         if (cameraInfo instanceof EZSubDeviceInfo) {
-            EZSubDeviceInfo subDeviceInfo = (EZSubDeviceInfo)cameraInfo;
+            EZSubDeviceInfo subDeviceInfo = (EZSubDeviceInfo) cameraInfo;
             return subDeviceInfo.isSupportPTZ();
         }
         return deviceInfo.isSupportPTZ();
@@ -178,7 +323,7 @@ public class EZBusinessTool {
      */
     public static boolean isSupportDirectInnerRelaySpeed(EZDeviceInfo deviceInfo, EZCameraInfo cameraInfo) {
         if (cameraInfo instanceof EZSubDeviceInfo) {
-            EZSubDeviceInfo subDeviceInfo = (EZSubDeviceInfo)cameraInfo;
+            EZSubDeviceInfo subDeviceInfo = (EZSubDeviceInfo) cameraInfo;
             return subDeviceInfo.isSupportDirectInnerRelaySpeed();
         }
         return deviceInfo.isSupportDirectInnerRelaySpeed();
@@ -189,7 +334,7 @@ public class EZBusinessTool {
      */
     public static boolean isSupportPlaybackRate(EZDeviceInfo deviceInfo, EZCameraInfo cameraInfo) {
         if (cameraInfo instanceof EZSubDeviceInfo) {
-            EZSubDeviceInfo subDeviceInfo = (EZSubDeviceInfo)cameraInfo;
+            EZSubDeviceInfo subDeviceInfo = (EZSubDeviceInfo) cameraInfo;
             return subDeviceInfo.isSupportPlaybackRate();
         }
         return deviceInfo.isSupportPlaybackRate();
@@ -200,7 +345,7 @@ public class EZBusinessTool {
      */
     public static boolean isSupportSdCover(EZDeviceInfo deviceInfo, EZCameraInfo cameraInfo) {
         if (cameraInfo instanceof EZSubDeviceInfo) {
-            EZSubDeviceInfo subDeviceInfo = (EZSubDeviceInfo)cameraInfo;
+            EZSubDeviceInfo subDeviceInfo = (EZSubDeviceInfo) cameraInfo;
             return subDeviceInfo.isSupportSdCover();
         }
         return deviceInfo.isSupportSdCover();
@@ -211,7 +356,7 @@ public class EZBusinessTool {
      */
     public static boolean isSupportSDRecordDownload(EZDeviceInfo deviceInfo, EZCameraInfo cameraInfo) {
         if (cameraInfo instanceof EZSubDeviceInfo) {
-            EZSubDeviceInfo subDeviceInfo = (EZSubDeviceInfo)cameraInfo;
+            EZSubDeviceInfo subDeviceInfo = (EZSubDeviceInfo) cameraInfo;
             return subDeviceInfo.isSupportSDRecordDownload();
         }
         return deviceInfo.isSupportSDRecordDownload();
@@ -222,10 +367,51 @@ public class EZBusinessTool {
      */
     public static boolean isSupportZoom(EZDeviceInfo deviceInfo, EZCameraInfo cameraInfo) {
         if (cameraInfo instanceof EZSubDeviceInfo) {
-            EZSubDeviceInfo subDeviceInfo = (EZSubDeviceInfo)cameraInfo;
+            EZSubDeviceInfo subDeviceInfo = (EZSubDeviceInfo) cameraInfo;
             return subDeviceInfo.isSupportZoom();
         }
         return deviceInfo.isSupportZoom();
+    }
+
+    /**
+     * 是否支持双目
+     */
+    public static boolean isSupportMultiChannel(EZDeviceInfo deviceInfo, EZCameraInfo cameraInfo) {
+        if (cameraInfo instanceof EZSubDeviceInfo) {
+            EZSubDeviceInfo subDeviceInfo = (EZSubDeviceInfo) cameraInfo;
+            return subDeviceInfo.isSupportMultiChannel();
+        }
+        return deviceInfo.isSupportMultiChannel();
+    }
+
+    /**
+     * 是否支持自动清晰度
+     */
+    public static boolean isSupportDeviceAutoVideolevel(EZDeviceInfo deviceInfo, EZCameraInfo cameraInfo) {
+        if (cameraInfo instanceof EZSubDeviceInfo) {
+            EZSubDeviceInfo subDeviceInfo = (EZSubDeviceInfo) cameraInfo;
+            return subDeviceInfo.isSupportDeviceAutoVideolevel();
+        }
+        return deviceInfo.isSupportDeviceAutoVideolevel();
+    }
+
+    /**
+     * 获取设备热点前缀
+     * @param deviceHotSpot 0-EZVIZ，1-SoftAP，2-CAMGO
+     */
+    public static String getWiFiConfigPrefix(int deviceHotSpot) {
+        String WiFiConfigPrefix = "EZVIZ";
+        switch (deviceHotSpot) {
+            case 1:
+                WiFiConfigPrefix = "SoftAP";
+                break;
+            case 2:
+                WiFiConfigPrefix = "CAMGO";
+                break;
+            default:
+                break;
+        }
+        return WiFiConfigPrefix;
     }
 
 }

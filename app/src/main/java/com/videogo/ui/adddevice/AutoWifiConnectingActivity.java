@@ -37,7 +37,7 @@ import com.videogo.exception.ErrorCode;
 import com.videogo.openapi.EZConstants;
 import com.videogo.openapi.EZOpenSDKListener;
 import com.videogo.openapi.bean.EZProbeDeviceInfoResult;
-import com.videogo.ui.cameralist.EZCameraListActivity;
+import com.videogo.ui.devicelist.EZDeviceListActivity;
 import com.videogo.util.ConnectionDetector;
 import com.videogo.util.LocalInfo;
 import com.videogo.util.LogUtil;
@@ -59,7 +59,7 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
 
     public static final int FROM_PAGE_SERIES_NUM_SEARCH_ACTIVITY = 1;
 
-    private static final String TAG = "AutoWifiConnectingActivity";
+    private static final String TAG = AutoWifiConnectingActivity.class.getSimpleName();
 
     private static final int MSG_ADD_CAMERA_SUCCESS = 10;
 
@@ -148,41 +148,41 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
     private MulticastLock lock;
 
     EZOpenSDKListener.EZStartConfigWifiCallback mEZStartConfigWifiCallback =
-        new EZOpenSDKListener.EZStartConfigWifiCallback() {
-            @Override
-            public void onStartConfigWifiCallback(String deviceSerial, final EZConstants.EZWifiConfigStatus status) {
-                AutoWifiConnectingActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (status == EZConstants.EZWifiConfigStatus.DEVICE_WIFI_CONNECTING) {
+            new EZOpenSDKListener.EZStartConfigWifiCallback() {
+                @Override
+                public void onStartConfigWifiCallback(String deviceSerial, final EZConstants.EZWifiConfigStatus status) {
+                    AutoWifiConnectingActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (status == EZConstants.EZWifiConfigStatus.DEVICE_WIFI_CONNECTING) {
 
-                        } else if (status == EZConstants.EZWifiConfigStatus.DEVICE_WIFI_CONNECTED) {
-                            if (isWifiConnected) {
-                                LogUtil.i(TAG, "defiveFindHandler: receiver WIFI while isWifiConnected is true");
-                                return;
+                            } else if (status == EZConstants.EZWifiConfigStatus.DEVICE_WIFI_CONNECTED) {
+                                if (isWifiConnected) {
+                                    LogUtil.i(TAG, "defiveFindHandler: receiver WIFI while isWifiConnected is true");
+                                    return;
+                                }
+                                LogUtil.d(TAG, "Received WIFI on device connection  " + serialNo);
+                                isWifiOkBonjourget = true;
+                                isWifiConnected = true;
+                                t2 = System.currentTimeMillis();
+                                changeStatuss(STATUS_REGISTING);
+                            } else if (status == EZConstants.EZWifiConfigStatus.DEVICE_PLATFORM_REGISTED) {
+                                LogUtil.d(TAG, "Received PLAT information on device connection " + serialNo);
+                                if (isPlatConnected) {
+                                    LogUtil.i(TAG, "defiveFindHandler: receiver PLAT while isPlatConnected is true");
+                                    return;
+                                }
+                                isPlatBonjourget = true;
+                                isPlatConnected = true;
+                                t3 = System.currentTimeMillis();
+                                cancelOvertimeTimer();
+                                changeStatuss(STATUS_ADDING_CAMERA);
+                                stopWifiConfigOnThread();
                             }
-                            LogUtil.d(TAG, "Received WIFI on device connection  " + serialNo);
-                            isWifiOkBonjourget = true;
-                            isWifiConnected = true;
-                            t2 = System.currentTimeMillis();
-                            changeStatuss(STATUS_REGISTING);
-                        } else if (status == EZConstants.EZWifiConfigStatus.DEVICE_PLATFORM_REGISTED) {
-                            LogUtil.d(TAG, "Received PLAT information on device connection " + serialNo);
-                            if (isPlatConnected) {
-                                LogUtil.i(TAG, "defiveFindHandler: receiver PLAT while isPlatConnected is true");
-                                return;
-                            }
-                            isPlatBonjourget = true;
-                            isPlatConnected = true;
-                            t3 = System.currentTimeMillis();
-                            cancelOvertimeTimer();
-                            changeStatuss(STATUS_ADDING_CAMERA);
-                            stopWifiConfigOnThread();
                         }
-                    }
-                });
-            }
-        };
+                    });
+                }
+            };
 
     private boolean isWifiConnected = false;
     private boolean isPlatConnected = false;
@@ -247,13 +247,13 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
     // return other value means fail, result is the error code
     private int probeDeviceInfo(String deviceSerial) {
         mEZProbeDeviceInfo = getOpenSDK().probeDeviceInfo(serialNo,deviceType);
-            if (mEZProbeDeviceInfo != null) {
-                if (mEZProbeDeviceInfo.getBaseException() != null){
-                    return mEZProbeDeviceInfo.getBaseException().getErrorCode();
-                }
-                return 0;
+        if (mEZProbeDeviceInfo != null) {
+            if (mEZProbeDeviceInfo.getBaseException() != null){
+                return mEZProbeDeviceInfo.getBaseException().getErrorCode();
             }
-            return 1;//unknown error
+            return 0;
+        }
+        return 1;//unknown error
     }
 
     @Override
@@ -291,18 +291,18 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
         isSupportWifi = getIntent().getBooleanExtra(IntentConsts.EXTRA_SUPPORT_SMART_CONFIG, true)
                 || getIntent().getBooleanExtra(IntentConsts.EXTRA_SUPPORT_SOUND_WAVE, true);
         LogUtil.d(TAG, "serialNo = "
-            + serialNo
-            + ",mVerifyCode = "
-            + mVerifyCode
-            + ",wifiSSID = "
-            + wifiSSID
-            + ",isSupportNetWork "
-            + isSupportNetWork
-            + ",isSupportWifi "
-            + isSupportWifi
-            + ",isFromDeviceSetting = "
-            + ",deviceType="
-            + deviceType);
+                + serialNo
+                + ",mVerifyCode = "
+                + mVerifyCode
+                + ",wifiSSID = "
+                + wifiSSID
+                + ",isSupportNetWork "
+                + isSupportNetWork
+                + ",isSupportWifi "
+                + isSupportWifi
+                + ",isFromDeviceSetting = "
+                + ",deviceType="
+                + deviceType);
         mMsgHandler = new MessageHandler();
         mLocalInfo = LocalInfo.getInstance();
 
@@ -471,9 +471,9 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
             // description.obj = timer3;
             // timerHandler.sendMessageDelayed(description, 1000);
         } else if (STATUS_ADD_CAMERA_SUCCESS == status
-            || ERROR_WIFI_CONNECT == status
-            || ERROR_REGIST == status
-            || ERROR_ADD_CAMERA == status) {
+                || ERROR_WIFI_CONNECT == status
+                || ERROR_REGIST == status
+                || ERROR_ADD_CAMERA == status) {
             connectStateContainer.setVisibility(View.GONE);
         } else {
 
@@ -531,7 +531,7 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
                         t4 = System.currentTimeMillis();
                         changeStatuss(STATUS_ADDING_CAMERA);
                         LogUtil.d(TAG,
-                            "start Timeout from the server to obtain the device information is successful");
+                                "start Timeout from the server to obtain the device information is successful");
                     }
                 };
                 final Runnable fail = new Runnable() {
@@ -593,7 +593,7 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
                 long startTime = System.currentTimeMillis();
                 getOpenSDK().stopConfigWiFi();
                 LogUtil.d(TAG,
-                    "stopBonjourOnThread .cost time = " + (System.currentTimeMillis() - startTime) + "ms");
+                        "stopBonjourOnThread .cost time = " + (System.currentTimeMillis() - startTime) + "ms");
             }
         }).start();
         LogUtil.d(TAG, "stopBonjourOnThread ..................");
@@ -601,35 +601,23 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btnBack:
-                onBackPressed();
-
-                break;
-            case R.id.cancel_btn:
-                cancelOnClick();
-                break;
-            case R.id.btnRetry:
-                retryOnclick();
-                break;
-            case R.id.btnLineConnet:
-                lineConnectClick();
-                break;
-            case R.id.btnLineConnetOk:
-                lineConnectOkClick();
-                break;
-            case R.id.btnFinish:
-                finishOnClick();
-                break;
-            case R.id.tvMore:
-                moreOnClick();
-                break;
-            case R.id.help:
-                helpOnclick();
-                break;
-
-            default:
-                break;
+        int id = v.getId();
+        if (id == R.id.btnBack) {
+            onBackPressed();
+        } else if (id == R.id.cancel_btn) {
+            cancelOnClick();
+        } else if (id == R.id.btnRetry) {
+            retryOnclick();
+        } else if (id == R.id.btnLineConnet) {
+            lineConnectClick();
+        } else if (id == R.id.btnLineConnetOk) {
+            lineConnectOkClick();
+        } else if (id == R.id.btnFinish) {
+            finishOnClick();
+        } else if (id == R.id.tvMore) {
+            moreOnClick();
+        } else if (id == R.id.help) {
+            helpOnclick();
         }
     }
 
@@ -642,7 +630,8 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
     }
 
     private void finishOnClick() {
-        // Cloud storage switch, the device is not online or not the latest device or the user does not open the cloud storage service is not see this control
+        // Cloud storage switch, the device is not online or not the latest device or the user does not open the cloud
+        // storage service is not see this control
         if (llyCloundService.getVisibility() == View.VISIBLE && ckbCloundService.isChecked()) {
             enableCloudStoryed();
         } else {
@@ -736,21 +725,21 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
 
     private void showConfirmDialog() {
         new AlertDialog.Builder(this).setMessage(R.string.auto_wifi_dialog_connecting_msg)
-            .setPositiveButton(R.string.update_exit, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                    finish();
-                }
-            })
-            .setNegativeButton(R.string.wait, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            })
-            .create()
-            .show();
+                .setPositiveButton(R.string.update_exit, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        finish();
+                    }
+                })
+                .setNegativeButton(R.string.wait, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .create()
+                .show();
     }
 
     private void changeStatuss(int Status) {
@@ -804,7 +793,7 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
                                 t4 = System.currentTimeMillis();
                                 changeStatuss(STATUS_ADDING_CAMERA);
                                 LogUtil.d(TAG,
-                                    "STATUS_REGISTING Timeout from the server to obtain the device information is successful");
+                                        "STATUS_REGISTING Timeout from the server to obtain the device information is successful");
                             }
                         };
                         final Runnable fail = new Runnable() {
@@ -825,15 +814,15 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
                                 LogUtil.i(TAG, "in change status STATUS_REGISTING, got probeDeviceInfo");
                                 if (result == 0 && mEZProbeDeviceInfo != null) {
                                     LogUtil.i(TAG, "in change status STATUS_REGISTING, probeDeviceInfo success, "
-                                        + mEZProbeDeviceInfo);
+                                            + mEZProbeDeviceInfo);
                                     runOnUiThread(success);
                                 } else if (result == ErrorCode.ERROR_WEB_DEVICE_ONLINE_NOT_ADD) {
                                     LogUtil.i(TAG, "in change status STATUS_REGISTING, "
-                                        + " probeDeviceInfo error:ERROR_WEB_DIVICE_ONLINE_NOT_ADD");
+                                            + " probeDeviceInfo error:ERROR_WEB_DIVICE_ONLINE_NOT_ADD");
                                     runOnUiThread(success);
                                 } else {
                                     LogUtil.i(TAG,
-                                        "in change status STATUS_REGISTING, probeDeviceInfo camera not online");
+                                            "in change status STATUS_REGISTING, probeDeviceInfo camera not online");
                                     runOnUiThread(fail);
                                 }
                             }
@@ -858,7 +847,7 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
                 // imgAnimation.setImageResource(R.drawable.divce_config_wifi_wait);
                 // } else {
                 // }
-                imgAnimation.setImageResource(R.drawable.auto_wifi_link_account_bg);
+                imgAnimation.setImageResource(ezviz.ezopensdkcommon.R.drawable.auto_wifi_link_account_bg);
                 animWaiting = (AnimationDrawable) imgAnimation.getDrawable();
                 animWaiting.start();
                 btnRetry.setVisibility(View.GONE);
@@ -882,9 +871,9 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
                 recordConfigTimeAndError();
                 btnFinish.setVisibility(View.VISIBLE);
                 boolean bX1orX2 =
-                    false;//mDeviceInfoEx.getEnumModel() == DeviceModel.X1 || mDeviceInfoEx.getEnumModel() == DeviceModel.X2;
+                        false;//mDeviceInfoEx.getEnumModel() == DeviceModel.X1 || mDeviceInfoEx.getEnumModel() == DeviceModel.X2;
                 if (bX1orX2) {
-                    imgAnimation.setImageResource(R.drawable.success_img);
+                    imgAnimation.setImageResource(ezviz.ezopensdkcommon.R.drawable.success_img);
                 } else {
                     imgAnimation.setImageResource(R.drawable.success);
                 }
@@ -956,7 +945,7 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
                 }
                 // Source device switch wifi
                 btnLineConnect.setText(R.string.ez_auto_wifi_line_connect);
-                imgAnimation.setImageResource(R.drawable.failure_wifi);
+                imgAnimation.setImageResource(ezviz.ezopensdkcommon.R.drawable.failure_wifi);
                 tvStatus.setText(R.string.ez_auto_wifi_connecting_failed);
                 helpTop.setVisibility(View.VISIBLE);
                 help.setVisibility(View.VISIBLE);
@@ -980,19 +969,19 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
                 if (errorCode == ErrorCode.ERROR_WEB_DEVICE_EXCEPTION) {
                     // Device exception
                     tvStatus.setText(
-                        getString(R.string.auto_wifi_add_device_failed) + "(" + getString(R.string.device_error) + ")");
+                            getString(R.string.auto_wifi_add_device_failed) + "(" + getString(R.string.device_error) + ")");
                 } else if (errorCode == ErrorCode.ERROR_WEB_DEVICE_ADD_OWN_AGAIN) {
                     // The device has been added by itself
                     // showToast(R.string.query_camera_fail_repeat_error);
                     tvStatus.setText(getString(R.string.auto_wifi_add_device_failed2) + "(" + getString(
-                        R.string.auto_wifi_device_you_added_already) + ")");
+                            R.string.auto_wifi_device_you_added_already) + ")");
                     btnRetry.setVisibility(View.GONE);
                     btnFinish.setVisibility(View.VISIBLE);
                 } else if (errorCode == ErrorCode.ERROR_WEB_DEVICE_ADDED) {
                     // TODO
                     // The device has been added
                     tvStatus.setText(getString(R.string.auto_wifi_add_device_failed2) + "(" + getString(
-                        R.string.auto_wifi_device_added_already) + ")");
+                            R.string.auto_wifi_device_added_already) + ")");
                     btnRetry.setVisibility(View.GONE);
                     btnFinish.setVisibility(View.VISIBLE);
                     //                } else if (errorCode == ErrorCode.ERROR_WEB_NET_EXCEPTION) {
@@ -1005,9 +994,9 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
                 } else if (errorCode == ErrorCode.ERROR_WEB_DEVICE_VERIFY_CODE_ERROR) {
                     // Verification code error
                     tvStatus.setText(getString(R.string.auto_wifi_add_device_failed2)
-                        + "("
-                        + getString(R.string.verify_code_error)
-                        + ")");
+                            + "("
+                            + getString(R.string.verify_code_error)
+                            + ")");
                 } else if (errorCode == ErrorCode.ERROR_WEB_DEVICE_NOT_EXIT) {
                     // The device does not exist
                     tvStatus.setText(R.string.auto_wifi_device_not_exist);
@@ -1138,26 +1127,26 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
         dismissWaitDialog();
         LogUtil.e(TAG, "Add cloud storage failed, error code：" + arg1);
         new AlertDialog.Builder(this).setTitle(R.string.enable_cloud_fause)
-            .setMessage(R.string.enable_cloud_fause_retry)
-            .setNegativeButton(R.string.retry, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int arg1) {
-                    dialog.dismiss();
-                    enableCloudStoryed();
-                    // mWaitDlg.show();
-                    showWaitDialog(R.string.start_cloud);
-                }
-            })
-            .setPositiveButton(R.string.not_now, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                    closeActivity();
-                }
-            })
-            .setCancelable(false)
-            .create()
-            .show();
+                .setMessage(R.string.enable_cloud_fause_retry)
+                .setNegativeButton(R.string.retry, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int arg1) {
+                        dialog.dismiss();
+                        enableCloudStoryed();
+                        // mWaitDlg.show();
+                        showWaitDialog(R.string.start_cloud);
+                    }
+                })
+                .setPositiveButton(R.string.not_now, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        closeActivity();
+                    }
+                })
+                .setCancelable(false)
+                .create()
+                .show();
     }
 
     public void openCloudSuccess() {
@@ -1304,7 +1293,7 @@ public class AutoWifiConnectingActivity extends RootActivity implements OnClickL
 
     private void closeActivity() {
         // start the EZCameraList here
-        Intent intent = new Intent(this, EZCameraListActivity.class);
+        Intent intent = new Intent(this, EZDeviceListActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
         finish();

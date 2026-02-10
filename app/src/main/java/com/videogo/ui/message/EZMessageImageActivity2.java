@@ -122,7 +122,7 @@ public class EZMessageImageActivity2 extends RootActivity implements VerifyCodeI
                 onBackPressed();
             }
         });
-        
+
         mTitleBar.setTitle(R.string.ez_event_message_detail);
     }
 
@@ -133,11 +133,11 @@ public class EZMessageImageActivity2 extends RootActivity implements VerifyCodeI
 //        mGallery.setFlingEnable(false);
 //        if (mCurrentIndex >= 0) {
 //            mGallery.setSelection(mCurrentIndex);
-            setupAlarmInfo(mEZAlarmInfo);
-            setAlarmImage();
+        setupAlarmInfo(mEZAlarmInfo);
+        setAlarmImage();
     }
 
-    private void setAlarmImage(){
+    private void setAlarmImage() {
         EZUtils.loadImage(this, mAlarmImageView, mEZAlarmInfo,this);
     }
 
@@ -173,22 +173,13 @@ public class EZMessageImageActivity2 extends RootActivity implements VerifyCodeI
 
             @Override
             public void onClick(View v) {
-                    switch (v.getId()) {
-                        case R.id.video_button:
-//                            RemotePlayBackUtils.goToMessageVideoActivity(EZMessageImageActivity2.this, alarm, true);
-//                            overridePendingTransition(R.anim.window_anim_slide_in_right, R.anim.window_anim_fade_out);
+                if (v.getId() == R.id.video_button) {
+                    Intent intent = new Intent(EZMessageImageActivity2.this, EZRemotePlayBackActivity.class);
+                    intent.putExtra(IntentConsts.EXTRA_ALARM_INFO, mEZAlarmInfo);
 
-//                            if (relAlarm != null && relAlarm.getEnumAlarmType() == AlarmType.DETECTOR_IPC_LINK)
-//                                alarmInfo = relAlarm;
-
-                            Intent intent = new Intent(EZMessageImageActivity2.this, EZRemotePlayBackActivity.class);
-                            intent.putExtra(IntentConsts.EXTRA_ALARM_INFO, mEZAlarmInfo);
-
-                            startActivity(intent);
-                            break;
-                    }
+                    startActivity(intent);
+                }
             }
-
         };
 
         mVideoButton.setOnClickListener(clickListener);
@@ -255,8 +246,7 @@ public class EZMessageImageActivity2 extends RootActivity implements VerifyCodeI
     }
 
     private void setupAlarmInfo(EZAlarmInfo alarm) {
-        AlarmType alarmType = AlarmType.BODY_ALARM;//alarm.getEnumAlarmType();
-        mMessageTypeView.setText( getString(alarmType.getTextResId()));
+        mMessageTypeView.setText(R.string.ez_alarm_type_person_alarm);
         mMessageFromView.setText(getText(R.string.from) + alarm.getAlarmName());
         mMessageTimeView.setText(alarm.getAlarmStartTime());
 
@@ -334,7 +324,7 @@ public class EZMessageImageActivity2 extends RootActivity implements VerifyCodeI
             mMessageFromView.setSingleLine(false);
             mMessageFromView.setEllipsize(null);
 
-            mVideoButton.setBackgroundResource(R.drawable.login_btn_selector);
+            mVideoButton.setBackgroundResource(ezviz.ezopensdkcommon.R.drawable.login_btn_selector);
 //            mVideoButton.setTextColor(getResources().getColorStateList(R.color.message_video_button_selector));
             layoutParams = (LayoutParams) mVideoButton.getLayoutParams();
             layoutParams.width = LayoutParams.MATCH_PARENT;
@@ -356,8 +346,6 @@ public class EZMessageImageActivity2 extends RootActivity implements VerifyCodeI
     }
 
     private void setButtonEnable(EZAlarmInfo alarm) {
-        AlarmType alarmType = AlarmType.BODY_ALARM;
-//        AlarmLogInfo relAlarm = alarm.getRelationAlarms();
 
         mVideoButton.setEnabled(true);
     }

@@ -27,8 +27,14 @@ public class AddDeviceToAccountActivity extends RootActivity {
         setContentView(R.layout.activity_add_device_to_acount);
 
         initUi();
-        tryToAddDevice();
-        showAddUi();
+
+        boolean bindRequired = getIntent().getBooleanExtra(IntentConstants.DEVICE_BIND_REQUIRED, true);
+        if (bindRequired) {
+            tryToAddDevice();
+            showAddUi();
+        } else {
+            finishAdd(true);
+        }
     }
 
     public void onClickRetryAddDevice(View view) {
@@ -61,9 +67,9 @@ public class AddDeviceToAccountActivity extends RootActivity {
                         isAddSuc = true;
                     }
                 }
-                if (isAddSuc){
+                if (isAddSuc) {
                     finishAdd(true);
-                }else{
+                } else {
                     showFailUi();
                 }
             }

@@ -1,5 +1,6 @@
 package com.videogo.ui.message;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
@@ -8,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -32,6 +34,7 @@ import com.videogo.constant.IntentConsts;
 import com.videogo.errorlayer.ErrorInfo;
 import com.videogo.exception.BaseException;
 import com.videogo.exception.ErrorCode;
+import com.videogo.openapi.EZConstants;
 import com.videogo.openapi.EZConstants.EZAlarmStatus;
 import com.videogo.openapi.bean.EZAlarmInfo;
 import com.videogo.util.ActivityUtils;
@@ -60,8 +63,10 @@ import java.util.List;
 
 import ezviz.ezopensdk.R;
 
+import static com.videogo.EzvizApplication.getOpenSDK;
+
 public class EZMessageActivity2 extends RootActivity implements VerifyCodeInput.VerifyCodeErrorListener{
-    private static final String TAG = "EMessageActivity2";
+    private static final String TAG = EZMessageActivity2.class.getSimpleName();
 
     private static final int REQUEST_CODE_SINGLE_DETAIL = 1;
     private static final int REQUEST_CODE_MULTI_DETAIL = 2;
@@ -117,12 +122,18 @@ public class EZMessageActivity2 extends RootActivity implements VerifyCodeInput.
         setListner();
     }
 
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     @Override
     protected void onResume() {
         super.onResume();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(Constant.ALARM_MESSAGE_DISPLAY_ACTION);
-        registerReceiver(mReceiver, intentFilter);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Constant.ALARM_MESSAGE_DISPLAY_ACTION);
+        // 添加版本兼容性判断
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {// Android 8.0及以上
+            registerReceiver(mReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+        } else {
+            registerReceiver(mReceiver, filter);
+        }
 
         if (mAdapter.getCount() > 0) {
             setRefreshLayoutVisibility(false);
@@ -192,12 +203,15 @@ public class EZMessageActivity2 extends RootActivity implements VerifyCodeInput.
                         }
                     });
         }
-        mTitleBar.addBackButton(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
+        mTitleBar.addBackButton(v -> onBackPressed());
+        new Thread(() -> {
+            try {
+                int count = getOpenSDK().getUnreadMessageCount(mDeviceSerial, EZConstants.EZMessageType.EZMessageTypeAlarm);
+                runOnUiThread(() -> mTitleBar.setTitle(getString(R.string.ez_event_message, count)));
+            } catch (BaseException e) {
+                e.printStackTrace();
             }
-        });
+        }).start();
     }
 
     private void initViews() {
@@ -227,7 +241,7 @@ public class EZMessageActivity2 extends RootActivity implements VerifyCodeInput.
             mMessageListView.getRefreshableView().addFooterView(mNoMoreView);
             mMessageListView.setAdapter(mAdapter);
             mMessageListView.getRefreshableView().removeFooterView(mNoMoreView);
-            
+
             mCheckModeButton.setVisibility(View.GONE);
         }
 //        boolean hasDevice = DeviceManager.getInstance().haveAlarmDevice();
@@ -240,38 +254,27 @@ public class EZMessageActivity2 extends RootActivity implements VerifyCodeInput.
 
             @Override
             public void onClick(View v) {
-                switch (v.getId()) {
-                    case R.id.retry_button:
-                        refreshButtonClicked();
-                        break;
-
-                    case R.id.no_message_layout:
-                        refreshButtonClicked();
-                        break;
-
-                    case R.id.check_mode_top:
-                        mCheckAllView.toggle();
-                    case R.id.check_all:
-                        if (mCheckAllView.isChecked()) {
-                        }
-                        if (mCheckAllView.isChecked())
-                            mAdapter.checkAll();
-                        else
-                            mAdapter.uncheckAll();
-                        setupCheckModeLayout(false);
-                        break;
-
-                    case R.id.del_button:
-                        deleteMessage(mAdapter.getCheckedIds());
-                        break;
-
-                    case R.id.read_button:
-                        new CheckAlarmInfoTask2(true).execute(mAdapter.getCheckedIds());
-                        break;
-
-                    case R.id.no_message_button:
-//                        WebUtils.openYsStore(EZMessageActivity2.this, null);
-                        break;
+                int id = v.getId();
+                if (id == R.id.retry_button) {
+                    refreshButtonClicked();
+                } else if (id == R.id.no_message_layout) {
+                    refreshButtonClicked();
+                } else if (id == R.id.check_mode_top) {
+                    mCheckAllView.toggle();
+                } else if (id == R.id.check_all) {
+                    if (mCheckAllView.isChecked()) {
+                    }
+                    if (mCheckAllView.isChecked())
+                        mAdapter.checkAll();
+                    else
+                        mAdapter.uncheckAll();
+                    setupCheckModeLayout(false);
+                } else if (id == R.id.del_button) {
+                    deleteMessage(mAdapter.getCheckedIds());
+                } else if (id == R.id.read_button) {
+                    new CheckAlarmInfoTask2(true).execute(mAdapter.getCheckedIds());
+                } else if (id == R.id.no_message_button) {
+                    // WebUtils.openYsStore(EZMessageActivity2.this, null);
                 }
             }
         };
@@ -457,33 +460,33 @@ public class EZMessageActivity2 extends RootActivity implements VerifyCodeInput.
     }
 
     private void setAlarmRead(EZAlarmInfo alarmInfo) {
-    	if(mMessageList != null && mMessageList.size() > 0) {
-    		for(EZAlarmInfo info : mMessageList) {
-    			if(info.getAlarmId().equals(alarmInfo.getAlarmId())) {
-    				info.setIsRead(1);
-    			}
-    		}
-    	}
+        if(mMessageList != null && mMessageList.size() > 0) {
+            for(EZAlarmInfo info : mMessageList) {
+                if(info.getAlarmId().equals(alarmInfo.getAlarmId())) {
+                    info.setIsRead(1);
+                }
+            }
+        }
     }
 
     private void setAlarmRead(String alarmId) {
-    	if(mMessageList != null && mMessageList.size() > 0) {
-    		for(EZAlarmInfo info : mMessageList) {
-    			if(info.getAlarmId().equals(alarmId)) {
-    				info.setIsRead(1);
-    			}
-    		}
-    	}
+        if(mMessageList != null && mMessageList.size() > 0) {
+            for(EZAlarmInfo info : mMessageList) {
+                if(info.getAlarmId().equals(alarmId)) {
+                    info.setIsRead(1);
+                }
+            }
+        }
     }
     private void deleteAlarmFromList(String alarmId) {
-    	if(mMessageList != null && mMessageList.size() > 0) {
-    		for(int i = 0 ; i < mMessageList.size(); i ++) {
-    			EZAlarmInfo info = mMessageList.get(i);
-    			if(info.getAlarmId().equals(alarmId)) {
-    				mMessageList.remove(info);
-    			}
-    		}
-    	}
+        if(mMessageList != null && mMessageList.size() > 0) {
+            for(int i = 0 ; i < mMessageList.size(); i ++) {
+                EZAlarmInfo info = mMessageList.get(i);
+                if(info.getAlarmId().equals(alarmId)) {
+                    mMessageList.remove(info);
+                }
+            }
+        }
     }
 
     @Override
@@ -491,9 +494,9 @@ public class EZMessageActivity2 extends RootActivity implements VerifyCodeInput.
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-               if (mAdapter != null){
-                   mAdapter.setVerifyCodeDialog();
-               }
+                if (mAdapter != null){
+                    mAdapter.setVerifyCodeDialog();
+                }
             }
         });
     }
@@ -544,24 +547,24 @@ public class EZMessageActivity2 extends RootActivity implements VerifyCodeInput.
             Calendar mEndTime;
             mStartTime = Calendar.getInstance();
             mStartTime.set(Calendar.AM_PM, 0);
-            mStartTime.set(mStartTime.get(Calendar.YEAR), mStartTime.get(Calendar.MONTH), 
+            mStartTime.set(mStartTime.get(Calendar.YEAR), mStartTime.get(Calendar.MONTH),
                     mStartTime.get(Calendar.DAY_OF_MONTH)-7, 0, 0, 0);
             mEndTime = Calendar.getInstance();
             mEndTime.set(Calendar.AM_PM, 0);
-            mEndTime.set(mEndTime.get(Calendar.YEAR), mEndTime.get(Calendar.MONTH), 
+            mEndTime.set(mEndTime.get(Calendar.YEAR), mEndTime.get(Calendar.MONTH),
                     mEndTime.get(Calendar.DAY_OF_MONTH), 23, 59, 59);
 
             int pageSize = 10;
             int pageStart = 0;
             if(mHeaderOrFooter) {
-            	pageStart = 0;
+                pageStart = 0;
             } else {
-            	pageStart = mAdapter.getCount() / pageSize;
+                pageStart = mAdapter.getCount() / pageSize;
             }
 
             try {
                 result = EzvizApplication.getOpenSDK().getAlarmList(mDeviceSerial, pageStart, pageSize,mStartTime,
-                    mEndTime);
+                        mEndTime);
             }
             catch (BaseException e) {
                 // TODO Auto-generated catch block
@@ -571,7 +574,7 @@ public class EZMessageActivity2 extends RootActivity implements VerifyCodeInput.
                 mErrorCode = errorInfo.errorCode;
                 LogUtil.d("EM", errorInfo.toString());
             }
-            
+
 
             return result;
 
@@ -709,34 +712,34 @@ public class EZMessageActivity2 extends RootActivity implements VerifyCodeInput.
             }
 
             List<String> deleteIds = new ArrayList<String>();
-                if (params[0] instanceof EZAlarmInfo) {
-                    // 单个删除 Single delete
-                    EZAlarmInfo info = (EZAlarmInfo) params[0];
-                    if (TextUtils.isEmpty(info.getAlarmId())) {
-                    }
-                    else {
-                        deleteIds.add(info.getAlarmId());
-                    }
-
-                } else if (params[0] instanceof List<?>) {
-                    // 批量删除 batch deletion
-                    List<String> ids = (List<String>) params[0];
-                    if (ids != null && ids.size() > 0)
-                        deleteIds.addAll(ids);
+            if (params[0] instanceof EZAlarmInfo) {
+                // 单个删除 Single delete
+                EZAlarmInfo info = (EZAlarmInfo) params[0];
+                if (TextUtils.isEmpty(info.getAlarmId())) {
                 }
-                
-                try {
-                    EzvizApplication.getOpenSDK().deleteAlarm(deleteIds);
-                }
-                catch (BaseException e) {
-                    e.printStackTrace();
-
-                    ErrorInfo errorInfo = (ErrorInfo) e.getObject();
-                    mErrorCode = errorInfo.errorCode;
-                    LogUtil.d(TAG, errorInfo.toString());
+                else {
+                    deleteIds.add(info.getAlarmId());
                 }
 
-                return params[0];
+            } else if (params[0] instanceof List<?>) {
+                // 批量删除 batch deletion
+                List<String> ids = (List<String>) params[0];
+                if (ids != null && ids.size() > 0)
+                    deleteIds.addAll(ids);
+            }
+
+            try {
+                EzvizApplication.getOpenSDK().deleteAlarm(deleteIds);
+            }
+            catch (BaseException e) {
+                e.printStackTrace();
+
+                ErrorInfo errorInfo = (ErrorInfo) e.getObject();
+                mErrorCode = errorInfo.errorCode;
+                LogUtil.d(TAG, errorInfo.toString());
+            }
+
+            return params[0];
 //            } catch (VideoGoNetSDKException e) {
 //                mErrorCode = e.getErrorCode();
 //                return null;
@@ -750,15 +753,15 @@ public class EZMessageActivity2 extends RootActivity implements VerifyCodeInput.
 
             if (result != null) {
                 if (result instanceof EZAlarmInfo) {
-                	EZAlarmInfo info = (EZAlarmInfo) result;
+                    EZAlarmInfo info = (EZAlarmInfo) result;
                     //mAlarmLogInfoManager.deleteAlarmLogList(info);
                     //mj if (mDataType == Constant.MESSAGE_INNER_PUSH)
-                	if (mDataType == Constant.MESSAGE_LIST)
+                    if (mDataType == Constant.MESSAGE_LIST)
                         mMessageList.remove(info);
                 } else if (result instanceof List<?>) {
                     List<String> ids = (List<String>) result;
                     for (String id : ids) {
-                    	deleteAlarmFromList(id);
+                        deleteAlarmFromList(id);
                     }
                 }
 
@@ -831,7 +834,7 @@ public class EZMessageActivity2 extends RootActivity implements VerifyCodeInput.
                 mErrorCode = ErrorCode.ERROR_WEB_NET_EXCEPTION;
                 return false;
             }
-            
+
             info = params[0];
 
             List<String> alarmIds = new ArrayList<String>();
@@ -929,7 +932,7 @@ public class EZMessageActivity2 extends RootActivity implements VerifyCodeInput.
             }
         }
     }
-    
+
     private class CheckAlarmInfoTask2 extends AsyncTask<Object, Void, Boolean> {
 
         private Dialog mWaitDialog;
@@ -957,26 +960,26 @@ public class EZMessageActivity2 extends RootActivity implements VerifyCodeInput.
                 mErrorCode = ErrorCode.ERROR_WEB_NET_EXCEPTION;
                 return false;
             }
-            
+
             List<String> alarmIds = new ArrayList<String>();
             if (params[0] instanceof EZAlarmInfo) {
                 EZAlarmInfo info = (EZAlarmInfo) params[0];
                 if (TextUtils.isEmpty(info.getAlarmId())) {
                 }
                 else {
-                	alarmIds.add(info.getAlarmId());
+                    alarmIds.add(info.getAlarmId());
                 }
 
             } else if (params[0] instanceof List<?>) {
                 List<String> ids = (List<String>) params[0];
                 if (ids != null && ids.size() > 0)
-                	alarmIds.addAll(ids);
+                    alarmIds.addAll(ids);
             }
-            
+
             try {
                 EzvizApplication.getOpenSDK().setAlarmStatus(alarmIds, EZAlarmStatus.EZAlarmStatusRead);
                 for(String alarmId : alarmIds) {
-                	setAlarmRead(alarmId);
+                    setAlarmRead(alarmId);
                 }
                 return true;
             }
@@ -1053,34 +1056,34 @@ public class EZMessageActivity2 extends RootActivity implements VerifyCodeInput.
     }
 
     private void sendUIMessage(Handler handler, int what, int arg1, int arg2) {
-    	Message msg = Message.obtain();
-    	msg.what = what;
-    	msg.arg1 = arg1;
-    	msg.arg2 = arg2;
-    	handler.sendMessage(msg);
+        Message msg = Message.obtain();
+        msg.what = what;
+        msg.arg1 = arg1;
+        msg.arg2 = arg2;
+        handler.sendMessage(msg);
     }
     private static final int UI_MSG_BASE = 500;
     private static final int UI_MSG_EMPTY_LIST = UI_MSG_BASE + 1;
     private static final int UI_MSG_LIST_CHANGE = UI_MSG_BASE + 2;
 
     private class UIHandler extends Handler {
-		@Override
-		public void handleMessage(Message msg) {
-			super.handleMessage(msg);
-			switch (msg.what) {
-			case UI_MSG_EMPTY_LIST:
-				break;
-			case UI_MSG_LIST_CHANGE:
-				if(mMessageList.size() == 0) {
-					mCheckModeButton.setVisibility(View.GONE);
-				} else {
-					mCheckModeButton.setVisibility(View.VISIBLE);
-				}
-				break;
-			default:
-				break;
-			}
-		}
-    	
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case UI_MSG_EMPTY_LIST:
+                    break;
+                case UI_MSG_LIST_CHANGE:
+                    if(mMessageList.size() == 0) {
+                        mCheckModeButton.setVisibility(View.GONE);
+                    } else {
+                        mCheckModeButton.setVisibility(View.VISIBLE);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
     }
 }

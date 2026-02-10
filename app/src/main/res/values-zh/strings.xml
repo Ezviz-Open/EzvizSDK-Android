@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <string name="cameras_txt">我的</string>
-    <string name="app_name">EZOpenSDK</string>
+    <string name="app_name">开放平台</string>
     <string name="exit">确定退出登录</string>
     <string name="exit_tip">是否要切换到其他账号？ \n注意：当前app将会被强制关闭，请重新手动打开它！</string>
     <string name="confirm">确定</string>
@@ -70,7 +69,7 @@
     <!-- 条形码、二维码扫描 -->
     <string name="scan_cue_txt">请将设备机身或说明书上的二维码放置在扫描框内，手机将自动识别</string>
     <string name="scan_title_txt">序列号扫描</string>
-    <string name="get_camera_list_fail">获取设备列表失败</string>
+    <string name="get_device_list_fail">获取设备列表失败</string>
     <string name="not_camera_device">该设备不是视频类设备</string>
     <string name="refresh">重试</string>
     <string name="later_alarm">消息推送</string>
@@ -197,11 +196,6 @@
     <string name="sms_verify_bind_error">该appkey下已绑定重复的的userId或phone！</string>
     <string name="refresh_empty_hint">没有内容哦，下拉刷新试试？</string>
     <string name="refresh_fail_hint">拉取内容失败了，下拉刷新试试？</string>
-    <string name="my_collect">我的收藏</string>
-    <string name="collect_success">收藏成功</string>
-    <string name="cancel_collect_success">取消收藏成功</string>
-    <string name="collect_fail">收藏失败</string>
-    <string name="cancel_collect_fail">取消收藏失败</string>
     <string name="cities">城市</string>
     <string name="search">搜索</string>
     <string name="cityConfig">配置</string>
@@ -243,12 +237,22 @@
     <string name="ptz_privacying_failed">镜头已遮蔽，无法操作云台</string>
     <string name="ptz_mirroring_failed">语音对讲中，无法操作云台</string>
 
+    <string name="talkback_select_tip">请选择对讲方式</string>
+    <string name="talkback_current_device">当前设备对讲</string>
+    <string name="talkback_nvr_channel_device">NVR通道对讲</string>
+    <string name="quality_select_tip">请选择设备清晰度</string>
+    <string name="quality_4K">4K</string>
+    <string name="quality_3K">3K</string>
+    <string name="quality_extreme_hd">极清</string>
     <string name="quality_super_hd">超清</string>
     <string name="quality_hd">高清</string>
     <string name="quality_balanced">均衡</string>
     <string name="quality_flunet">流畅</string>
+    <string name="quality_auto">自动</string>
+    <string name="quality_auto_select">自动(%s)</string>
     <string name="ptz">云台</string>
     <string name="talk">对讲</string>
+    <string name="watermark">水印</string>
     <string name="capture">截图</string>
     <string name="record">录像</string>
     <string name="capture_upload">云录制截图上传</string>
@@ -323,7 +327,6 @@
     <string name="device_reset_ok">我已重启好</string>
     <string name="device_reset_title">重启设备</string>
     <string name="device_reset_tip">长按设备上的reset键10秒后松开，并等待大约30秒直到设备启动完成</string>
-    <string name="device_unsupport_5g_wifi">如果你使用的是双频路由器，请不要让摄像机连接5G频段的Wi-Fi</string>
     <string name="interface_call_demo_txt">接口调用demo</string>
     <string name="ui_call_demo_txt">UI界面demo</string>
     <string name="auto_wifi_cer_config_title1">网络连接(1/2)</string>
@@ -363,9 +366,6 @@
     <string name="cloud">云存储</string>
     <string name="about_alarm_sound_mode">探测器或紧急按钮发送报警时，会发出声音提醒</string>
     <string name="alarm_sound_mode">报警声音</string>
-    <string name="defence_plan_tip">开启了防护计划后，报警盒子会按照你设置的时间自动切换防护模式</string>
-    <string name="set_defence_plan">设置防护计划</string>
-    <string name="defence_plan">防护计划</string>
     <string name="detail_defend_c1_c2_f1">活动检测提醒</string>
     <string name="bind_baidu_account">绑定百度帐号</string>
     <string name="wechat_interconnect">微信互联</string>
@@ -380,6 +380,8 @@
     <string name="password_security_txt">修改密码</string>
     <string name="detail_notify_online">设备下线消息接收</string>
     <string name="detail_safe_mode">视频图片加密</string>
+    <string name="detail_hard_decode">硬解码</string>
+    <string name="band_width_check">带宽检测</string>
     <string name="device_ptz_flip">画面翻转</string>
     <string name="device_status_lamp">设备状态灯</string>
     <string name="device_warning_tone">设备语音提示</string>
@@ -453,7 +455,7 @@
     <string name="ez_no_remote_data">没有查询到云录像</string>
     <string name="ez_no_remote_data_sdkcloud">没有查询到云录制录像</string>
     <string name="ez_no_remote_data_device">没有查询到本地录像</string>
-    <string name="ez_event_message">消息</string>
+    <string name="ez_event_message">消息（%d）</string>
     <string name="ez_event_message_detail">消息详情</string>
     <string name="ez_check_all_message">设为已读</string>
     <string name="ez_no_message">暂无消息</string>
@@ -527,6 +529,28 @@
     <string name="ezviz_device">联网设备</string>
     <string name="ddns_device">DDNS设备</string>
 
+    <string name="wifi_bluetooth_device_config">霍曼蓝牙配网</string>
+    <string name="wifi_bluetooth_scan_start">开始扫描</string>
+    <string name="wifi_bluetooth_device_select_tip">请选择要连接的设备</string>
+    <string name="wifi_bluetooth_scan_device_tip">请先扫描蓝牙设备</string>
+    <string name="wifi_bluetooth_scanning_device_tip">正在扫描蓝牙设备，请稍后</string>
+    <string name="wifi_bluetooth_device_connect_first">请先连接蓝牙设备</string>
+    <string name="wifi_bluetooth_device_connect_success">蓝牙设备连接成功</string>
+    <string name="wifi_bluetooth_device_connect_failed">蓝牙设备连接失败。错误码：%d</string>
+    <string name="wifi_bluetooth_device_disconnect_success">设备蓝牙连接断开成功</string>
+    <string name="wifi_bluetooth_config_instructions">使用说明</string>
+    <string name="wifi_bluetooth_config_instructions_content">第一步：点击\'蓝牙设备扫描\'按钮\n\n第二步：点击\'显示已扫描设备\'，没有就重新打开查看\n\n第三步：选择要连接的蓝牙设备\n\n第四步：点击\'获取token\'按钮，获取霍曼蓝牙配网所需的信息\n\n第五步：点击\'向设备配网\'按钮，发起配网\n\n注意：其他灰色按钮非必须，按需使用</string>
+    <string name="wifi_info_send_succeed">向设备发送WiFi信息成功</string>
+    <string name="wifi_config_succeed">配置成功</string>
+    <string name="wifi_device_bind_success">设备已联网成功并绑定账号</string>
+    <string name="wifi_ssid_cannot_empty">WiFi用户名不能为空</string>
+    <string name="wifi_password_cannot_empty">WiFi密码不能为空</string>
+    <string name="wifi_get_token_first">请先获取配网token</string>
+    <string name="wifi_device_info">设备信息</string>
+    <string name="wifi_device_info_get_failed">设备信息获取失败</string>
+    <string name="wifi_list_get_success">WiFi列表获取成功</string>
+    <string name="wifi_list_get_failed">WiFi列表获取失败</string>
+
     <string name="title_activity_connect_device_wifi">连接到设备Wi-Fi</string>
     <string name="connect_device_wifi_tip3">等待与设备连接成功，自动进入下一步操作</string>
     <string name="connect_device_wifi_ap">热点模式配网</string>
@@ -538,6 +562,13 @@
 
     <string name="string_ap_connection_normal">热点模式连接 ( 若设备指示灯蓝色闪烁，请选择 )</string>
     <string name="string_smart_connection_normal">无线连接 ( 若设备指示灯红蓝闪烁或其它状态，请选择 )</string>
+
+    <string name="app_key">"AppKey:"</string>
+    <string name="access_token">"AccessToken/TKToken:"</string>
+    <string name="string_ezopenurl">"Url:"</string>
+    <string name="string_apiurl">"ApiUrl:"</string>
+    <string name="string_authurl">"AuthUrl:"</string>
+    <string name="string_deviceserial">"device_serial:"</string>
     <string name="server_area">服务器区域：</string>
     <string name="start_to_experience">开始体验！</string>
     <string name="explain_of_app_key">请从开发者网站获取</string>
@@ -563,11 +594,13 @@
     <string name="step3_adding_device_to_account">step3: 正在添加设备到账户</string>
     <string name="try_again">重试</string>
     <string name="config_wifi_succeed">配网成功！</string>
+    <string name="config_wifi_failed">配网失败！</string>
     <string name="tip_of_added_by_yourself_and_online">设备在线且已被当前账户添加，如果需要给设备重新配网，请重置设备，并在下次配网前至少等待3分钟。</string>
     <string name="switch_to_handset">切换到听筒</string>
     <string name="switch_to_speaker">切换到扬声器</string>
     <string name="stream_type">stream type: </string>
     <string name="btn_ensure">确认</string>
+    <string name="download_start">开始下载</string>
     <string name="download_success">下载成功！</string>
     <string name="download_fail">下载失败！</string>
     <string name="choose_config_wifi_way">选择配网方式</string>
@@ -579,20 +612,7 @@
     <string name="device_playbackrate_not_support">该设备不支持回放倍率设置</string>
 
     <string name="please_operate_after_select_any_record">请在选择任意录像后操作！</string>
-    <!--    <String name="device_no_support_talkback">该设备不支持对讲</String>-->
-    <!--儿童手表-视频通话-->
-    <string name="video_talk_sdk_toast_hang_up">通话已结束</string>
-    <string name="video_talk_sdk_toast_nobody">对方无应答</string>
-    <string name="device_setting">设备管理</string>
-    <string name="video_talk_call_cancel">已取消</string>
-    <string name="video_talk_call_is_accepted">聊天已被人接收</string>
-    <string name="video_talk_watch_is_busy">手表正在通话，请稍后再试</string>
-    <string name="video_talk_is_playing">手表正被远程看护，请稍后再试</string>
-    <string name="video_talk_watch_temperature_high_hang">手表温度过高，通话已结束</string>
-    <string name="video_talk_watch_temperature_high_reject">手表温度较高，为避免手表过度发热，请稍后再试</string>
-    <string name="video_talk_watch_temperature_high_warn">手表温度过高，大约30S后将自动结束通话</string>
-    <string name="video_talk_watch_temperature_high_hint">天气温度或长时间通话会导致手表发热、电量过快消耗</string>
-    <string name="video_talk_signal_weak">网络信号弱</string>
+
     <string name="main_tab_second_tab">智能</string>
     <string name="goto_ad_close_page">可前往关闭广告</string>
     <string name="device_no_support_talkback">该设备不支持对讲</string>
@@ -606,4 +626,34 @@
     <string name="cloud_storage_services_interface">海外云存储服务接口</string>
     <string name="cloud_storage_services_is_supported">此国家支持云存储服务</string>
     <string name="cloud_storage_services_is_not_supported">此国家不支持云存储服务</string>
+
+    <!-- 视频会议-->
+    <string name="videotalk_app_id">项目ID</string>
+    <string name="videotalk_app_id_hint">请输入项目ID(AppId)，不是AppKey</string>
+    <string name="videotalk_client_token">客户端Token</string>
+    <string name="videotalk_device_token">设备端Token</string>
+    <string name="videotalk_client_token_hint">请输入ERTC ClientToken，不是accessToken或httpToken</string>
+    <string name="videotalk_device_token_hint">请输入ERTC DeviceToken，不是accessToken或httpToken</string>
+    <string name="videotalk_join_room_id">房间ID</string>
+    <string name="videotalk_join_room_id_hint">请输入房间ID(RoomID/房间号/会议ID)</string>
+    <string name="videotalk_join_user_id">用户ID</string>
+    <string name="videotalk_join_user_id_hint">请输入用户ID(UserID/姓名)</string>
+    <string name="videotalk_start">视频通话（客户端呼叫设备）</string>
+
+    <string name="ys_mt_imm_btn_audio_on">静音</string>
+    <string name="ys_mt_imm_btn_audio_off">解除静音</string>
+    <string name="ys_mt_imm_btn_sound_speaker">扬声器</string>
+    <string name="ys_mt_imm_btn_sound_earpiece">听筒</string>
+    <string name="ys_mt_imm_btn_camera_switch">转换摄像头</string>
+    <string name="ys_mt_imm_btn_video_on">摄像头已开</string>
+    <string name="ys_mt_imm_btn_video_off">摄像头已关</string>
+    <string name="ys_mt_room_toast_audio_off">已关闭麦克风</string>
+    <string name="ys_mt_room_toast_audio_on">已开启麦克风</string>
+    <string name="ys_mt_room_toast_sound_speaker">已切换至扬声器</string>
+    <string name="ys_mt_room_toast_sound_earpiece">已切换至听筒</string>
+    <string name="ys_mt_room_toast_video_end">设备端已挂断，视频通话结束</string>
+
+    <!-- Test-->
+    <string name="test_specify_device_tip">请先在登录页面指定设备序列号</string>
+    <string name="test_request_success_tip">请求成功，请查看日志打印</string>
 </resources>

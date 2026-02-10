@@ -17,7 +17,7 @@ import ezviz.ezopensdkcommon.common.LogUtil;
 import ezviz.ezopensdkcommon.common.RootActivity;
 import ezviz.ezopensdkcommon.common.RouteNavigator;
 
-public class ConfigWifiExecutingActivity extends RootActivity implements ConfigWifiExecutingActivityPresenter.Callback{
+public class ConfigWifiExecutingActivity extends RootActivity implements ConfigWifiExecutingActivityPresenter.Callback {
 
     private final static String TAG = ConfigWifiExecutingActivity.class.getSimpleName();
 
@@ -28,7 +28,7 @@ public class ConfigWifiExecutingActivity extends RootActivity implements ConfigW
     private TextView mConfigErrorInfoTv;
     private String mAllErrorInfo;
 
-    public static void launch(Context context, Intent intent){
+    public static void launch(Context context, Intent intent) {
         Intent newIntent = new Intent(context, ConfigWifiExecutingActivity.class);
         newIntent.putExtras(intent);
         newIntent.putExtra(IntentConstants.USE_MANUAL_AP_CONFIG, true);
@@ -40,9 +40,9 @@ public class ConfigWifiExecutingActivity extends RootActivity implements ConfigW
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_config_wifi_executing);
 
-        mPresenter = ConfigWifiExecutingActivityPresenter.getPresenter(getIntent()
-                .getStringExtra(IntentConstants.SELECTED_PRESENTER_TYPE));
-        if (mPresenter == null){
+        mPresenter =
+                ConfigWifiExecutingActivityPresenter.getPresenter(getIntent().getStringExtra(IntentConstants.SELECTED_PRESENTER_TYPE));
+        if (mPresenter == null) {
             LogUtil.e(TAG, "failed to init!");
             return;
         }
@@ -76,19 +76,18 @@ public class ConfigWifiExecutingActivity extends RootActivity implements ConfigW
      */
     public void onClickToConfigAnother(View view) {
         // 如果是在使用配网sdk，则跳转到配网开始页
-        if (getIntent().getBooleanExtra(IntentConstants.USING_CONFIG_WIFI_SDK, false)){
-            ARouter.getInstance().build(RouteNavigator.CONFIG_WIFI_MAIN_PAGE)
-                    .navigation(this, new NavCallback() {
-                        @Override
-                        public void onArrival(Postcard postcard) {
-                            exitPage();
-                        }
+        if (getIntent().getBooleanExtra(IntentConstants.USING_CONFIG_WIFI_SDK, false)) {
+            ARouter.getInstance().build(RouteNavigator.CONFIG_WIFI_MAIN_PAGE).navigation(this, new NavCallback() {
+                @Override
+                public void onArrival(Postcard postcard) {
+                    exitPage();
+                }
 
-                        @Override
-                        public void onLost(Postcard postcard) {
-                            // do nothing
-                        }
-                    });
+                @Override
+                public void onLost(Postcard postcard) {
+                    // do nothing
+                }
+            });
         }
     }
 
@@ -101,7 +100,7 @@ public class ConfigWifiExecutingActivity extends RootActivity implements ConfigW
         exitPage();
     }
 
-    private void exitPage(){
+    private void exitPage() {
         stopConfig();
         finish();
     }
@@ -110,7 +109,7 @@ public class ConfigWifiExecutingActivity extends RootActivity implements ConfigW
     public void onConnectedToWifi() {
         LogUtil.i(TAG, "onConnectedToWifi");
         // 仅使用配网sdk时，才展示配网成功的ui
-        if (getIntent().getBooleanExtra(IntentConstants.USING_CONFIG_WIFI_SDK, false)){
+        if (getIntent().getBooleanExtra(IntentConstants.USING_CONFIG_WIFI_SDK, false)) {
             showConfigSuccessUi();
         }
     }
@@ -118,9 +117,15 @@ public class ConfigWifiExecutingActivity extends RootActivity implements ConfigW
     @Override
     public void onConnectedToPlatform() {
         LogUtil.i(TAG, "onConnectedToPlatform");
+        // 如果是AP-http协议配网，设备直接绑定到账号，不需要手动绑定
+        boolean bindRequired = true;
+        if (getIntent().getStringExtra(IntentConstants.SELECTED_PRESENTER_TYPE).equals(ConfigWifiTypeConstants.FULL_SDK_APHTTP)) {
+            bindRequired = false;
+        }
         ARouter.getInstance().build(RouteNavigator.ADD_DEVICE_PAGE)
                 .withString(IntentConstants.DEVICE_SERIAL, getIntent().getStringExtra(IntentConstants.DEVICE_SERIAL))
                 .withString(IntentConstants.DEVICE_VERIFY_CODE, getIntent().getStringExtra(IntentConstants.DEVICE_VERIFY_CODE))
+                .withBoolean(IntentConstants.DEVICE_BIND_REQUIRED, bindRequired)
                 .withFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK)
                 .navigation(this, new NavCallback() {
                     @Override
@@ -142,21 +147,21 @@ public class ConfigWifiExecutingActivity extends RootActivity implements ConfigW
 
     @Override
     public void onConfigError(int code, String msg) {
-        String errorInfo = "***"  + "error code is: " + code +  ", error msg is: " + msg + "\n";
+        String errorInfo = "***" + "error code is: " + code + ", error msg is: " + msg + "\n";
         LogUtil.e(TAG, errorInfo);
         // 仅展示新定义的错误码
-        for (EZConfigWifiErrorEnum error : EZConfigWifiErrorEnum.values()){
-            if (code == error.code){
-                if (mAllErrorInfo == null){
+        for (EZConfigWifiErrorEnum error : EZConfigWifiErrorEnum.values()) {
+            if (code == error.code) {
+                if (mAllErrorInfo == null) {
                     mAllErrorInfo = "" + errorInfo;
-                }else{
+                } else {
                     mAllErrorInfo += errorInfo;
                 }
                 break;
             }
         }
         // 用户拒绝连接设备热点则认为配网失败
-        if (code == EZConfigWifiErrorEnum.USER_REFUSED_CONNECTION_REQUEST.code){
+        if (code == EZConfigWifiErrorEnum.USER_REFUSED_CONNECTION_REQUEST.code) {
             failedToConfig();
         }
     }
@@ -166,13 +171,12 @@ public class ConfigWifiExecutingActivity extends RootActivity implements ConfigW
         failedToConfig();
     }
 
-    private void failedToConfig(){
+    private void failedToConfig() {
         stopConfig();
-        switch (mPresenter.getType()){
+        switch (mPresenter.getType()) {
             case ConfigWifiTypeConstants.CONFIG_WIFI_SDK_AP:
-            case ConfigWifiTypeConstants.CONFIG_WIFI_SDK_APLINK:
             case ConfigWifiTypeConstants.FULL_SDK_AP:
-            case ConfigWifiTypeConstants.FULL_SDK_APLINK:
+            case ConfigWifiTypeConstants.FULL_SDK_APHTTP:
                 ManualConnectDeviceHotspotActivity.Companion.launch(this, getIntent());
                 break;
             default:
@@ -181,15 +185,16 @@ public class ConfigWifiExecutingActivity extends RootActivity implements ConfigW
         }
     }
 
-    private void startConfig(){
-        if (mPresenter != null){
+    private void startConfig() {
+        if (mPresenter != null) {
+            mPresenter.setActivity(this);
             mPresenter.setCallback(this);
             mPresenter.startConfigWifi(getApplication(), getIntent());
         }
     }
 
-    private void stopConfig(){
-        if (mPresenter != null){
+    private void stopConfig() {
+        if (mPresenter != null) {
             mPresenter.setCallback(null);
             mPresenter.stopConfigWifi();
         }
@@ -202,7 +207,7 @@ public class ConfigWifiExecutingActivity extends RootActivity implements ConfigW
         mConfigErrorInfoTv = findViewById(R.id.app_common_all_config_error_info);
     }
 
-    private void showExecutingUi(){
+    private void showExecutingUi() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -214,7 +219,7 @@ public class ConfigWifiExecutingActivity extends RootActivity implements ConfigW
         });
     }
 
-    private void showConfigSuccessUi(){
+    private void showConfigSuccessUi() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -226,17 +231,17 @@ public class ConfigWifiExecutingActivity extends RootActivity implements ConfigW
         });
     }
 
-    private void showConfigFailUi(){
-       runOnUiThread(new Runnable() {
-           @Override
-           public void run() {
-               mConfigErrorInfoTv.setText(mAllErrorInfo);
-               mConfigResultView.setVisibility(View.VISIBLE);
-               mConfigSuccessView.setVisibility(View.GONE);
-               mConfigFailView.setVisibility(View.VISIBLE);
-               mAllErrorInfo = null;
-           }
-       });
+    private void showConfigFailUi() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mConfigErrorInfoTv.setText(mAllErrorInfo);
+                mConfigResultView.setVisibility(View.VISIBLE);
+                mConfigSuccessView.setVisibility(View.GONE);
+                mConfigFailView.setVisibility(View.VISIBLE);
+                mAllErrorInfo = null;
+            }
+        });
     }
 
 }

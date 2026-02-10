@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <com.videogo.widget.TitleBar
+        android:id="@+id/title_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="wifiSSID:" />
+
+        <EditText
+            android:id="@+id/wifiSsidEt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="请输入2.4G网络，不支持5G"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="wifiPwd:" />
+
+        <EditText
+            android:id="@+id/wifiPwdEt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="请输入8-32位密码，无空格或特殊字符"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="devSerial:" />
+
+        <EditText
+            android:id="@+id/devSerialEt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="configToken:" />
+
+        <EditText
+            android:id="@+id/tokenEt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/scanDeviceBtn"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_margin="4dp"
+            android:layout_weight="1"
+            android:background="@color/blue_button_selector"
+            android:text="蓝牙设备扫描"
+            android:textColor="@color/white" />
+
+        <Button
+            android:id="@+id/showDeviceBtn"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_margin="4dp"
+            android:layout_weight="1"
+            android:background="@color/blue_button_selector"
+            android:text="显示已扫描设备"
+            android:textColor="@color/white" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/getTokenBtn"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_margin="4dp"
+            android:layout_weight="1"
+            android:background="@color/blue_button_selector"
+            android:text="获取token"
+            android:textColor="@color/white" />
+
+        <Button
+            android:id="@+id/bluetoothConfigWifiBtn"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_margin="4dp"
+            android:layout_weight="1"
+            android:background="@color/blue_button_selector"
+            android:text="向设备配网"
+            android:textColor="@color/white" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/getDeviceInfoBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="获取设备信息" />
+
+        <Button
+            android:id="@+id/getDeviceWifiListBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="获取设备Wifi列表" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/continueQueryBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="继续查询" />
+
+        <Button
+            android:id="@+id/stopWifiConfigBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="停止配网" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/instructionsBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="使用说明" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text=""
+            android:visibility="invisible" />
+
+    </LinearLayout>
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="日志输出:" />
+
+    <TextView
+        android:id="@+id/log_print"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

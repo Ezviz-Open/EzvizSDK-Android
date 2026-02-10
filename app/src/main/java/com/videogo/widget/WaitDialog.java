@@ -26,8 +26,8 @@ public class WaitDialog extends Dialog {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.wait_dialog);
-        mWaitTv = (TextView) findViewById(R.id.wait_tv);
+        setContentView(ezviz.ezopensdkcommon.R.layout.wait_dialog);
+        mWaitTv = (TextView) findViewById(ezviz.ezopensdkcommon.R.id.wait_tv);
 
         if (mWaitingTxt != null && !mWaitingTxt.isEmpty()) {
             mWaitTv.setVisibility(View.VISIBLE);

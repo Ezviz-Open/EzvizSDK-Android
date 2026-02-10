@@ -2,8 +2,8 @@ package com.videogo.ui.others;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,12 +26,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import ezviz.ezopensdk.R;
+import ezviz.ezopensdkcommon.common.RootActivity;
 
 import static com.videogo.EzvizApplication.getOpenSDK;
 
-public class EZP2pTestActivity extends AppCompatActivity {
+public class EZP2pTestActivity extends RootActivity {
 
-    protected static final String TAG = "EZP2pTestActivity";
+    protected static final String TAG = EZP2pTestActivity.class.getSimpleName();;
 
     private TextView tv_p2pInfo;
     private ListView listView;
@@ -42,7 +43,9 @@ public class EZP2pTestActivity extends AppCompatActivity {
     private ArrayList<String> processedPreconnectSerialArray;
     private ArrayList<String> toDoPreconnectSerialArray;
     private EZDeviceInfo selectDevice;
-    /** 计时器 */
+    /**
+     * 计时器
+     */
     private Timer mTimer;
 
     @Override
@@ -68,14 +71,9 @@ public class EZP2pTestActivity extends AppCompatActivity {
         mTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        refreshAction();
-                    }
-                });
+                runOnUiThread(() -> refreshAction());
             }
-        }, 1000,1000);
+        }, 1000, 1000);
     }
 
     @Override
@@ -87,30 +85,49 @@ public class EZP2pTestActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    /** 连接Action */
+    /**
+     * 连接Action
+     */
     public void connectAction(View view) {
         if (selectDevice == null) {
-            Toast.makeText(this,"请先选择一个设备", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "请先选择一个设备", Toast.LENGTH_LONG).show();
             return;
         }
         getOpenSDK().startP2PPreconnect(selectDevice.getDeviceSerial());
     }
 
-    /** 断开连接Action */
+    /**
+     * 断开连接Action
+     */
     public void disconnectAction(View view) {
         if (selectDevice == null) {
-            Toast.makeText(this,"请先选择一个设备", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "请先选择一个设备", Toast.LENGTH_LONG).show();
             return;
         }
         getOpenSDK().clearP2PPreconnect(selectDevice.getDeviceSerial());
     }
 
-    /** 刷新Action */
+    /**
+     * 设备p2p预连接是否成功
+     */
+    public void isPreConnectionSucceedAction(View view) {
+        if (selectDevice == null) {
+            Toast.makeText(this, "请先选择一个设备", Toast.LENGTH_LONG).show();
+            return;
+        }
+        boolean isSuccess = getOpenSDK().isPreConnectionSucceed(selectDevice.getDeviceSerial());
+        Toast.makeText(this, isSuccess ? "Success" : "Failed", Toast.LENGTH_LONG).show();
+    }
+
+    /**
+     * 刷新Action
+     */
     public void refreshAction() {
         processedPreconnectSerialArray = getOpenSDK().getAllProcessedPreconnectSerials();
         toDoPreconnectSerialArray = getOpenSDK().getAllToDoPreconnectSerials();
         deviceAdapter.notifyDataSetChanged();
-        tv_p2pInfo.setText(String.format("p2p预连接设备数量：%s\n正在排队的p2p预连接设备数量：%s", processedPreconnectSerialArray.size(), toDoPreconnectSerialArray.size()));
+        tv_p2pInfo.setText(String.format("p2p预连接设备数量：%s\n正在排队的p2p预连接设备数量：%s", processedPreconnectSerialArray.size(),
+                toDoPreconnectSerialArray.size()));
     }
 
     private class GetCamersInfoListTask extends AsyncTask<Void, Void, List<EZDeviceInfo>> {
@@ -149,9 +166,7 @@ public class EZP2pTestActivity extends AppCompatActivity {
                 deviceAdapter.notifyDataSetChanged();
             }
         }
-
     }
-
 
     /**
      * Adapter
@@ -186,47 +201,43 @@ public class EZP2pTestActivity extends AppCompatActivity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHoder viewHoder = null;
+            ViewHolder viewHolder = null;
             EZDeviceInfo info = mData.get(position);
             if (convertView == null) {
-                viewHoder = new ViewHoder();
+                viewHolder = new ViewHolder();
                 convertView = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
-                viewHoder.tv_name = (TextView) convertView.findViewById(android.R.id.text1);
-                convertView.setTag(viewHoder);
+                viewHolder.tv_name = (TextView) convertView.findViewById(android.R.id.text1);
+                convertView.setTag(viewHolder);
             } else {
-                viewHoder = (ViewHoder) convertView.getTag();
+                viewHolder = (ViewHolder) convertView.getTag();
             }
 
-            viewHoder.tv_name.setText(info.getDeviceName());
+            viewHolder.tv_name.setText(TextUtils.isEmpty(info.getDeviceName()) ?
+                    String.format("%s(%s)", info.getCategory(), info.getDeviceSerial()) : info.getDeviceName());
             // 设置title颜色
             if (processedPreconnectSerialArray != null && processedPreconnectSerialArray.contains(info.getDeviceSerial())) {
-                viewHoder.tv_name.setTextColor(getResources().getColor(R.color.yellow_text));
+                viewHolder.tv_name.setTextColor(getResources().getColor(R.color.yellow_text));
             } else {
-                viewHoder.tv_name.setTextColor(getResources().getColor(R.color.black));
+                viewHolder.tv_name.setTextColor(getResources().getColor(R.color.black));
             }
             // 设置选中状态
             if (selectDevice != null && selectDevice.getDeviceSerial().equals(info.getDeviceSerial())) {
-                viewHoder.tv_name.setBackgroundColor(getResources().getColor(R.color.gray));
+                viewHolder.tv_name.setBackgroundColor(getResources().getColor(R.color.gray));
             } else {
-                viewHoder.tv_name.setBackgroundColor(getResources().getColor(R.color.white));
+                viewHolder.tv_name.setBackgroundColor(getResources().getColor(R.color.white));
             }
 
             return convertView;
         }
 
-        class ViewHoder {
+        class ViewHolder {
             TextView tv_name;
         }
     }
 
     private void initTitleBar() {
         TitleBar mTitleBar = (TitleBar) findViewById(R.id.title_bar);
-        mTitleBar.addBackButton(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
+        mTitleBar.addBackButton(view -> finish());
         mTitleBar.setTitle("p2p测试");
     }
 }

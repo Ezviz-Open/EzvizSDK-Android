@@ -15,6 +15,8 @@
  */
 package ezviz.ezopensdkcommon.common;
 
+import static androidx.core.content.ContextCompat.getSystemService;
+
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.pm.PackageInfo;
@@ -88,6 +90,141 @@ public class Utils {
             }
         }
         return "UNKNOWN";
+    }
+
+    /**
+     * 获取网络类型信息
+     */
+    public static String getNetworkType(Context context) {
+        try {
+            android.net.ConnectivityManager cm = (android.net.ConnectivityManager)
+                    context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (cm == null) {
+                return "未知网络";
+            }
+
+            android.net.NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+            if (networkInfo == null || !networkInfo.isConnected()) {
+                return "未连接网络";
+            }
+
+            int type = networkInfo.getType();
+            if (type == android.net.ConnectivityManager.TYPE_WIFI) {
+                return "Wi-Fi";
+            } else if (type == android.net.ConnectivityManager.TYPE_MOBILE) {
+                return getMobileNetworkType(context);
+            } else {
+                return "其他网络";
+            }
+        } catch (Exception e) {
+            LogUtil.e("getNetworkType", "getNetworkType error: " + e.getMessage());
+            return "网络信息获取失败";
+        }
+    }
+
+    /**
+     * 获取移动网络类型
+     */
+    public static String getMobileNetworkType(Context context) {
+        try {
+            android.telephony.TelephonyManager tm = (android.telephony.TelephonyManager)
+                    context.getSystemService(Context.TELEPHONY_SERVICE);
+            if (tm == null) {
+                return "移动网络";
+            }
+
+            int networkType = tm.getNetworkType();
+            switch (networkType) {
+                case android.telephony.TelephonyManager.NETWORK_TYPE_GPRS:
+                case android.telephony.TelephonyManager.NETWORK_TYPE_EDGE:
+                case android.telephony.TelephonyManager.NETWORK_TYPE_CDMA:
+                case android.telephony.TelephonyManager.NETWORK_TYPE_1xRTT:
+                case android.telephony.TelephonyManager.NETWORK_TYPE_IDEN:
+                    return "2G";
+                case android.telephony.TelephonyManager.NETWORK_TYPE_UMTS:
+                case android.telephony.TelephonyManager.NETWORK_TYPE_EVDO_0:
+                case android.telephony.TelephonyManager.NETWORK_TYPE_EVDO_A:
+                case android.telephony.TelephonyManager.NETWORK_TYPE_HSDPA:
+                case android.telephony.TelephonyManager.NETWORK_TYPE_HSUPA:
+                case android.telephony.TelephonyManager.NETWORK_TYPE_HSPA:
+                case android.telephony.TelephonyManager.NETWORK_TYPE_EVDO_B:
+                case android.telephony.TelephonyManager.NETWORK_TYPE_EHRPD:
+                case android.telephony.TelephonyManager.NETWORK_TYPE_HSPAP:
+                    return "3G";
+                case android.telephony.TelephonyManager.NETWORK_TYPE_LTE:
+                    return "4G";
+                case android.telephony.TelephonyManager.NETWORK_TYPE_NR:
+                    return "5G";
+                default:
+                    return "移动网络";
+            }
+        } catch (Exception e) {
+            LogUtil.e("getMobileNetworkType", "getMobileNetworkType error: " + e.getMessage());
+            return "移动网络";
+        }
+    }
+
+    /**
+     * 获取运营商信息
+     */
+    public static String getCarrierName(Context context) {
+        try {
+            android.telephony.TelephonyManager tm = (android.telephony.TelephonyManager)
+                    context.getSystemService(Context.TELEPHONY_SERVICE);
+            if (tm == null) {
+                return "未知运营商";
+            }
+
+            String simOperator = tm.getSimOperator();
+            if (simOperator != null) {
+                switch (simOperator) {
+                    case "46000":
+                    case "46002":
+                    case "46007":
+                        return "中国移动";
+                    case "46001":
+                    case "46006":
+                        return "中国联通";
+                    case "46003":
+                    case "46005":
+                    case "46011":
+                        return "中国电信";
+                    case "46004":
+                        return "中国卫通";
+                    case "46020":
+                        return "中国铁通";
+                    default:
+                        return getCarrierNameByNetwork(tm);
+                }
+            } else {
+                return getCarrierNameByNetwork(tm);
+            }
+        } catch (Exception e) {
+            LogUtil.e("getCarrierName", "getCarrierName error: " + e.getMessage());
+            return "运营商信息获取失败";
+        }
+    }
+
+    /**
+     * 通过网络运营商获取运营商名称
+     */
+    public static String getCarrierNameByNetwork(android.telephony.TelephonyManager tm) {
+        try {
+            String networkOperator = tm.getNetworkOperatorName();
+            if (!TextUtils.isEmpty(networkOperator)) {
+                if (networkOperator.contains("移动") || networkOperator.contains("China Mobile")) {
+                    return "中国移动";
+                } else if (networkOperator.contains("联通") || networkOperator.contains("China Unicom")) {
+                    return "中国联通";
+                } else if (networkOperator.contains("电信") || networkOperator.contains("China Telecom")) {
+                    return "中国电信";
+                }
+                return networkOperator;
+            }
+            return "未知运营商";
+        } catch (Exception e) {
+            return "未知运营商";
+        }
     }
 
     /**
@@ -295,29 +432,6 @@ public class Utils {
         }
     }
 
-
-    public static Calendar parseTimeToCalendar(String strTime) {
-        if (strTime == null) {
-            return null;
-        }
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date date = null;
-        try {
-            date = sdf.parse(strTime);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        Calendar timeCalendar = Calendar.getInstance();
-        timeCalendar.setTime(date);
-        return timeCalendar;
-    }
-
-    public static String OSD2Time(Calendar OSDTime) {
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-        return sdf.format(OSDTime.getTimeInMillis());
-    }
-
     public static long get19TimeInMillis(String createTime) {
         Calendar calendar = convert19Calender(createTime);
 
@@ -388,19 +502,6 @@ public class Utils {
         }
 
         return null;
-    }
-
-
-    public static String calendar2String(Calendar calendar) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String dateStr = sdf.format(calendar.getTime());
-        return dateStr;
-    }
-
-    public static String date2String(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String dateStr = sdf.format(date);
-        return dateStr;
     }
 
     public static boolean isNumeric(String str) {

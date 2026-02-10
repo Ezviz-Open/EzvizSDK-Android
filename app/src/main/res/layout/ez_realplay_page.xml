@@ -24,12 +24,30 @@
             android:layout_width="match_parent"
             android:layout_height="200dp">
 
-            <!-- 主窗口-->
-            <SurfaceView
-                android:id="@+id/realplay_sv"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@android:color/transparent" />
+                android:orientation="vertical">
+                <!-- 主窗口-->
+                <SurfaceView
+                    android:id="@+id/realplay_sv"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent" />
+
+                <!-- 主窗口2，双目设备-->
+                <SurfaceView
+                    android:id="@+id/realplay_second_sv"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_below="@id/realplay_sv"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:visibility="gone" />
+
+            </LinearLayout>
 
             <!-- 鱼眼设备子窗口-->
             <RelativeLayout
@@ -75,12 +93,32 @@
 
             </RelativeLayout>
 
-            <!-- 封面 -->
-            <ImageView
-                android:id="@+id/coverImage"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:visibility="gone" />
+                android:orientation="vertical">
+
+                <!-- 封面 -->
+                <ImageView
+                    android:id="@+id/coverImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:scaleType="fitXY"
+                    android:visibility="gone" />
+
+                <!-- 双目设备第二个封面 -->
+                <ImageView
+                    android:id="@+id/coverImage2"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="1"
+                    android:scaleType="fitXY"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
 
             <!-- 加载UI -->
             <include
@@ -119,10 +157,6 @@
         <!-- 提示布局：如录制时的动画，云台操作提示 -->
         <include layout="@layout/ez_realplay_prompt_layout" />
 
-        <!-- 横屏时，播放器操作栏 -->
-        <include layout="@layout/realplay_full_operate_layout" />
-
-
         <ImageButton
             android:id="@+id/realplay_full_anim_btn"
             android:layout_width="wrap_content"
@@ -130,9 +164,8 @@
             android:background="@drawable/yuntai_pressed"
             android:visibility="gone" />
 
-        <!-- 解码方式 & 取流方式 -->
+        <!-- 码流信息 -->
         <LinearLayout
-            android:id="@+id/vg_play_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -140,6 +173,7 @@
             android:gravity="right"
             android:orientation="vertical">
 
+            <!-- 取流方式 -->
             <TextView
                 android:id="@+id/tv_stream_type"
                 android:layout_width="wrap_content"
@@ -148,13 +182,51 @@
                 android:textColor="@color/green_text"
                 android:visibility="gone" />
 
+            <!-- 更多 -->
             <TextView
-                android:id="@+id/tv_decode_type"
+                android:id="@+id/tv_stream_info_more"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/stream_type"
+                android:layout_alignParentRight="true"
+                android:gravity="right"
+                android:onClick="onClick"
+                android:text="more"
                 android:textColor="@color/yellow_text"
                 android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/vg_play_info_more"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="right"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <!-- 分辨率 -->
+                <TextView
+                    android:id="@+id/tv_resolution_ratio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/stream_type"
+                    android:textColor="@color/yellow_text" />
+
+                <!-- 编码格式 -->
+                <TextView
+                    android:id="@+id/tv_encode_type"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/stream_type"
+                    android:textColor="@color/yellow_text" />
+
+                <!-- 解码方式 -->
+                <TextView
+                    android:id="@+id/tv_decode_type"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/stream_type"
+                    android:textColor="@color/yellow_text" />
+            </LinearLayout>
+
 
         </LinearLayout>
 
@@ -166,24 +238,24 @@
         android:visibility="visible" />
 
     <!-- 其他功能扩展 -->
-<!--    <HorizontalScrollView-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="100dp"-->
-<!--        android:background="#e0e0e0"-->
-<!--        android:paddingLeft="10dp">-->
+    <!--    <HorizontalScrollView-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="100dp"-->
+    <!--        android:background="#e0e0e0"-->
+    <!--        android:paddingLeft="10dp">-->
 
-<!--        <LinearLayout-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
+    <!--        <LinearLayout-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content"-->
 
-<!--            android:orientation="horizontal">-->
+    <!--            android:orientation="horizontal">-->
 
-<!--            <Button-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="云录制截图上传" />-->
+    <!--            <Button-->
+    <!--                android:layout_width="wrap_content"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:text="云录制截图上传" />-->
 
-<!--        </LinearLayout>-->
-<!--    </HorizontalScrollView>-->
+    <!--        </LinearLayout>-->
+    <!--    </HorizontalScrollView>-->
 
 </LinearLayout>

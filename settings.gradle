@@ -1,2 +1,2 @@
-include ':app-common',':app'
+include ':app',':app-common',':bandwidthcheck'
 

@@ -5,7 +5,8 @@ import com.google.gson.Gson;
 public class SdkInitParams {
 
     public String appKey;
-    public String accessToken;
+    // accessToken 或 tkToken
+    public String token;
     public int serverAreaId;
     public String openApiServer;
     public String openAuthApiServer;

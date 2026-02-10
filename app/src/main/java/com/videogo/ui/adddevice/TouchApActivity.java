@@ -2,12 +2,13 @@ package com.videogo.ui.adddevice;
 
 import android.app.Dialog;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import androidx.annotation.Nullable;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.ezviz.http.exception.EzConfigWifiException;
@@ -67,6 +68,8 @@ public class TouchApActivity extends RootActivity implements View.OnClickListene
         findViewById(R.id.getDeviceWifiListBtn).setOnClickListener(this);
         findViewById(R.id.getTokenBtn).setOnClickListener(this);
         findViewById(R.id.apConfigWifiBtn).setOnClickListener(this);
+        findViewById(R.id.continueQueryBtn).setOnClickListener(this);
+        findViewById(R.id.stopWifiConfigBtn).setOnClickListener(this);
 
         wifiSsidEt.setText(SSID_Name);
         wifiPwdEt.setText(SSID_Pwd);
@@ -80,141 +83,159 @@ public class TouchApActivity extends RootActivity implements View.OnClickListene
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.getTokenBtn:// 获取配网token
-                waitDialog.show();
-                EzvizApplication.getOpenSDK().getNewApConfigToken(new GetTokenCallback() {
-                    @Override
-                    public void onSuccess(final DeviceTokenInfo deviceTokenInfo) {
-                        waitDialog.dismiss();
-                        runOnUiThread(() -> {
-                            tokenInfo = deviceTokenInfo;
-                            configTokenEt.setText(deviceTokenInfo.token);
-                            logPrintTv.setText(TouchApApi.responseData);
-                        });
+        int id = v.getId();
+        if (id == R.id.getTokenBtn) {// 获取配网token
+            waitDialog.show();
+            EzvizApplication.getOpenSDK().getNewApConfigToken(new GetTokenCallback() {
+                @Override
+                public void onSuccess(final DeviceTokenInfo deviceTokenInfo) {
+                    waitDialog.dismiss();
+                    runOnUiThread(() -> {
+                        tokenInfo = deviceTokenInfo;
+                        configTokenEt.setText(deviceTokenInfo.token);
+                        logPrintTv.setText(TouchApApi.responseData);
+                    });
 
-                    }
-
-                    @Override
-                    public void onError(final EzConfigWifiException ezConfigWifiException) {
-                        runOnUiThread(() -> Utils.showToast(TouchApActivity.this,
-                                "请求失败，错误码 ： " + ezConfigWifiException.errorCode + " 错误信息: " + ezConfigWifiException.message));
-                        waitDialog.dismiss();
-                    }
-                });
-                break;
-            case R.id.apConfigWifiBtn:// 发起配网
-                /**
-                 * 步骤0：解除对指定ip的网络限制
-                 * res/xml文件夹下创建network_security_config.xml，
-                 * 并在AndroidManifest.xml中的application下配置android:networkSecurityConfig="@xml/network_security_config"
-                 */
-
-                stopTimer();
-                final String wifiSsid = wifiSsidEt.getText().toString();
-                final String wifiPwd = wifiPwdEt.getText().toString();
-                final String configToken = configTokenEt.getText().toString();
-
-                if (TextUtils.isEmpty(wifiSsid)) {
-                    Utils.showToast(TouchApActivity.this, "wifi用户名不能为空");
-                    return;
                 }
-                if (TextUtils.isEmpty(wifiPwd)) {
-                    Utils.showToast(TouchApActivity.this, "wifi密码不能为空");
-                    return;
+
+                @Override
+                public void onError(final EzConfigWifiException ezConfigWifiException) {
+                    runOnUiThread(() -> Utils.showToast(TouchApActivity.this,
+                            "请求失败，错误码 ： " + ezConfigWifiException.errorCode + " 错误信息: " + ezConfigWifiException.message));
+                    waitDialog.dismiss();
                 }
-                // 步骤1：getNewApConfigToken获取配网所需的tokenInfo；获取成功后手动切换连接设备热点
-                if (TextUtils.isEmpty(configToken)) {
-                    Utils.showToast(TouchApActivity.this, "请先获取配网token");
-                    return;
+            });
+        } else if (id == R.id.apConfigWifiBtn) {// 发起配网
+            /**
+             * 步骤0：解除对指定ip的网络限制
+             * res/xml文件夹下创建network_security_config.xml，
+             * 并在AndroidManifest.xml中的application下配置android:networkSecurityConfig="@xml/network_security_config"
+             */
+
+            stopTimer();
+            final String wifiSsid = wifiSsidEt.getText().toString();
+            final String wifiPwd = wifiPwdEt.getText().toString();
+            final String configToken = configTokenEt.getText().toString();
+
+            if (TextUtils.isEmpty(wifiSsid)) {
+                Utils.showToast(TouchApActivity.this, R.string.wifi_ssid_cannot_empty);
+                return;
+            }
+            if (TextUtils.isEmpty(wifiPwd)) {
+                Utils.showToast(TouchApActivity.this, R.string.wifi_password_cannot_empty);
+                return;
+            }
+            // 步骤1：getNewApConfigToken获取配网所需的tokenInfo；获取成功后手动切换连接设备热点
+            if (TextUtils.isEmpty(configToken)) {
+                Utils.showToast(TouchApActivity.this, R.string.wifi_get_token_first);
+                return;
+            }
+            waitDialog.show();
+            // 步骤2：连接设备热点(手动去设置里连接)
+
+            // 步骤3：连接上设备热点后，获取设备的序列号，查询设备配网结果用
+            EzvizApplication.getOpenSDK().getAccessDeviceInfo(new GetAccessDeviceInfoCallback() {
+                @Override
+                public void onSuccess(final AccessDeviceInfo accessDeviceInfo) {
+                    runOnUiThread(() -> {
+                        devSerialEt.setText(accessDeviceInfo.devSubserial);
+                        logPrintTv.setText(TouchApApi.responseData);
+
+                        // 步骤4：发起配网请求，设备配网成功后会自动绑定到账号下
+                        EzvizApplication.getOpenSDK().startNewApConfigWithToken(configToken, wifiSsid
+                                , wifiPwd, tokenInfo.registerUrl, new StartNewApConfigCallback() {
+                                    @Override
+                                    public void onResponse(int statusCode, String statusDesc) {
+                                        waitDialog.dismiss();
+                                        runOnUiThread(() -> {
+                                            logPrintTv.setText(TouchApApi.responseData);
+                                            // 步骤5：开始轮询
+                                            startSearchDeviceTimer();
+                                        });
+                                    }
+
+                                    @Override
+                                    public void onError(final EzConfigWifiException ezConfigWifiException) {
+                                        // 将信息发送给设备后，设备关闭热点去连接网络，无回调给App，会回调onError，也需要去发起轮询
+                                        runOnUiThread(() -> {
+                                            // 步骤5
+                                            startSearchDeviceTimer();
+                                            Log.e(TAG, "请求失败，错误码 ： " + ezConfigWifiException.errorCode + " 错误信息: "
+                                                    + ezConfigWifiException.message);
+                                        });
+                                        waitDialog.dismiss();
+                                    }
+                                });
+                    });
                 }
-                waitDialog.show();
-                // 步骤2：连接设备热点(手动去设置里连接)
 
-                // 步骤3：连接上设备热点后，获取设备的序列号，查询设备配网结果用
-                EzvizApplication.getOpenSDK().getAccessDeviceInfo(new GetAccessDeviceInfoCallback() {
-                    @Override
-                    public void onSuccess(final AccessDeviceInfo accessDeviceInfo) {
-                        runOnUiThread(() -> {
-                            devSerialEt.setText(accessDeviceInfo.devSubserial);
-                            logPrintTv.setText(TouchApApi.responseData);
-
-                            // 步骤4：发起配网请求，设备配网成功后会自动绑定到账号下
-                            EzvizApplication.getOpenSDK().startNewApConfigWithToken(configToken, wifiSsid
-                                    , wifiPwd, tokenInfo.registerUrl, new StartNewApConfigCallback() {
-                                @Override
-                                public void onResponse(int statusCode, String statusDesc) {
-                                    waitDialog.dismiss();
-                                    runOnUiThread(() -> {
-                                        logPrintTv.setText(TouchApApi.responseData);
-                                        // 步骤5
-                                        startSearchDeviceTimer();
-                                    });
-                                }
-
-                                @Override
-                                public void onError(final EzConfigWifiException ezConfigWifiException) {
-                                    // 将信息发送给设备后，设备关闭热点去连接网络，无回调给App，会回调onError，也需要去发起轮询
-                                    runOnUiThread(() -> {
-                                        // 步骤5
-                                        startSearchDeviceTimer();
-                                        Log.e(TAG, "请求失败，错误码 ： " + ezConfigWifiException.errorCode + " 错误信息: "
-                                                + ezConfigWifiException.message);
-                                    });
-                                    waitDialog.dismiss();
-                                }
-                            });
-                        });
-                    }
-
-                    @Override
-                    public void onError(final EzConfigWifiException ezConfigWifiException) {
-                        runOnUiThread(() -> {
-                            Utils.showToast(TouchApActivity.this,
-                                    "请求失败，错误码 ： " + ezConfigWifiException.errorCode + " 错误信息: " + ezConfigWifiException.message);
-                            waitDialog.dismiss();
-                        });
-                    }
-                });
-                break;
-            case R.id.getDeviceInfoBtn:// 获取设备信息
-                waitDialog.show();
-                EzvizApplication.getOpenSDK().getAccessDeviceInfo(new GetAccessDeviceInfoCallback() {
-                    @Override
-                    public void onSuccess(final AccessDeviceInfo accessDeviceInfo) {
+                @Override
+                public void onError(final EzConfigWifiException ezConfigWifiException) {
+                    runOnUiThread(() -> {
+                        Utils.showToast(TouchApActivity.this,
+                                "请求失败，错误码 ： " + ezConfigWifiException.errorCode + " 错误信息: " + ezConfigWifiException.message);
                         waitDialog.dismiss();
-                        runOnUiThread(() -> {
-                            devSerialEt.setText(accessDeviceInfo.devSubserial);
-                            logPrintTv.setText(TouchApApi.responseData);
-                        });
-                    }
+                    });
+                }
+            });
+        } else if (id == R.id.getDeviceInfoBtn) {// 获取设备信息
+            waitDialog.show();
+            EzvizApplication.getOpenSDK().getAccessDeviceInfo(new GetAccessDeviceInfoCallback() {
+                @Override
+                public void onSuccess(final AccessDeviceInfo accessDeviceInfo) {
+                    waitDialog.dismiss();
+                    runOnUiThread(() -> {
+                        devSerialEt.setText(accessDeviceInfo.devSubserial);
+                        logPrintTv.setText(TouchApApi.responseData);
+                    });
+                }
 
-                    @Override
-                    public void onError(final EzConfigWifiException ezConfigWifiException) {
-                        waitDialog.dismiss();
-                        runOnUiThread(() -> Utils.showToast(TouchApActivity.this,
-                                "请求失败，错误码 ： " + ezConfigWifiException.errorCode + " 错误信息: " + ezConfigWifiException.message));
-                    }
-                });
-                break;
-            case R.id.getDeviceWifiListBtn:// 获取设备WiFi列表
-                waitDialog.show();
-                EzvizApplication.getOpenSDK().getAccessDeviceWifiList(new GetDeviceWifiListCallback() {
+                @Override
+                public void onError(final EzConfigWifiException ezConfigWifiException) {
+                    waitDialog.dismiss();
+                    runOnUiThread(() -> Utils.showToast(TouchApActivity.this,
+                            "请求失败，错误码 ： " + ezConfigWifiException.errorCode + " 错误信息: " + ezConfigWifiException.message));
+                }
+            });
+        } else if (id == R.id.getDeviceWifiListBtn) {// 获取设备WiFi列表
+            waitDialog.show();
+            EzvizApplication.getOpenSDK().getAccessDeviceWifiList(new GetDeviceWifiListCallback() {
 
-                    @Override
-                    public void onSuccess(List<EzWifiInfo> ezWifiInfoList) {
-                        waitDialog.dismiss();
-                        runOnUiThread(() -> logPrintTv.setText(TouchApApi.responseData));
-                    }
+                @Override
+                public void onSuccess(List<EzWifiInfo> ezWifiInfoList) {
+                    waitDialog.dismiss();
+                    runOnUiThread(() -> logPrintTv.setText(TouchApApi.responseData));
+                }
 
-                    @Override
-                    public void onError(final EzConfigWifiException ezConfigWifiException) {
-                        waitDialog.dismiss();
-                        runOnUiThread(() -> Utils.showToast(TouchApActivity.this,
-                                "请求失败，错误码 ： " + ezConfigWifiException.errorCode + " 错误信息: " + ezConfigWifiException.message));
+                @Override
+                public void onError(final EzConfigWifiException ezConfigWifiException) {
+                    waitDialog.dismiss();
+                    runOnUiThread(() -> Utils.showToast(TouchApActivity.this,
+                            "请求失败，错误码 ： " + ezConfigWifiException.errorCode + " 错误信息: " + ezConfigWifiException.message));
+                }
+            });
+        } else if (id == R.id.continueQueryBtn) {// 继续查询设备绑定状态
+            String deviceSerial = devSerialEt.getText().toString();
+            EzvizApplication.getOpenSDK().queryPlatformBindStatus(deviceSerial, new QueryPlatformBindStatusCallback() {
+                @Override
+                public void onSuccess(boolean isBindSuccess) {
+                    if (isBindSuccess) {
+                        Log.e(TAG, "queryPlatformBindStatus success");
+                        dialog(getString(R.string.wifi_config_succeed), getString(R.string.wifi_device_bind_success));
+                    } else {
+                        Log.e(TAG, "");
                     }
-                });
-                break;
+                }
+
+                @Override
+                public void onError(final EzConfigWifiException ezConfigWifiException) {
+                    String errorMsg = "请求失败，错误码 ： " + ezConfigWifiException.errorCode + " 错误信息: " + ezConfigWifiException.message;
+                    Log.e(TAG, errorMsg);
+                    runOnUiThread(() -> logPrintTv.setText(errorMsg));
+                }
+            });
+        } else if (id == R.id.stopWifiConfigBtn) {// 停止配网
+            stopTimer();
         }
     }
 
@@ -245,7 +266,7 @@ public class TouchApActivity extends RootActivity implements View.OnClickListene
             public void onSuccess(boolean isBindSuccess) {
                 if (isBindSuccess) {
                     Log.e(TAG, "queryPlatformBindStatus success");
-                    dialog("config success","device has been successfully connected to the network and successfully bind to account");
+                    dialog(getString(R.string.wifi_config_succeed), getString(R.string.wifi_device_bind_success));
                     stopTimer();
                 } else {
                     Log.e(TAG, "");
@@ -254,7 +275,9 @@ public class TouchApActivity extends RootActivity implements View.OnClickListene
 
             @Override
             public void onError(final EzConfigWifiException ezConfigWifiException) {
-                Log.e(TAG, "请求失败，错误码 ： " + ezConfigWifiException.errorCode + " 错误信息: " + ezConfigWifiException.message);
+                String errorMsg = "请求失败，错误码 ： " + ezConfigWifiException.errorCode + " 错误信息: " + ezConfigWifiException.message;
+                Log.e(TAG, errorMsg);
+                runOnUiThread(() -> logPrintTv.setText(errorMsg));
             }
         });
     }

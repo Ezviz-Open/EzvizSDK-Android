@@ -23,7 +23,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.callback.NavCallback;
@@ -34,10 +33,12 @@ import com.videogo.errorlayer.ErrorInfo;
 import com.videogo.exception.BaseException;
 import com.videogo.exception.ErrorCode;
 import com.videogo.exception.ExtraException;
+import com.videogo.global.DemoConfig;
+import com.videogo.global.GlobalKit;
 import com.videogo.openapi.EzvizAPI;
 import com.videogo.openapi.bean.EZProbeDeviceInfoResult;
-import com.videogo.ui.adddevice.device.DeviceModel;
-import com.videogo.ui.adddevice.presenter.ApLinkConfigWifiPresenterForFullSdk;
+import com.videogo.ui.adddevice.presenter.ApHttpConfigWifiPresenterForFullSdk;
+import com.videogo.ui.common.EZBusinessTool;
 import com.videogo.util.ActivityUtils;
 import com.videogo.util.ConnectionDetector;
 import com.videogo.util.LocalInfo;
@@ -50,6 +51,8 @@ import ezviz.ezopensdk.R;
 import com.videogo.ui.adddevice.presenter.ApConfigWifiPresenterForFullSdk;
 import com.videogo.ui.adddevice.presenter.SmartConfigWifiPresenterForFullSdk;
 import com.videogo.ui.adddevice.presenter.SoundWaveConfigWifiPresenterForFullSdk;
+
+import ezviz.ezopensdkcommon.common.Config;
 import ezviz.ezopensdkcommon.common.IntentConstants;
 import ezviz.ezopensdkcommon.common.RootActivity;
 import ezviz.ezopensdkcommon.common.RouteNavigator;
@@ -59,9 +62,9 @@ import ezviz.ezopensdkcommon.configwifi.ConfigWifiExecutingActivityPresenter;
 
 import static com.videogo.EzvizApplication.getOpenSDK;
 
-public class SeriesNumSearchActivity extends RootActivity implements OnClickListener/*, OnAuthListener*/ {
+public class SeriesNumSearchActivity extends RootActivity implements OnClickListener {
 
-    private static final String TAG = "SeriesNumSearchActivity";
+    private static final String TAG = SeriesNumSearchActivity.class.getSimpleName();
 
     protected static final int MSG_QUERY_CAMERA_FAIL = 0;
 
@@ -95,6 +98,8 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
     private final int MODIFYPSD_FAIL_DIALOG_ID = 25;
 
     private EditText mSeriesNumberEt = null;
+
+    private EditText mVerifyCodeEt;
 
     private MessageHandler mMsgHandler = null;
 
@@ -142,14 +147,10 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
     private TextView mFailedMsg;
 
     private String mDeviceType;
-    private DeviceModel mDeviceModel;
-
 
     private boolean isActivated; // Used to determine whether the jump from the activation page
 
     private EZProbeDeviceInfoResult mEZProbeDeviceInfo = null;
-
-    private EditText mVerifyCodeEt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -162,6 +163,11 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
         initUI();
         setListener();
         getData();
+
+        if (GlobalKit.isJCTest && mType == 0) {
+            mSeriesNumberEt.setText(DemoConfig.WIFI_CONFIG_DEVICE);
+            mVerifyCodeEt.setText(DemoConfig.WIFI_CONFIG_VERIFY_CODE);
+        }
     }
 
     private void initTitleBar() {
@@ -194,10 +200,8 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
             }
             isActivated = mBundle.getBoolean(BUNDLE_ISACTIVATED, false);
             mDeviceType = mBundle.getString(AutoWifiNetConfigActivity.DEVICE_TYPE);
-            mDeviceModel = DeviceModel.getDeviceModel(mDeviceType);
         }
-        LogUtil.d(TAG, "mSerialNoStr = " + mSerialNoStr + ",mVerifyCode = " + mVerifyCode + ",deviceType="
-                + mDeviceModel);
+        LogUtil.d(TAG, "mSerialNoStr = " + mSerialNoStr + ",mVerifyCode = " + mVerifyCode);
         mLocalInfo = LocalInfo.getInstance();
 
 //        mTriggerHelper = new UnbindDeviceTriggerHelper(this, R.id.unbind_button);
@@ -234,12 +238,13 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
         // 国内支持，海外不支持
         if (!EzvizAPI.getInstance().isUsingGlobalSDK() && mType == 0) {
             findViewById(R.id.touchAP).setVisibility(View.VISIBLE);
+            findViewById(R.id.bluetoothConfig).setVisibility(View.VISIBLE);
         }
     }
 
 
     private void initUI() {
-        if (mTvStatus != null){
+        if (mTvStatus != null) {
             mTvStatus.setPadding(100,0, 100, 0);
         }
         if (mType == 1) {
@@ -266,79 +271,76 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
     @Override
     public void onClick(View view) {
         mVerifyCode = mVerifyCodeEt.getText().toString().trim();
-        if (TextUtils.isEmpty(mVerifyCode)){
-            Toast.makeText(this,"VerifyCode can not be empty",Toast.LENGTH_LONG).show();
-            return;
-        }
-        switch (view.getId()) {
-            case R.id.searchBtn:
-                // Only manually search when the click will, clear the verification code, two-dimensional code over will not be empty
-                // If the scanned serial number is the same as the entered serial number, the verification code will not be cleared
-                final String serialNo = mSeriesNumberEt.getText().toString().trim();
-                if (mSerialNoStr == null || !mSerialNoStr.equals(serialNo)) {
-                    mVerifyCode = null;
-                    mDeviceType = "";
-                    mDeviceModel = null;
-                }
+//        if (TextUtils.isEmpty(mVerifyCode)) {
+//            Toast.makeText(this,"VerifyCode can not be empty",Toast.LENGTH_LONG).show();
+//            return;
+//        }
+        int id = view.getId();
+        if (id == R.id.searchBtn) {
+            // Only manually search when the click will, clear the verification code, two-dimensional code over will not be empty
+            // If the scanned serial number is the same as the entered serial number, the verification code will not be cleared
+            final String serialNo = mSeriesNumberEt.getText().toString().trim();
+            if (mSerialNoStr == null || !mSerialNoStr.equals(serialNo)) {
+                mVerifyCode = null;
+                mDeviceType = "";
+            }
 
-                searchCameraBySN();
-                break;
-            case R.id.addBtn:
-                addQueryCamera();
-                break;
-            case R.id.btnNext:
-                Intent intent;
-                // demo code here only show wifi configuration
-                // Determine the type of equipment (you can determine whether only wireless or wired) jump the corresponding page
-                intent = new Intent(this, AutoWifiPrepareStepOneActivity.class);
-                intent.putExtra(BUNDE_SERIANO, mSeriesNumberEt.getText().toString());
-                intent.putExtra(BUNDE_VERYCODE, mVerifyCodeEt.getText().toString());
-                if (mEZProbeDeviceInfo != null && mEZProbeDeviceInfo.getEZProbeDeviceInfo() != null) {
-                    if (mEZProbeDeviceInfo.getEZProbeDeviceInfo().getSupportAP() == 2) {
-                        ConfigWifiExecutingActivityPresenter.addPresenter(new ApConfigWifiPresenterForFullSdk());
-                        intent.putExtra(IntentConstants.EXTRA_SUPPORT_AP, true);
-                    }
-                    if (mEZProbeDeviceInfo.getEZProbeDeviceInfo().getSupportAPLink() == 1) {
-                        ConfigWifiExecutingActivityPresenter.addPresenter(new ApLinkConfigWifiPresenterForFullSdk());
-                        intent.putExtra(IntentConstants.EXTRA_SUPPORT_APLINK, true);
-                    }
-                    if (mEZProbeDeviceInfo.getEZProbeDeviceInfo().getSupportWifi() == 3) {
-                        ConfigWifiExecutingActivityPresenter.addPresenter(new SmartConfigWifiPresenterForFullSdk());
-                        intent.putExtra(IntentConstants.EXTRA_SUPPORT_SMART_CONFIG, true);
-                    }
-                    if (mEZProbeDeviceInfo.getEZProbeDeviceInfo().getSupportSoundWave() == 1) {
-                        ConfigWifiExecutingActivityPresenter.addPresenter(new SoundWaveConfigWifiPresenterForFullSdk());
-                        intent.putExtra(IntentConstants.EXTRA_SUPPORT_SOUND_WAVE, true);
-                    }
-                }else{
-                    intent.putExtra("support_unknow_mode", true);
+            searchCameraBySN();
+        } else if (id == R.id.addBtn) {
+            addQueryCamera();
+        } else if (id == R.id.btnNext) {
+            Intent intent;
+            // demo code here only show wifi configuration
+            // Determine the type of equipment (you can determine whether only wireless or wired) jump the corresponding page
+            intent = new Intent(this, AutoWifiPrepareStepOneActivity.class);
+            intent.putExtra(BUNDE_SERIANO, mSeriesNumberEt.getText().toString());
+            intent.putExtra(BUNDE_VERYCODE, mVerifyCodeEt.getText().toString());
+            if (mEZProbeDeviceInfo != null && mEZProbeDeviceInfo.getEZProbeDeviceInfo() != null) {
+                if (mEZProbeDeviceInfo.getEZProbeDeviceInfo().getSupportAP() == 2) {
+                    ConfigWifiExecutingActivityPresenter.addPresenter(new ApConfigWifiPresenterForFullSdk());
+                    intent.putExtra(IntentConstants.EXTRA_SUPPORT_AP, true);
+                    // AP配网是否支持5G频段，不支持的话就只能使用2.4G频段来进行配网
+                    intent.putExtra(IntentConstants.EXTRA_SUPPORT_WIFI_5G, mEZProbeDeviceInfo.getEZProbeDeviceInfo().isSupport5GWiFi());
                 }
-                intent.putExtra("device_type", mDeviceType);
-                intent.putExtra(IntentConstants.USING_FULL_EZVIZ_SDK, true);
-                startActivity(intent);
-                break;
-            case R.id.myRetry:
-                searchCameraBySN();
-                break;
-            case R.id.activateHint:
-                if (ConnectionDetector.getConnectionType(this) != ConnectionDetector.WIFI) {
-                    // 配置wifi
-                    showWifiRequiredDialog();
-                } else {
-//                    ActivateActivity.launch(this, mSerialNoStr, mVerifyCode, mType, mDeviceType);
-                    // finish();
+                if (mEZProbeDeviceInfo.getEZProbeDeviceInfo().getSupportAPType() == 1) {
+                    ConfigWifiExecutingActivityPresenter.addPresenter(new ApHttpConfigWifiPresenterForFullSdk());
+                    intent.putExtra(IntentConstants.EXTRA_SUPPORT_APHTTP, true);
+                    intent.putExtra(IntentConstants.EXTRA_SUPPORT_WIFI_5G, mEZProbeDeviceInfo.getEZProbeDeviceInfo().isSupport5GWiFi());
                 }
-                break;
-            default:
-                break;
+                if (mEZProbeDeviceInfo.getEZProbeDeviceInfo().getSupportWifi() == 3) {
+                    ConfigWifiExecutingActivityPresenter.addPresenter(new SmartConfigWifiPresenterForFullSdk());
+                    intent.putExtra(IntentConstants.EXTRA_SUPPORT_SMART_CONFIG, true);
+                }
+                if (mEZProbeDeviceInfo.getEZProbeDeviceInfo().getSupportSoundWave() == 1) {
+                    ConfigWifiExecutingActivityPresenter.addPresenter(new SoundWaveConfigWifiPresenterForFullSdk());
+                    intent.putExtra(IntentConstants.EXTRA_SUPPORT_SOUND_WAVE, true);
+                }
+                // 记录该设备热点前缀
+                Config.DeviceHotspotPrefix = EZBusinessTool.getWiFiConfigPrefix(mEZProbeDeviceInfo.getEZProbeDeviceInfo().getDeviceHotSpot());
+            } else {
+                intent.putExtra("support_unknow_mode", true);
+            }
+            intent.putExtra("device_type", mDeviceType);
+            intent.putExtra(IntentConstants.USING_FULL_EZVIZ_SDK, true);
+            startActivity(intent);
+        } else if (id == R.id.myRetry) {
+            searchCameraBySN();
+        } else if (id == R.id.activateHint) {
+            if (ConnectionDetector.getConnectionType(this) != ConnectionDetector.WIFI) {
+                // 配置wifi
+                showWifiRequiredDialog();
+            } else {
+//                ActivateActivity.launch(this, mSerialNoStr, mVerifyCode, mType, mDeviceType);
+                // finish();
+            }
         }
     }
 
     /**
-     * 接触式配网
+     * 接触式AP配网
      */
-    public void onTouchClick(View view) {
-        LogUtil.i(TAG, "onTouchClick");
+    public void onTouchAPClick(View view) {
+        LogUtil.i(TAG, "onTouchAPClick");
         ARouter.getInstance().build(RouteNavigator.TOUCH_AP_WIFICONFIG_PAGE)
                 .navigation(this, new NavCallback() {
                     @Override
@@ -351,6 +353,29 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
                         // do nothing
                     }
                 });
+    }
+
+    /**
+     * 霍曼设备蓝牙配网
+     */
+    public void onBluetoothConfigClick(View view) {
+        LogUtil.i(TAG, "onBluetoothConfigClick");
+        ARouter.getInstance().build(RouteNavigator.BLUETOOTH_WIFICONFIG_PAGE)
+                .navigation(this, new NavCallback() {
+                    @Override
+                    public void onArrival(Postcard postcard) {
+
+                    }
+
+                    @Override
+                    public void onLost(Postcard postcard) {
+                        // do nothing
+                    }
+                });
+
+//        LogUtil.i(TAG, "onBluetoothConfigClick");
+//        Intent intent = new Intent(this, BluetoothConfigActivity.class);
+//        startActivity(intent);
     }
 
     private void showWifiRequiredDialog() {
@@ -394,7 +419,6 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
             }
             isActivated = mBundle.getBoolean(BUNDLE_ISACTIVATED, false);
             mDeviceType = mBundle.getString(AutoWifiNetConfigActivity.DEVICE_TYPE);
-            mDeviceModel = DeviceModel.getDeviceModel(mDeviceType);
             //isFromRouterIntroduce = mBundle.getBoolean(RouterIntroduceActivity.IS_FROM_ROUTER_INTRODUCE);
         }
         getData();
@@ -431,13 +455,13 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
         new Thread() {
             public void run() {
 
-                mEZProbeDeviceInfo = getOpenSDK().probeDeviceInfo(serialNo,mDeviceType);
-                if (mEZProbeDeviceInfo != null){
-                    if (mEZProbeDeviceInfo.getBaseException() == null){
+                mEZProbeDeviceInfo = getOpenSDK().probeDeviceInfo(serialNo, mDeviceType);
+                if (mEZProbeDeviceInfo != null) {
+                    if (mEZProbeDeviceInfo.getBaseException() == null) {
                         // TODO: 2018/6/25 添加设备
                         sendMessage(MSG_QUERY_CAMERA_SUCCESS);
-                    }else{
-                        switch (mEZProbeDeviceInfo.getBaseException().getErrorCode()){
+                    } else {
+                        switch (mEZProbeDeviceInfo.getBaseException().getErrorCode()) {
 
                             case 120023:
                                 // TODO: 2018/6/25  设备不在线，未被用户添加 （这里需要网络配置）
@@ -472,7 +496,7 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
                                 break;
                         }
                     }
-                }else{
+                } else {
                     sendMessage(MSG_QUERY_CAMERA_FAIL, ErrorCode.ERROR_WEB_NET_EXCEPTION);
                 }
                 runOnUiThread(new Runnable() {
@@ -568,19 +592,19 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
                 break;
             case ErrorCode.ERROR_WEB_DEVICE_VERIFY_CODE_ERROR:
                 mVerifyCode = null;
-                {
-                    //The verification code is legal but wrong
-                    Bundle args = new Bundle();
-                    args.putString(BUNDE_DIALOG_TIP, getString(R.string.added_camera_verycode_fail_title_txt));
+            {
+                //The verification code is legal but wrong
+                Bundle args = new Bundle();
+                args.putString(BUNDE_DIALOG_TIP, getString(R.string.added_camera_verycode_fail_title_txt));
 
-                    // Pop-up prompts
-                    if (!isFinishing() && mHasShowInputPswDialog) {
-                        showDialog(MODIFYPSD_FAIL_DIALOG_ID, args);
-                    } else {
-                        showInputCameraVerifyCodeDlg();
-                    }
+                // Pop-up prompts
+                if (!isFinishing() && mHasShowInputPswDialog) {
+                    showDialog(MODIFYPSD_FAIL_DIALOG_ID, args);
+                } else {
+                    showInputCameraVerifyCodeDlg();
                 }
-                break;
+            }
+            break;
             case ErrorCode.ERROR_WEB_DEVICE_SO_TIMEOUT:
                 showToast(R.string.device_so_timeout);
                 break;
@@ -591,7 +615,7 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
                 showToast(R.string.camera_not_online);
                 break;
             case ErrorCode.ERROR_WEB_DEVICE_VALICATECODE_ERROR:
-                LogUtil.d(TAG, "Add camera failure verification code error = " + errCode);
+                showToast("Add camera failure verification code error = " + errCode);
                 mVerifyCode = "";
                 break;
             default:
@@ -654,16 +678,8 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
 //        mDeviceIcon.setImageResource(getDeviceIcon(""));
     }
 
-    private int getDeviceIcon(String model) {
-        DeviceModel deviceModel = DeviceModel.getDeviceModel(model);
-        if (deviceModel == null)
-            return DeviceModel.OTHER.getDrawable2ResId();
-        else
-            return deviceModel.getDrawable2ResId();
-    }
-
     private void showAddButton() {
-    	LogUtil.i(TAG, "enter showAddButton");
+        LogUtil.i(TAG, "enter showAddButton");
         showCameraList();
         mBtnNext.setVisibility(View.GONE);
         mActivateHint.setVisibility(View.GONE);
@@ -817,11 +833,11 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
 
 
     public void addQueryCamera() {
-    	if(!TextUtils.isEmpty(mVerifyCode)){
-    		addQueryCameraAddVerifyCode();
-    	} else {
-    		showInputCameraVerifyCodeDlg();
-    	}
+        if (!TextUtils.isEmpty(mVerifyCode)) {
+            addQueryCameraAddVerifyCode();
+        } else {
+            showInputCameraVerifyCodeDlg();
+        }
     }
 
     private void addQueryCameraAddVerifyCode() {
@@ -886,7 +902,7 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
     }
 
     private void showCameraList() {
-    	LogUtil.i(TAG, "enter showCameraList");
+        LogUtil.i(TAG, "enter showCameraList");
         mTitle.setText(R.string.result_txt);
         mActivateHint.setVisibility(View.GONE);
         errorPage.setVisibility(View.GONE);
@@ -894,13 +910,7 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
         mQueryingCameraRyt.setVisibility(View.GONE);
         mInputLinearlayout.setVisibility(View.GONE);
 
-        if (mDeviceModel != null) {
-            // Update the image of the search camera
-            mDeviceIcon.setImageResource(mDeviceModel.getDrawable2ResId());
-        } else {
-            // Update the image of the search camera
-            mDeviceIcon.setImageResource(DeviceModel.OTHER.getDrawable2ResId());
-        }
+        mDeviceIcon.setImageResource(R.drawable.device_other);
         // Device name processing
         mDeviceName.setText(mSeriesNumberEt.getText().toString().trim());
     }
@@ -920,7 +930,7 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
     }
 
     private void showWifiConfig() {
-    	boolean bShowActivation = false;
+        boolean bShowActivation = false;
         showCameraList();
         mBtnNext.setVisibility(View.VISIBLE);
         if (!bShowActivation) { // If it is fluorite equipment or jump from the activation page, do not display the activation prompt, otherwise the activation prompt
@@ -966,7 +976,7 @@ public class SeriesNumSearchActivity extends RootActivity implements OnClickList
                             }).create();
                 }
             }
-                break;
+            break;
             default:
                 break;
         }

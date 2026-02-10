@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.videogo.ui.others.MoreFeaturesEntranceActivity">
+    android:fitsSystemWindows="true"
+    tools:context="com.videogo.ui.others.EZTestActivity">
 
     <com.videogo.widget.TitleBar
         android:id="@+id/title_bar"
@@ -24,90 +25,66 @@
 
             <Button
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="onClickDebug"
-                android:paddingBottom="10dp"
-                android:text="临时开发测试" />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:onClick="onClickGetOriginStream"
-                android:paddingBottom="10dp"
-                android:text="获取原始码流" />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:onClick="onClickMultiVideoTalk"
-                android:paddingBottom="10dp"
-                android:text="多方音视频通话" />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:onClick="onClickGetStreamFromHub"
-                android:paddingBottom="10dp"
-                android:text="HUB设备取流" />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:onClick="onClickMeeting"
-                android:paddingBottom="10dp"
-                android:text="视频会议" />
-
-            <Button
-                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="5dp"
                 android:onClick="onClickLanDevice"
-                android:paddingBottom="10dp"
                 android:text="设备发现" />
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="5dp"
                 android:onClick="onClickP2pTest"
-                android:paddingBottom="10dp"
                 android:text="p2p测试" />
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="5dp"
                 android:onClick="onClickAutoTest"
-                android:paddingBottom="10dp"
                 android:text="自动化测试" />
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginTop="10dp"
-                android:onClick="onClickP2pOpen"
-                android:paddingBottom="10dp"
-                android:text="P2P开启" />
+                android:layout_marginTop="5dp"
+                android:onClick="onClickStreamTypeSetting"
+                android:text="取流方式设置" />
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginTop="10dp"
-                android:onClick="onClickP2pClose"
-                android:paddingBottom="10dp"
-                android:text="P2P关闭" />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="5dp"
                 android:onClick="onClickCloudRecordSpaceId"
-                android:paddingBottom="10dp"
                 android:text="设置云录制SpaceId" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginTop="5dp"
+                android:onClick="onClickTKToken"
+                android:text="小权限tkToken设置" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginTop="5dp"
+                android:onClick="onClickInterfaceTest"
+                android:text="接口测试" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginTop="5dp"
+                android:onClick="onClickVerifycodeClear"
+                android:text="设备验证码清空" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginTop="5dp"
+                android:onClick="onClickVideoQuality"
+                android:text="性能/画质优先(随机，多点几次)" />
 
         </LinearLayout>
 

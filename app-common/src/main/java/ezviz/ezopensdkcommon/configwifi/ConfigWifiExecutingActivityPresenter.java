@@ -1,6 +1,8 @@
 package ezviz.ezopensdkcommon.configwifi;
 
+import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 
@@ -11,11 +13,16 @@ public abstract class ConfigWifiExecutingActivityPresenter {
 
     private static List<ConfigWifiExecutingActivityPresenter> mAvailablePresenterList = new ArrayList<>();
 
+    protected Activity mActivity;
     protected Callback mCallback;
     protected String mType;
 
     public String getType(){
         return mType;
+    }
+
+    public void setActivity(Activity activity) {
+        this.mActivity = activity;
     }
 
     public void setCallback(Callback mCallback) {

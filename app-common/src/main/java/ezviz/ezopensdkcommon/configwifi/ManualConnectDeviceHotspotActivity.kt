@@ -15,25 +15,28 @@ import android.widget.Toast
 import com.ezviz.sdk.configwifi.WiFiUtils
 import com.hikvision.wifi.configuration.BaseUtil
 import ezviz.ezopensdkcommon.R
+import ezviz.ezopensdkcommon.common.Config
 import ezviz.ezopensdkcommon.common.IntentConstants.*
 import ezviz.ezopensdkcommon.common.RootActivity
-import kotlinx.android.synthetic.main.activity_manual_connect_device_hotspot.*
+import ezviz.ezopensdkcommon.databinding.ActivityManualConnectDeviceHotspotBinding
 
 class ManualConnectDeviceHotspotActivity : RootActivity() {
 
+    private lateinit var binding: ActivityManualConnectDeviceHotspotBinding
     private var mSSID: String? = null
     private var mPWD: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_manual_connect_device_hotspot)
+        binding = ActivityManualConnectDeviceHotspotBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         initUi()
     }
 
     override fun initUi() {
         super.initUi()
         intent?.apply {
-            val prefix = "EZVIZ_"
+            val prefix = Config.DeviceHotspotPrefix + "_"
             mSSID = getStringExtra(DEVICE_HOTSPOT_SSID)
             if (TextUtils.isEmpty(mSSID)) {
                 mSSID = prefix + getStringExtra(DEVICE_SERIAL)
@@ -41,11 +44,15 @@ class ManualConnectDeviceHotspotActivity : RootActivity() {
             mPWD = getStringExtra(DEVICE_HOTSPOT_PWD)
             if (TextUtils.isEmpty(mPWD)) {
                 mPWD = prefix + getStringExtra(DEVICE_VERIFY_CODE)
+                if (TextUtils.isEmpty(getStringExtra(DEVICE_VERIFY_CODE))) {
+                    mPWD = ""
+                }
             }
-            tv_ssid.text = mSSID
-            tv_pwd.text = mPWD
+
+            binding.tvSsid.text = mSSID
+            binding.tvPwd.text = mPWD
             val string = String.format(getString(R.string.wifi_config_step_two_hint), "<font color='#ff8800'>$mSSID</font>")
-            tv_setting_hint.text = Html.fromHtml(string)
+            binding.tvSettingHint.text = Html.fromHtml(string)
         }
     }
 
@@ -81,7 +88,7 @@ class ManualConnectDeviceHotspotActivity : RootActivity() {
 
     fun onclickPasswordCopy(view: View) {
         val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = ClipData.newPlainText("text", tv_pwd.text)
+        val clip = ClipData.newPlainText("text", binding.tvPwd.text)
         clipboard.setPrimaryClip(clip)
         Toast.makeText(applicationContext, getString(R.string.copied_to_clipboard), Toast.LENGTH_LONG).show()
     }

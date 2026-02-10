@@ -1,0 +1,538 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/common_bg">
+
+    <!-- 右上角关闭 -->
+    <ImageButton
+        android:id="@+id/watermark_close_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/play_close_selector"
+        android:onClick="onClick" />
+
+    <Switch
+        android:id="@+id/switch_watermark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:switchPadding="5dp"
+        android:text="水印开关"
+        android:textColor="@color/grey" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/switch_watermark">
+
+        <LinearLayout
+            android:id="@+id/ll_watermark"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <!-- 字体大小 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:text="字体大小：" />
+
+                <com.warkiz.widget.IndicatorSeekBar
+                    android:id="@+id/seekbar_font_size"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:isb_max="100"
+                    app:isb_min="15"
+                    app:isb_progress="35"
+                    app:isb_show_indicator="none"
+                    app:isb_show_thumb_text="true"
+                    app:isb_show_tick_texts="true"
+                    app:isb_thumb_color="@color/green_text"
+                    app:isb_thumb_text_color="@color/green_text"
+                    app:isb_tick_texts_color="@color/gray"
+                    app:isb_ticks_count="2"
+                    app:isb_track_progress_color="@color/green_text" />
+
+            </LinearLayout>
+
+            <!-- 字体行间距 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:text="字体行间距：" />
+
+                <com.warkiz.widget.IndicatorSeekBar
+                    android:id="@+id/seekbar_font_space"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:isb_max="2"
+                    app:isb_min="1"
+                    app:isb_progress="1.2"
+                    app:isb_progress_value_float="true"
+                    app:isb_show_indicator="none"
+                    app:isb_show_thumb_text="true"
+                    app:isb_show_tick_texts="true"
+                    app:isb_thumb_color="@color/green_text"
+                    app:isb_thumb_text_color="@color/green_text"
+                    app:isb_tick_texts_color="@color/gray"
+                    app:isb_ticks_count="2"
+                    app:isb_track_progress_color="@color/green_text" />
+
+            </LinearLayout>
+
+            <!-- 倾斜角度 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:text="字体倾斜角度：" />
+
+                <com.warkiz.widget.IndicatorSeekBar
+                    android:id="@+id/seekbar_rotate_angle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:isb_max="360"
+                    app:isb_min="0"
+                    app:isb_progress="0"
+                    app:isb_show_indicator="none"
+                    app:isb_show_thumb_text="true"
+                    app:isb_show_tick_texts="true"
+                    app:isb_thumb_color="@color/green_text"
+                    app:isb_thumb_text_color="@color/green_text"
+                    app:isb_tick_texts_color="@color/gray"
+                    app:isb_ticks_count="2"
+                    app:isb_track_progress_color="@color/green_text" />
+
+            </LinearLayout>
+
+            <!-- 对齐方式 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:text="字体对齐方式：" />
+
+                <com.warkiz.widget.IndicatorSeekBar
+                    android:id="@+id/seekbar_font_alignment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:isb_max="2"
+                    app:isb_min="0"
+                    app:isb_progress="0"
+                    app:isb_show_indicator="none"
+                    app:isb_show_thumb_text="true"
+                    app:isb_show_tick_texts="true"
+                    app:isb_thumb_color="@color/green_text"
+                    app:isb_thumb_text_color="@color/green_text"
+                    app:isb_tick_marks_ends_hide="true"
+                    app:isb_tick_texts_array="@array/watermark_font_alignment"
+                    app:isb_tick_texts_color="@color/gray"
+                    app:isb_ticks_count="3"
+                    app:isb_track_progress_color="@color/green_text" />
+
+            </LinearLayout>
+
+            <!-- x轴比例位置 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:text="x轴比例位置：" />
+
+                <com.warkiz.widget.IndicatorSeekBar
+                    android:id="@+id/seekbar_font_position_x"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:isb_max="1"
+                    app:isb_min="0"
+                    app:isb_progress="0"
+                    app:isb_progress_value_float="true"
+                    app:isb_show_indicator="none"
+                    app:isb_show_thumb_text="true"
+                    app:isb_show_tick_texts="true"
+                    app:isb_thumb_color="@color/green_text"
+                    app:isb_thumb_text_color="@color/green_text"
+                    app:isb_tick_texts_color="@color/gray"
+                    app:isb_ticks_count="2"
+                    app:isb_track_progress_color="@color/green_text" />
+
+            </LinearLayout>
+
+            <!-- y轴比例位置 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:text="y轴比例位置：" />
+
+                <com.warkiz.widget.IndicatorSeekBar
+                    android:id="@+id/seekbar_font_position_y"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:isb_max="1"
+                    app:isb_min="0"
+                    app:isb_progress="0"
+                    app:isb_progress_value_float="true"
+                    app:isb_show_indicator="none"
+                    app:isb_show_thumb_text="true"
+                    app:isb_show_tick_texts="true"
+                    app:isb_thumb_color="@color/green_text"
+                    app:isb_thumb_text_color="@color/green_text"
+                    app:isb_tick_texts_color="@color/gray"
+                    app:isb_ticks_count="2"
+                    app:isb_track_progress_color="@color/green_text" />
+
+            </LinearLayout>
+
+            <!-- 颜色-红 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:text="红：" />
+
+                <com.warkiz.widget.IndicatorSeekBar
+                    android:id="@+id/seekbar_font_color_red"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:isb_max="255"
+                    app:isb_min="0"
+                    app:isb_progress="0"
+                    app:isb_show_indicator="none"
+                    app:isb_show_thumb_text="true"
+                    app:isb_show_tick_texts="true"
+                    app:isb_thumb_color="@android:color/holo_red_light"
+                    app:isb_thumb_text_color="@android:color/holo_red_light"
+                    app:isb_tick_texts_color="@color/gray"
+                    app:isb_ticks_count="2"
+                    app:isb_track_progress_color="@android:color/holo_red_light" />
+
+            </LinearLayout>
+
+            <!-- 颜色-绿 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:text="绿：" />
+
+                <com.warkiz.widget.IndicatorSeekBar
+                    android:id="@+id/seekbar_font_color_green"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:isb_max="255"
+                    app:isb_min="0"
+                    app:isb_progress="0"
+                    app:isb_show_indicator="none"
+                    app:isb_show_thumb_text="true"
+                    app:isb_show_tick_texts="true"
+                    app:isb_thumb_color="@android:color/holo_green_light"
+                    app:isb_thumb_text_color="@android:color/holo_green_light"
+                    app:isb_tick_texts_color="@color/gray"
+                    app:isb_ticks_count="2"
+                    app:isb_track_progress_color="@android:color/holo_green_light" />
+
+            </LinearLayout>
+
+            <!-- 颜色-蓝 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:text="蓝：" />
+
+                <com.warkiz.widget.IndicatorSeekBar
+                    android:id="@+id/seekbar_font_color_blue"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:isb_max="255"
+                    app:isb_min="0"
+                    app:isb_progress="0"
+                    app:isb_show_indicator="none"
+                    app:isb_show_thumb_text="true"
+                    app:isb_show_tick_texts="true"
+                    app:isb_thumb_color="@android:color/holo_blue_light"
+                    app:isb_thumb_text_color="@android:color/holo_blue_light"
+                    app:isb_tick_texts_color="@color/gray"
+                    app:isb_ticks_count="2"
+                    app:isb_track_progress_color="@android:color/holo_blue_light" />
+
+            </LinearLayout>
+
+            <!-- 颜色-透明度 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:text="透明度：" />
+
+                <com.warkiz.widget.IndicatorSeekBar
+                    android:id="@+id/seekbar_font_alpha"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:isb_max="100"
+                    app:isb_min="0"
+                    app:isb_progress="0"
+                    app:isb_show_indicator="none"
+                    app:isb_show_thumb_text="true"
+                    app:isb_show_tick_texts="true"
+                    app:isb_thumb_color="@color/green_text"
+                    app:isb_thumb_text_color="@color/green_text"
+                    app:isb_tick_texts_color="@color/gray"
+                    app:isb_ticks_count="2"
+                    app:isb_track_progress_color="@color/green_text" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <!-- 颜色自适应 -->
+                <Switch
+                    android:id="@+id/switch_font_color_adapt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:switchPadding="5dp"
+                    android:text="字体颜色自适应"
+                    android:textColor="@color/grey" />
+
+                <!-- 铺满全屏 -->
+                <Switch
+                    android:id="@+id/switch_fill_full_screen"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:switchPadding="5dp"
+                    android:text="水印铺满全屏"
+                    android:textColor="@color/grey" />
+
+            </LinearLayout>
+
+            <!-- 行数 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:text="行数：" />
+
+                <com.warkiz.widget.IndicatorSeekBar
+                    android:id="@+id/seekbar_font_row_number"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:isb_max="9"
+                    app:isb_min="1"
+                    app:isb_progress="1"
+                    app:isb_show_indicator="none"
+                    app:isb_show_thumb_text="true"
+                    app:isb_show_tick_texts="true"
+                    app:isb_thumb_color="@color/green_text"
+                    app:isb_thumb_text_color="@color/green_text"
+                    app:isb_tick_texts_color="@color/gray"
+                    app:isb_ticks_count="2"
+                    app:isb_track_progress_color="@color/green_text" />
+
+            </LinearLayout>
+
+            <!-- 列数 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:text="列数：" />
+
+                <com.warkiz.widget.IndicatorSeekBar
+                    android:id="@+id/seekbar_font_column_number"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:isb_max="9"
+                    app:isb_min="1"
+                    app:isb_progress="1"
+                    app:isb_show_indicator="none"
+                    app:isb_show_thumb_text="true"
+                    app:isb_show_tick_texts="true"
+                    app:isb_thumb_color="@color/green_text"
+                    app:isb_thumb_text_color="@color/green_text"
+                    app:isb_tick_texts_color="@color/gray"
+                    app:isb_ticks_count="2"
+                    app:isb_track_progress_color="@color/green_text" />
+
+            </LinearLayout>
+
+            <!-- 窗口自适应 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:text="窗口自适应：" />
+
+                <com.warkiz.widget.IndicatorSeekBar
+                    android:id="@+id/seekbar_window_adapt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:isb_max="2"
+                    app:isb_min="0"
+                    app:isb_progress="0"
+                    app:isb_show_indicator="none"
+                    app:isb_show_thumb_text="true"
+                    app:isb_show_tick_texts="true"
+                    app:isb_thumb_color="@color/green_text"
+                    app:isb_thumb_text_color="@color/green_text"
+                    app:isb_tick_marks_ends_hide="true"
+                    app:isb_tick_texts_array="@array/watermark_window_adapt"
+                    app:isb_tick_texts_color="@color/gray"
+                    app:isb_ticks_count="3"
+                    app:isb_track_progress_color="@color/green_text" />
+
+            </LinearLayout>
+
+            <!-- 自适应行列数行间距 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:text="自适应行列数行间距：" />
+
+                <com.warkiz.widget.IndicatorSeekBar
+                    android:id="@+id/seekbar_window_adapt_row_space"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:isb_max="300"
+                    app:isb_min="1"
+                    app:isb_progress="100"
+                    app:isb_show_indicator="none"
+                    app:isb_show_thumb_text="true"
+                    app:isb_show_tick_texts="true"
+                    app:isb_thumb_color="@color/green_text"
+                    app:isb_thumb_text_color="@color/green_text"
+                    app:isb_tick_texts_color="@color/gray"
+                    app:isb_ticks_count="2"
+                    app:isb_track_progress_color="@color/green_text" />
+
+            </LinearLayout>
+
+            <!-- 自适应行列数列间距 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:text="自适应行列数列间距：" />
+
+                <com.warkiz.widget.IndicatorSeekBar
+                    android:id="@+id/seekbar_window_adapt_column_space"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:isb_max="300"
+                    app:isb_min="1"
+                    app:isb_progress="100"
+                    app:isb_show_indicator="none"
+                    app:isb_show_thumb_text="true"
+                    app:isb_show_tick_texts="true"
+                    app:isb_thumb_color="@color/green_text"
+                    app:isb_thumb_text_color="@color/green_text"
+                    app:isb_tick_texts_color="@color/gray"
+                    app:isb_ticks_count="2"
+                    app:isb_track_progress_color="@color/green_text" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</RelativeLayout>

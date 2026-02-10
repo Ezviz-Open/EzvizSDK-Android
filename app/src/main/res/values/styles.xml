@@ -19,4 +19,10 @@
         <item name="android:windowExitAnimation">@anim/trm_popup_exit</item>
     </style>
 
+    <!--bottom menu-->
+    <style name="menu_animation">
+        <item name="android:windowEnterAnimation">@anim/menu_appear</item>
+        <item name="android:windowExitAnimation">@anim/menu_disappear</item>
+    </style>
+
 </resources>

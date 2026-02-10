@@ -11,6 +11,7 @@ import com.videogo.ui.playback.RemoteListContant;
 import com.videogo.ui.playback.bean.CloudPartInfoFileEx;
 import com.videogo.ui.common.HikAsyncTask;
 import com.videogo.util.CollectionUtil;
+import com.videogo.util.DateTimeUtil;
 import com.videogo.util.Utils;
 
 import java.text.SimpleDateFormat;
@@ -75,59 +76,56 @@ public class QueryCloudRecordFilesAsyncTask extends HikAsyncTask<String, Void, I
     }
 
     private void convertEZCloudRecordFile2CloudPartInfoFile(CloudPartInfoFile dst, EZCloudRecordFile src, int pos) {
-    	String startT = new SimpleDateFormat("yyyyMMddHHmmss").format(src.getStartTime().getTime());
-		String endT = new SimpleDateFormat("yyyyMMddHHmmss").format(src.getStopTime().getTime());
-    	dst.setCloud(true);
-    	dst.setDownloadPath(src.getDownloadPath());
-    	dst.setEndTime(endT);
-    	dst.setFileId(src.getFileId());
-    	dst.setKeyCheckSum(src.getEncryption());
-    	dst.setPicUrl(src.getCoverPic());
-    	dst.setPosition(pos);
-    	dst.setStartTime(startT);
-    	dst.setDeviceSerial(src.getDeviceSerial());
-    	dst.setCameraNo(src.getCameraNo());
-    	dst.setVideoType(src.getVideoType());
+        String startT = DateTimeUtil.calendarToYMDHMSCompactString(src.getStartTime());
+        String endT = DateTimeUtil.calendarToYMDHMSCompactString(src.getStopTime());
+        dst.setCloud(true);
+        dst.setDownloadPath(src.getDownloadPath());
+        dst.setEndTime(endT);
+        dst.setFileId(src.getFileId());
+        dst.setKeyCheckSum(src.getEncryption());
+        dst.setPicUrl(src.getCoverPic());
+        dst.setPosition(pos);
+        dst.setStartTime(startT);
+        dst.setDeviceSerial(src.getDeviceSerial());
+        dst.setCameraNo(src.getCameraNo());
+        dst.setVideoType(src.getVideoType());
+        dst.setCloudType(src.getCloudType());
         dst.setiStorageVersion(src.getiStorageVersion());
         dst.setFileSize(src.getFileSize());
     }
 
-    private int queryCloudFile(){
-		Calendar startTime = Calendar.getInstance();
-		Calendar endTime = Calendar.getInstance();
-		startTime.setTime(searchDate);
-		endTime.setTime(searchDate);
-       
-		startTime.set(Calendar.HOUR_OF_DAY, 0);
-		startTime.set(Calendar.MINUTE, 0);
-		startTime.set(Calendar.SECOND, 0);
-		endTime.set(Calendar.HOUR_OF_DAY, 23);
-		endTime.set(Calendar.MINUTE, 59);
-		endTime.set(Calendar.SECOND, 59);
+    private int queryCloudFile() {
+        Date beginDate = DateTimeUtil.beginDate(searchDate);
+        Date endDate = DateTimeUtil.endDate(searchDate);
+        Calendar startTime = Calendar.getInstance();
+        Calendar endTime = Calendar.getInstance();
+        startTime.setTime(beginDate);
+        endTime.setTime(endDate);
 
-		List<EZCloudRecordFile> tmpList = null;
-		try {
-			tmpList = EzvizApplication.getOpenSDK().searchRecordFileFromCloud(deviceSerial,channelNo,
-					startTime, endTime);
-		} catch (BaseException e) {
-			e.printStackTrace();
+        List<EZCloudRecordFile> tmpList = null;
+        try {
+            tmpList = EzvizApplication.getOpenSDK().searchRecordFileFromCloud(deviceSerial,channelNo,
+                    startTime, endTime);
+        } catch (BaseException e) {
+            e.printStackTrace();
 
         }
 
         cloudPartFiles = new ArrayList<>();
-		if (tmpList != null && tmpList.size() > 0) {
-			for (int i = 0; i < tmpList.size(); i++) {
-				EZCloudRecordFile file = tmpList.get(i);
-				CloudPartInfoFile cpif = new CloudPartInfoFile();
+        if (tmpList != null && tmpList.size() > 0) {
+            for (int i = 0; i < tmpList.size(); i++) {
+                EZCloudRecordFile file = tmpList.get(i);
+                CloudPartInfoFile cpif = new CloudPartInfoFile();
 
-				convertEZCloudRecordFile2CloudPartInfoFile(cpif, file, i);
-				cloudPartFiles.add(cpif);
-			}
-		}
+                convertEZCloudRecordFile2CloudPartInfoFile(cpif, file, i);
+                cloudPartFiles.add(cpif);
+            }
+        }
 
-		if (CollectionUtil.isNotEmpty(cloudPartFiles)) {
-			Collections.sort(cloudPartFiles);
-		}
+        if (CollectionUtil.isNotEmpty(cloudPartFiles)) {
+            Collections.sort(cloudPartFiles);
+            Collections.reverse(cloudPartFiles);
+        }
 
         int length = cloudPartFiles.size();
         int i = 0;

@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@color/opensdk_cameralist_bg"
+    android:background="@color/opensdk_devicelist_bg"
     android:orientation="vertical">
 
     <!-- 标题栏 -->
@@ -63,7 +63,7 @@
     </RelativeLayout>
 
     <com.videogo.widget.pulltorefresh.PullToRefreshListView
-        android:id="@+id/camera_listview"
+        android:id="@+id/device_listview"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_below="@+id/title"
@@ -78,10 +78,9 @@
         android:scrollingCache="true" />
 
     <LinearLayout
-        android:id="@+id/no_camera_tip_ly"
+        android:id="@+id/no_device_tip_ly"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/title_bar"
         android:layout_centerInParent="true"
         android:onClick="onClick"
         android:orientation="vertical"
@@ -99,7 +98,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/get_camera_fail_tip_ly"
+        android:id="@+id/get_device_fail_tip_ly"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
@@ -107,16 +106,16 @@
         android:visibility="gone">
 
         <TextView
-            android:id="@+id/get_camera_list_fail_tv"
+            android:id="@+id/get_device_list_fail_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             android:gravity="center"
-            android:text="@string/get_camera_list_fail"
+            android:text="@string/get_device_list_fail"
             android:textSize="@dimen/title_text_size" />
 
         <Button
-            android:id="@+id/camera_list_refresh_btn"
+            android:id="@+id/device_list_refresh_btn"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/refresh_selector"

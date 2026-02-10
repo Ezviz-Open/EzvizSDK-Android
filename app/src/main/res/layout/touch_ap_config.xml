@@ -81,16 +81,22 @@
         <Button
             android:id="@+id/getTokenBtn"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
+            android:layout_margin="4dp"
             android:layout_weight="1"
-            android:text="获取token" />
+            android:background="@color/auto_wifi_blue"
+            android:text="获取配网token"
+            android:textColor="@color/white" />
 
         <Button
             android:id="@+id/apConfigWifiBtn"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
+            android:layout_margin="4dp"
             android:layout_weight="1"
-            android:text="向设备配网" />
+            android:background="@color/auto_wifi_blue"
+            android:text="向设备配网"
+            android:textColor="@color/white" />
 
     </LinearLayout>
 
@@ -113,6 +119,33 @@
             android:text="获取设备Wifi列表" />
 
     </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/continueQueryBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="继续查询" />
+
+        <Button
+            android:id="@+id/stopWifiConfigBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="停止配网" />
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:text="使用说明:\n第一步：点击'获取token'按钮，获取接触式AP配网所需的信息\n第二步：连接设备热点(手动去设置里连接)\n第三步：点击'向设备配网'按钮，发起配网\n注意：其他灰色按钮非必须，按需使用" />
 
     <TextView
         android:layout_width="wrap_content"

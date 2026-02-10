@@ -10,7 +10,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
@@ -44,6 +44,7 @@ public class AutoWifiNetConfigActivity extends RootActivity {
     private TextView tvSSID;
     private EditText edtPassword;
     private TextView tvTitle;
+    private TextView tvNotSupport5G;
     /**
      * true为应用权限管理返回
      */
@@ -100,12 +101,12 @@ public class AutoWifiNetConfigActivity extends RootActivity {
                         startActivity(new Intent(android.provider.Settings.ACTION_SETTINGS));
                     }
                 }).setPositiveButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                onBackPressed();
-            }
-        }).setCancelable(false).create().show();
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        onBackPressed();
+                    }
+                }).setCancelable(false).create().show();
     }
 
     private void updateWifiInfo() {
@@ -118,8 +119,9 @@ public class AutoWifiNetConfigActivity extends RootActivity {
         if (isValidWifiSSID(wifiName)) {
             tvSSID.setText(wifiName);
         }
-        tvSSID.setText("ezviz_mobile_AV");
-        edtPassword.setText("chengjun7");
+
+//        tvSSID.setText("");
+//        edtPassword.setText("");
     }
 
     private boolean isValidWifiSSID(String wifiName) {
@@ -130,6 +132,7 @@ public class AutoWifiNetConfigActivity extends RootActivity {
         btnNext = findViewById(R.id.btnNext);
         tvSSID = findViewById(R.id.tvSSID);
         edtPassword = findViewById(R.id.edtPassword);
+        tvNotSupport5G = findViewById(R.id.tvNotSupport5G);
     }
 
 
@@ -137,6 +140,9 @@ public class AutoWifiNetConfigActivity extends RootActivity {
         tvTitle.setText(R.string.auto_wifi_cer_config_title2);
         String password = "";
         edtPassword.setText(password);
+
+        boolean isSupport5GWiFi = getIntent().getBooleanExtra(IntentConstants.EXTRA_SUPPORT_WIFI_5G, false);
+        tvNotSupport5G.setVisibility(isSupport5GWiFi ? View.INVISIBLE : View.VISIBLE);
     }
 
 
@@ -150,6 +156,11 @@ public class AutoWifiNetConfigActivity extends RootActivity {
     }
 
     private void goToChooseConfigWifiWay() {
+        // 不支持5G无线频段配网，需要拦截
+        if (!getIntent().getBooleanExtra(IntentConstants.EXTRA_SUPPORT_WIFI_5G, false) && tvSSID.getText().toString().contains("5G")) {
+            showToast(R.string.device_unsupport_5g_wifi);
+            return;
+        }
         Intent toConfigIntent = new Intent(mContext, ManualChooseConfigWifiWayActivity.class);
         toConfigIntent.putExtras(getIntent());
         toConfigIntent.putExtra(IntentConstants.ROUTER_WIFI_SSID, tvSSID.getText().toString());
@@ -174,6 +185,9 @@ public class AutoWifiNetConfigActivity extends RootActivity {
     @TargetApi(Build.VERSION_CODES.M)
     private void checkAndRequestPermission() {
         List<String> lackedPermission = new ArrayList<>();
+        if (!(checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
+            lackedPermission.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+        }
         if (!(checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
             lackedPermission.add(Manifest.permission.ACCESS_FINE_LOCATION);
         }
@@ -206,7 +220,7 @@ public class AutoWifiNetConfigActivity extends RootActivity {
      * 权限设置
      */
     private void showPermissionDialog() {
-        android.support.v7.app.AlertDialog dialog = new android.support.v7.app.AlertDialog.Builder(this)
+        AlertDialog dialog = new AlertDialog.Builder(this)
                 .setMessage("应用缺少必要的权限！请点击\"权限\"，打开所需要的权限。")
                 .setPositiveButton("去设置", new DialogInterface.OnClickListener() {
                     @Override
@@ -228,7 +242,7 @@ public class AutoWifiNetConfigActivity extends RootActivity {
                 }).create();
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
-        dialog.getButton(android.support.v7.app.AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(this, R.color.black));
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(this, R.color.black));
         //设置居中，解决Android9.0 AlertDialog不居中问题
         Window dialogWindow = dialog.getWindow();
         WindowManager.LayoutParams p = dialogWindow.getAttributes();

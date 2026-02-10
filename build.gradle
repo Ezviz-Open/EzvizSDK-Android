@@ -1,23 +1,25 @@
 buildscript {
 
     //依赖版本统一管理
-    ext.kotlin_version = '1.4.20-RC'
-    ext.arrouter_api_version = '1.5.0'
-    ext.arouter_compiler_version = '1.2.2'
+    ext.kotlin_version = '2.0.21'
+    ext.arrouter_api_version = '1.4.0'
+    ext.arouter_compiler_version = '1.2.1'
 
     ext.minSdk = 21
-    ext.targetSdk = 30
-    ext.compileVersion = 30
-    ext.buildToolsVersion = "30.0.3"
+    ext.targetSdk = 35
+    ext.compileVersion = 35
+    ext.buildToolsVersion = "35.0.0"
+
+    ext.gsonVersion = '2.8.5'
 
     repositories {
         google()
-        jcenter()
         mavenCentral()
+        maven { url 'https://jitpack.io' }
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.3'
+        classpath 'com.android.tools.build:gradle:8.5.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -25,7 +27,7 @@ buildscript {
 allprojects {
     repositories {
         google()
-        jcenter()
         mavenCentral()
+        maven { url 'https://jitpack.io' }
     }
 }

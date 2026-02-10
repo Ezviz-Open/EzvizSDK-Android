@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
-    <RelativeLayout android:layout_width="match_parent"
-                    android:layout_height="50dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
 
         <TextView
             android:id="@+id/text_camerano"
@@ -15,7 +16,7 @@
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:layout_marginLeft="10dp"
-            android:text="通道号"/>
+            android:text="通道号" />
 
         <TextView
             android:id="@+id/text_camera_name"
@@ -23,8 +24,11 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
+            android:layout_marginLeft="15dp"
             android:layout_marginRight="10dp"
-            android:text="通道名称"/>
+            android:layout_toRightOf="@id/text_camerano"
+            android:gravity="right"
+            android:text="通道名称" />
     </RelativeLayout>
 
 </RelativeLayout>

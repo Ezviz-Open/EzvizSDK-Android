@@ -19,7 +19,7 @@ import android.app.Activity;
 import android.content.Intent;
 
 import com.videogo.EzvizApplication;
-import com.videogo.ui.cameralist.EZCameraListActivity;
+import com.videogo.ui.devicelist.EZDeviceListActivity;
 
 
 public class ActivityUtils {
@@ -32,7 +32,7 @@ public class ActivityUtils {
     }
 
     public static void goToMainPage(Activity activity) {
-        Intent intent = new Intent(activity, EZCameraListActivity.class);
+        Intent intent = new Intent(activity, EZDeviceListActivity.class);
         activity.startActivity(intent);
     }
 

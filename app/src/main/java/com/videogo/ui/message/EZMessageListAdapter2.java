@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.videogo.openapi.bean.EZAlarmInfo;
 import com.videogo.util.DataManager;
+import com.videogo.util.DateTimeUtil;
 import com.videogo.util.EZUtils;
 import com.videogo.util.VerifyCodeInput;
 import com.videogo.widget.PinnedSectionListView.PinnedSectionListAdapter;
@@ -64,7 +65,6 @@ public class EZMessageListAdapter2 extends BaseAdapter implements View.OnClickLi
         ImageView unread;
     }
 
-    private final DateFormat mDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
     private final String[] mWeekdayNames = DateFormatSymbols.getInstance(Locale.getDefault()).getWeekdays();
 
     private Context mContext;
@@ -118,12 +118,7 @@ public class EZMessageListAdapter2 extends BaseAdapter implements View.OnClickLi
                 //mj String time = ((EZAlarmInfo) item).getAlarmStartTime();
                 String time = ((EZAlarmInfo) item).getAlarmStartTime();
 
-                try {
-                tempDate.setTime(mDateFormat.parse(time));
-                } catch (ParseException e) {
-                    //tempDate.setTime(mDateFormat.parse(time));
-                    e.printStackTrace();
-                }
+                tempDate.setTime(DateTimeUtil.parseYMDHMSStringToDate(time));
                 if (mLastDate == null || !isSameDate(mLastDate, tempDate)) {
                     mLastDate = (Calendar) tempDate.clone();
                     objects.add(mLastDate);
@@ -306,9 +301,7 @@ public class EZMessageListAdapter2 extends BaseAdapter implements View.OnClickLi
 //
 //                viewHolder.type.setText(alarmType == AlarmType.DOORBELL_ALARM ? alarmLogInfo.getSampleName() : mContext
 //                        .getString(alarmType.getTextResId()));
-                AlarmType alarmType = AlarmType.BODY_ALARM;
-
-                viewHolder.type.setText(mContext.getString(alarmType.getTextResId()));
+                viewHolder.type.setText(R.string.ez_alarm_type_person_alarm);
 
                 viewHolder.from.setText(alarmLogInfo.getAlarmName());
 
@@ -330,7 +323,7 @@ public class EZMessageListAdapter2 extends BaseAdapter implements View.OnClickLi
                     }
                 } else {
                     viewHolder.image.setBackgroundResource(R.drawable.message_a1_bg);
-                    viewHolder.image.setImageResource(alarmType.getDrawableResId());
+                    viewHolder.image.setImageResource(R.drawable.message_infrared);
                 }
 
             } /*else if (item instanceof LeaveMessageItem) {
@@ -391,29 +384,25 @@ public class EZMessageListAdapter2 extends BaseAdapter implements View.OnClickLi
     @Override
     public void onClick(View v) {
         int position;
-        switch (v.getId()) {
-            case R.id.message_layout:
-                position = (Integer) v.getTag(R.id.tag_key_position);
-
-                if (mCheckMode) {
-                    CheckBox checkBox = (CheckBox) v.findViewById(R.id.message_check);
-                    checkBox.toggle();
-                    if (mOnClickListener != null)
-                        mOnClickListener
-                                .onCheckClick(EZMessageListAdapter2.this, checkBox, position, checkBox.isChecked());
-                } else {
-                    if (mOnClickListener != null)
-                        mOnClickListener.onItemClick(EZMessageListAdapter2.this, v, position);
-                }
-                break;
-
-            case R.id.message_check:
-                position = (Integer) v.getTag(R.id.tag_key_position);
-                boolean check = ((CheckBox) v).isChecked();
-
+        int id = v.getId();
+        if (id == R.id.message_layout) {
+            position = (Integer) v.getTag(R.id.tag_key_position);
+            if (mCheckMode) {
+                CheckBox checkBox = (CheckBox) v.findViewById(R.id.message_check);
+                checkBox.toggle();
                 if (mOnClickListener != null)
-                    mOnClickListener.onCheckClick(EZMessageListAdapter2.this, v, position, check);
-                break;
+                    mOnClickListener
+                            .onCheckClick(EZMessageListAdapter2.this, checkBox, position, checkBox.isChecked());
+            } else {
+                if (mOnClickListener != null)
+                    mOnClickListener.onItemClick(EZMessageListAdapter2.this, v, position);
+            }
+        } else if (id == R.id.message_check) {
+            position = (Integer) v.getTag(R.id.tag_key_position);
+            boolean check = ((CheckBox) v).isChecked();
+
+            if (mOnClickListener != null)
+                mOnClickListener.onCheckClick(EZMessageListAdapter2.this, v, position, check);
         }
     }
 

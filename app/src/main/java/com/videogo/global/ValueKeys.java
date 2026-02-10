@@ -9,5 +9,9 @@ public enum ValueKeys {
     /*萤石测试人员-自动化测试专用*/
     AUTO_TEST,
     /*云录制空间id*/
-    SDK_CLOUD_SPACEID;
+    SDK_CLOUD_SPACEID,
+    /*硬解开关装填*/
+    VideoPlayHardDecodingStatus,
+    /*自动清晰度开关*/
+    QUALITY_AUTO;
 }

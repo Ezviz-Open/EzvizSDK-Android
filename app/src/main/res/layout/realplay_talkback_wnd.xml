@@ -32,22 +32,6 @@
         android:textColor="@color/white"
         android:textSize="@dimen/realplay_button_text_size" />
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="10dp"
-        android:visibility="gone">
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="onClickSwitchBetweenSpeakerAndHandset"
-            android:text="@string/switch_to_handset" />
-
-    </LinearLayout>
-
     <!-- 变声 -->
     <LinearLayout
         android:id="@+id/talk_voice_change_ll"
@@ -58,26 +42,42 @@
         android:orientation="vertical">
 
         <Button
+            android:id="@+id/talk_voice_normal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="onTalkVoiceChangeClick"
-            android:tag="0"
             android:text="原声" />
 
         <Button
+            android:id="@+id/talk_voice_clown"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="onTalkVoiceChangeClick"
-            android:tag="7"
             android:text="小丑音" />
 
         <Button
+            android:id="@+id/talk_voice_man"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="onTalkVoiceChangeClick"
-            android:tag="-7"
             android:text="大叔音" />
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/talkback_local_loudness_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="23dp"
+        android:layout_toRightOf="@+id/talk_voice_change_ll"
+        android:text="本地音频音量：-40分贝" />
+
+    <Switch
+        android:id="@+id/switch_remote_mute"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/talkback_local_loudness_tv"
+        android:layout_marginTop="70dp"
+        android:switchPadding="5dp"
+        android:text="对讲时设备端静音"
+        android:textColor="@color/grey" />
 
 </RelativeLayout>

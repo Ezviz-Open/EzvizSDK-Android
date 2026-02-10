@@ -217,6 +217,9 @@ public class SectionListAdapter implements ListAdapter, OnItemClickListener, Pin
             holder.text1 = (TextView) convertView.findViewById(R.id.text1);
             holder.text2 = (TextView) convertView.findViewById(R.id.text2);
             holder.text3 = (TextView) convertView.findViewById(R.id.text3);
+            holder.during1 = (TextView) convertView.findViewById(R.id.during1);
+            holder.during2 = (TextView) convertView.findViewById(R.id.during2);
+            holder.during3 = (TextView) convertView.findViewById(R.id.during3);
 
             holder.layout1 = (LinearLayout) convertView.findViewById(R.id.local_l1);
             holder.layout2 = (LinearLayout) convertView.findViewById(R.id.local_l2);
@@ -301,6 +304,7 @@ public class SectionListAdapter implements ListAdapter, OnItemClickListener, Pin
             }
             holder.text1.setVisibility(View.VISIBLE);
             holder.text1.setText(getDate(Utils.convert14Calender(dataOne.getStartTime())));
+            holder.during1.setText(RemoteListUtil.convToUIDuration(dataOne));
             holder.layout1.setVisibility(View.GONE);
             if (dataOne.getPosition() == selPosition && !isEdit) {
                 holder.image1.setSelected(true);
@@ -340,6 +344,7 @@ public class SectionListAdapter implements ListAdapter, OnItemClickListener, Pin
             }
             holder.text2.setVisibility(View.VISIBLE);
             holder.text2.setText(getDate(Utils.convert14Calender(dataTwo.getStartTime())));
+            holder.during2.setText(RemoteListUtil.convToUIDuration(dataTwo));
             holder.layout2.setVisibility(View.GONE);
             holder.image2.setVisibility(View.VISIBLE);
             holder.image2.setOnClickListener(new OnHikClickListener(dataTwo, position, holder.check2));
@@ -379,6 +384,7 @@ public class SectionListAdapter implements ListAdapter, OnItemClickListener, Pin
             }
             holder.text3.setVisibility(View.VISIBLE);
             holder.text3.setText(getDate(Utils.convert14Calender(dataThree.getStartTime())));
+            holder.during3.setText(RemoteListUtil.convToUIDuration(dataThree));
             holder.layout3.setVisibility(View.GONE);
             holder.image3.setVisibility(View.VISIBLE);
             holder.image3.setOnClickListener(new OnHikClickListener(dataThree, position, holder.check3));
@@ -580,6 +586,7 @@ public class SectionListAdapter implements ListAdapter, OnItemClickListener, Pin
 
         ImageView image1;
         TextView text1;
+        TextView during1;
         LinearLayout layout1;
         TextView localTimePart1;
         ImageView localAlarm1;
@@ -587,6 +594,7 @@ public class SectionListAdapter implements ListAdapter, OnItemClickListener, Pin
 
         ImageView image2;
         TextView text2;
+        TextView during2;
         LinearLayout layout2;
         TextView localTimePart2;
         ImageView localAlarm2;
@@ -594,6 +602,7 @@ public class SectionListAdapter implements ListAdapter, OnItemClickListener, Pin
 
         ImageView image3;
         TextView text3;
+        TextView during3;
         LinearLayout layout3;
         TextView localTimePart3;
         ImageView localAlarm3;

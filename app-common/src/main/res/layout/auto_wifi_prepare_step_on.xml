@@ -42,7 +42,7 @@
             android:background="@drawable/login_btn_selector"
             android:text="@string/next_button_txt"
             android:textColor="@color/white"
-            android:textSize="@dimen/realplay_button_text_size" />
+            android:textSize="15dp" />
 
         <Button
             android:id="@+id/btnIntroduce"
@@ -52,7 +52,7 @@
             android:background="@drawable/ez_btn_r1_retry_selector"
             android:text="@string/next_button_txt"
             android:textColor="@color/tv_my_blue"
-            android:textSize="@dimen/realplay_button_text_size" />
+            android:textSize="15dp" />
     </LinearLayout>
 
 </LinearLayout>

@@ -4,13 +4,13 @@ import com.videogo.stream.EZCloudStreamDownload;
 
 public class DownloadTaskRecordOfCloud extends DownLoadTaskRecordAbstract {
 
-    public DownloadTaskRecordOfCloud(EZCloudStreamDownload downloader, int notificationId) {
-        super(downloader, notificationId);
+    public DownloadTaskRecordOfCloud(EZCloudStreamDownload downloader) {
+        super(downloader);
     }
 
     @Override
     public void stopDownloader() {
-        if (mDownloader instanceof EZCloudStreamDownload){
+        if (mDownloader instanceof EZCloudStreamDownload) {
             ((EZCloudStreamDownload) mDownloader).stop();
         }
     }

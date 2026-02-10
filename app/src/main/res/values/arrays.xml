@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <array name="watermark_font_alignment">
+        <item>居中对齐</item>
+        <item>左对齐</item>
+        <item>右对齐</item>
+    </array>
 
-    <string-array name="speeds">
-        <item>1x</item>
-        <item>3x </item>
-        <item>4x</item>
-        <item>8x</item>
-        <item>16x</item>
-    </string-array>
-
+    <array name="watermark_window_adapt">
+        <item>关闭</item>
+        <item>行列数自适应</item>
+        <item>大小自适应</item>
+    </array>
 </resources>

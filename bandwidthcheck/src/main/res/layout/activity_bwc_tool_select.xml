@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/bwc_bg"
+    android:orientation="vertical"
+    tools:context="com.ezviz.bandwidthcheck.BWCToolSelectActivity">
+
+    <com.ezviz.common.TitleBar
+        android:id="@+id/title_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!-- 设备带宽检测 -->
+    <RelativeLayout
+        android:id="@+id/rl_bwc_device"
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:layout_margin="16dp"
+        android:background="@drawable/bg_solid_white_16dp"
+        android:padding="16dp">
+
+        <ImageView
+            android:id="@+id/iv_bwc_tool_device"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:src="@mipmap/bwc_tool_device" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="50dp"
+            android:layout_toRightOf="@id/iv_bwc_tool_device"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_bwc_tool_device"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="模拟设备带宽检测"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tv_bwc_tool_device"
+                android:layout_marginTop="8dp"
+                android:text="根据设备序列号测带宽，需设备本身支持带宽检测"
+                android:textColor="#999999"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <!-- 网络测速 -->
+    <RelativeLayout
+        android:id="@+id/rl_bwc_net"
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:background="@drawable/bg_solid_white_16dp"
+        android:padding="16dp">
+
+        <ImageView
+            android:id="@+id/iv_bwc_tool_net"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:src="@mipmap/bwc_tool_net" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="50dp"
+            android:layout_toRightOf="@id/iv_bwc_tool_net"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_bwc_tool_net"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="网络测速"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tv_bwc_tool_device"
+                android:layout_marginTop="8dp"
+                android:text="检测现场网络或模拟设备进行现场网络测速"
+                android:textColor="#999999"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</LinearLayout>

@@ -61,8 +61,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:textColor="@color/white"
-        android:textSize="@dimen/realplay_text_size"
-        android:visibility="invisible" />
+        android:textSize="@dimen/realplay_text_size" />
 
     <View
         android:id="@+id/mirror_line"

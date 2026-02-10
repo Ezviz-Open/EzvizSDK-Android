@@ -7,25 +7,17 @@
  */
 package com.videogo.ui.playback;
 
-import android.content.ContentResolver;
-import android.content.ContentValues;
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.provider.MediaStore;
 import android.text.TextUtils;
 
 import com.videogo.device.DeviceInfoEx;
+import com.videogo.openapi.bean.resp.CloudPartInfoFile;
 import com.videogo.util.LocalInfo;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
 import ezviz.ezopensdk.R;
-
-//import com.videogo.util.MD5Util;
 
 public class RemoteListUtil {
     private static LocalInfo mLocalInfo = LocalInfo.getInstance();
@@ -88,7 +80,6 @@ public class RemoteListUtil {
             }
             return hStr + ":" + minStr + ":" + secStr;
         } else {
-            hStr = "00";
             if (min < 10) {
                 if (min > 0) {
                     minStr = "0" + min;
@@ -107,20 +98,20 @@ public class RemoteListUtil {
             } else {
                 secStr = "" + sec;
             }
-            return hStr + ":" + minStr + ":" + secStr;
+            return minStr + ":" + secStr;
         }
     }
 
-    public static String converTime(Calendar calenderTime) {
-        // libCASClient 内部统一进行时间转换
-        // 20130605T001020Z->2013-06-25T00:10:20
-        // 调用libCASClient接口时必须使用时间格式：20130605T001020Z
-        // 请和各位同步更新
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd,HHmmss.");
-        String now = sdf.format(calenderTime.getTime());
-        String aString = now.replace(',', 'T');
-        String bString = aString.replace('.', 'Z');
-        return bString;
+    public static String convToUIDuration(CloudPartInfoFile file) {
+        int diffSeconds = (int) (file.getEndMillis() - file.getStartMillis()) / 1000;
+        int minute = diffSeconds / 60;
+        int seconds = diffSeconds % 60;
+
+        return minute + "'" + seconds + "\"";
+    }
+
+    public static long converToSecondDuration(Calendar startTime, Calendar stopTime) {
+        return (stopTime.getTimeInMillis() - startTime.getTimeInMillis()) / 1000;
     }
 
     public static String converToMonthAndDay(Date queryDate) {

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- common -->
+    <color name="title_text">#333333</color>
+    <color name="common_text">#333333</color>
+    <color name="black">#333333</color>
+    <color name="gray">#adadad</color>
+    <color name="red">#bd2228</color>
+    <color name="white">#ffffff</color>
+    <color name="green">#4CAF50</color>
+    <color name="tv_my_blue">#1b9ee2</color>
+    <color name="transparent">#00000000</color>
+    <color name="blue_bwc">#407AFF</color>
+    <color name="blue_bwc_50">#80407AFF</color>
+    <color name="red_bwc">#FF4D4F</color>
+    <color name="red_bwc_70">#B3FF4D4F</color>
+</resources>

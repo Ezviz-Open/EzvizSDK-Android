@@ -25,16 +25,33 @@
             android:layout_height="300dp"
             android:background="@color/black">
 
-            <!--            <SurfaceView-->
-            <!--                android:id="@+id/remote_playback_wnd_sv"-->
-            <!--                android:layout_width="600dp"-->
-            <!--                android:layout_height="300dp"-->
-            <!--                android:background="@android:color/transparent" />-->
-
-            <TextureView
-                android:id="@+id/remote_playback_wnd_sv"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <!--            <SurfaceView-->
+                <!--                android:id="@+id/remote_playback_wnd_sv"-->
+                <!--                android:layout_width="600dp"-->
+                <!--                android:layout_height="300dp"-->
+                <!--                android:background="@android:color/transparent" />-->
+
+                <TextureView
+                    android:id="@+id/remote_playback_wnd_sv"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <!-- 主窗口2，双目设备-->
+                <TextureView
+                    android:id="@+id/remote_playback_wnd_second_sv"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="1"
+                    android:visibility="gone" />
+
+            </LinearLayout>
 
             <!-- 鱼眼设备子窗口-->
             <RelativeLayout
@@ -117,7 +134,7 @@
             android:visibility="gone" />
 
         <TextView
-            android:id="@+id/stream_type_tv"
+            android:id="@+id/tv_stream_type"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -126,32 +143,6 @@
             android:text="取流方式："
             android:textColor="@color/red"
             android:visibility="gone" />
-
-        <LinearLayout
-            android:id="@+id/touch_progress_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:background="@android:color/transparent"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-            <com.videogo.widget.loading.LoadingView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:id="@+id/touch_loading_buffer_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="5dp"
-                android:text="0%"
-                android:textColor="@color/white"
-                android:textSize="15sp"
-                android:visibility="gone" />
-        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/loading_pb_ly"
@@ -167,97 +158,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
-            <TextView
-                android:id="@+id/remote_loading_buffer_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="5dp"
-                android:text="0%"
-                android:textColor="@color/white"
-                android:textSize="15sp"
-                android:visibility="gone" />
         </LinearLayout>
 
-        <ImageButton
-            android:id="@+id/loading_play_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:background="@drawable/leave_message_play_selector"
-            android:visibility="visible" />
-
-        <ImageButton
-            android:id="@+id/exit_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
-            android:background="@drawable/remote_exit_btn_selector"
-            android:visibility="gone" />
-
-        <LinearLayout
-            android:id="@+id/re_next_area"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:visibility="gone">
-
-            <ImageButton
-                android:id="@+id/replay_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:background="@drawable/palyback_replay" />
-
-            <ImageButton
-                android:id="@+id/next_play_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginLeft="40dp"
-                android:background="@drawable/palyback_nest" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/remoteplayback_record_ly"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_marginTop="15dp"
-            android:layout_marginRight="20dp"
-            android:background="@drawable/play_video_time_bg"
-            android:gravity="center"
-            android:visibility="gone">
-
-            <ImageView
-                android:id="@+id/remoteplayback_record_iv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/play_video_record"
-                android:scaleType="fitXY" />
-
-            <TextView
-                android:id="@+id/remoteplayback_record_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="10dp"
-                android:text="00:25"
-                android:textColor="@color/white"
-                android:textSize="@dimen/remoteplayback_text_size" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/remoteplayback_ratio_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/remoteplayback_record_ly"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="30dp"
-            android:text="2.0X"
-            android:textColor="@color/white"
-            android:textSize="@dimen/remoteplayback_ratio_text_size"
-            android:visibility="gone" />
     </RelativeLayout>
 
     <!-- 播放控制工具类-->
@@ -277,7 +179,7 @@
             android:gravity="center">
 
             <TextView
-                android:id="@+id/begin_time_tv"
+                android:id="@+id/play_time_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
@@ -300,7 +202,7 @@
                 android:thumb="@drawable/remote_seekbar_thumb" />
 
             <TextView
-                android:id="@+id/end_time_tv"
+                android:id="@+id/during_time_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
@@ -311,7 +213,7 @@
         </LinearLayout>
 
         <RelativeLayout
-            android:id="@+id/flow_area"
+            android:id="@+id/control_bar"
             android:layout_width="match_parent"
             android:layout_height="40dp">
 
@@ -333,13 +235,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/remote_list_soundoff_btn_selector"
-                    android:visibility="visible" />
-
-                <ImageButton
-                    android:id="@+id/remote_playback_video_recording_btn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/palyback_video_selector"
                     android:visibility="visible" />
 
                 <LinearLayout
@@ -372,8 +267,7 @@
                     android:layout_width="50dp"
                     android:layout_height="match_parent"
                     android:background="@drawable/translucent"
-                    android:enabled="false"
-                    android:onClick="onClickChangePlaybackSpeed"
+                    android:enabled="true"
                     android:text="1x"
                     android:textColor="@color/white" />
 
@@ -415,7 +309,6 @@
             android:id="@+id/img_active_cloud_video"
             android:layout_width="match_parent"
             android:layout_height="85dp"
-            android:onClick="goToActiveCloudVideo"
             android:scaleType="fitXY"
             android:src="@drawable/cloud_ad" />
 
@@ -480,7 +373,7 @@
         android:layout_marginTop="5dp">
 
         <com.videogo.widget.loading.LoadingTextView
-            android:id="@+id/loadingTextView"
+            android:id="@+id/record_loadingTextView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_centerInParent="true"
@@ -549,7 +442,7 @@
                     android:listSelector="@null"
                     android:overScrollFooter="@null"
                     android:scrollbarAlwaysDrawVerticalTrack="false"
-                    android:scrollingCache="false"/>
+                    android:scrollingCache="false" />
 
                 <TextView
                     android:id="@+id/delete_playback"
@@ -621,7 +514,7 @@
                     android:listSelector="@null"
                     android:overScrollFooter="@null"
                     android:scrollbarAlwaysDrawVerticalTrack="false"
-                    android:scrollingCache="false"/>
+                    android:scrollingCache="false" />
 
                 <TextView
                     android:id="@+id/delete_playback_sdkcloud"
@@ -694,7 +587,7 @@
                     android:listSelector="@null"
                     android:overScrollFooter="@null"
                     android:scrollbarAlwaysDrawVerticalTrack="false"
-                    android:scrollingCache="false"/>
+                    android:scrollingCache="false" />
 
                 <TextView
                     android:id="@+id/delete_playback_device"

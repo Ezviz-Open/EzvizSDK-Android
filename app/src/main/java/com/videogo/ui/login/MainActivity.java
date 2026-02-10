@@ -1,13 +1,16 @@
 package com.videogo.ui.login;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.DataSetObserver;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
+
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
@@ -23,8 +26,10 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 import com.videogo.EzvizApplication;
 import com.videogo.exception.BaseException;
+import com.videogo.global.DemoConfig;
+import com.videogo.global.GlobalKit;
 import com.videogo.openapi.EZOpenSDK;
-import com.videogo.ui.cameralist.EZCameraListActivity;
+import com.videogo.ui.devicelist.EZDeviceListActivity;
 import com.videogo.util.LocalInfo;
 import com.videogo.util.LogUtil;
 
@@ -38,7 +43,6 @@ import com.videogo.global.ValueKeys;
 import ezviz.ezopensdkcommon.common.RootActivity;
 import static com.videogo.EzvizApplication.getOpenSDK;
 import static com.videogo.constant.Constant.OAUTH_SUCCESS_ACTION;
-import static com.videogo.ui.login.ServerAreasEnum.ASIA_CHINA;
 
 public class MainActivity extends RootActivity {
 
@@ -55,14 +59,6 @@ public class MainActivity extends RootActivity {
     private SdkInitParams mSdkInitParams;
     // 萤石账号登录成功回调广播
     private BroadcastReceiver mLoginResultReceiver;
-    
-    // JuneCheng's AppKey
-    private final static String APPKEY_JC = "fd82f9a6f0154aa2aa9284ae7af25a5b";
-    private final static String TOKEN_JC = "at.14l6i7al3kobl1pk1o9ht664cq6tz5mr-231nydzk16-15elpn8-l5ntywzsc";
-    // 开发者账号信息
-    private final static String APPKEY_DEV = "26810f3acd794862b608b6cfbc32a6b8";
-    private final static String TOKEN_DEV = "at.4t5gkmac6mk75w9s7dkcln7i5d733toq-8ojhpl8mpa-1b92k8x-kmo4vgats";
-    private final static String DEVICE_DEV = "BA5918431";
 
     /**
      * @param savedInstanceState
@@ -75,19 +71,19 @@ public class MainActivity extends RootActivity {
         initUI();
         autoLogin();
 
-        mAppKeyET.setText(APPKEY_DEV);
-        mAccessTokenET.setText(TOKEN_DEV);
-        mSpecifiedDeviceET.setText(DEVICE_DEV);
+        mAppKeyET.setText(DemoConfig.APPKEY_DEV);
+        mAccessTokenET.setText(DemoConfig.TOKEN_DEV);
+        mSpecifiedDeviceET.setText(DemoConfig.DEVICE_DEV);
     }
 
     /**
-     * 通过AccessToken进行体验
+     * 通过AccessToken/tkToken进行体验
      */
     public void onClickStartExperience(View view) {
         if (checkLoginInfo()) {
             SdkInitParams sdkInitParams = SdkInitParams.createBy(mCurrentServerArea);
             sdkInitParams.appKey = getValidText(mAppKeyET.getText().toString());
-            sdkInitParams.accessToken = getValidText(mAccessTokenET.getText().toString());
+            sdkInitParams.token = getValidText(mAccessTokenET.getText().toString());
             sdkInitParams.openApiServer = getValidText(mApiET.getText().toString());
             sdkInitParams.openAuthApiServer = getValidText(mAuthET.getText().toString());
             sdkInitParams.specifiedDevice = getValidText(mSpecifiedDeviceET.getText().toString());
@@ -96,7 +92,7 @@ public class MainActivity extends RootActivity {
                 showLoginAnim(true);
                 if (checkAppKeyAndAccessToken()) {
                     // 保存相关信息
-                    saveLastSdkInitParams(sdkInitParams);
+                    SpTool.storeValue(ValueKeys.SDK_INIT_PARAMS, sdkInitParams.toString());
                     jumpToCameraListActivity();
                 }
                 showLoginAnim(false);
@@ -109,44 +105,47 @@ public class MainActivity extends RootActivity {
      */
     public void onClickLoginByEzvizAccount(View view) {
         if (mCurrentServerArea == null || mCurrentServerArea.defaultOpenAuthAppKey == null) {
-            toast("Error occurred! Please try to use demo with appKey & accessToken.");
+            showToast("Error occurred! Please try to use demo with appKey & accessToken.");
             return;
         }
         mSdkInitParams = SdkInitParams.createBy(mCurrentServerArea);
         mSdkInitParams.openApiServer = getValidText(mApiET.getText().toString());
         mSdkInitParams.openAuthApiServer = getValidText(mAuthET.getText().toString());
+        /**
+         * 国内使用萤石账号登录，一定要设置为false
+         * 本Demo是accessToken和tkToken两种模式共存的，如果第一次使用了tkToken，第二次要用accessToken模式登录，需要将enableSDKWithTKToken重置为false
+         */
+        if (!mSdkInitParams.usingGlobalSDK) {
+            EZOpenSDK.enableSDKWithTKToken(false);
+        }
         SdkInitTool.initSdk(getApplication(), mSdkInitParams);
         registerLoginResultReceiver();
         getOpenSDK().openLoginPage();
     }
 
     public void jcTestClick(View view) {
-        mSpecifiedDeviceET.setText("");
-        SdkInitParams sdkInitParams = SdkInitParams.createBy(ASIA_CHINA);
-        sdkInitParams.appKey = APPKEY_JC;
-        sdkInitParams.accessToken = TOKEN_JC;
-        sdkInitParams.specifiedDevice = "";
-        SdkInitTool.initSdk(getApplication(), sdkInitParams);
-        new Thread(() -> {
-            showLoginAnim(true);
-            if (checkAppKeyAndAccessToken()) {
-                // 保存相关信息
-                saveLastSdkInitParams(sdkInitParams);
-                jumpToCameraListActivity();
-            }
-            showLoginAnim(false);
-        }).start();
+        if (!GlobalKit.isJCTest) {
+            return;
+        }
+        mCurrentServerArea = ServerAreasEnum.getAllServers().get(0);
+        mAppKeyET.setText(DemoConfig.APPKEY_JC);
+        mAccessTokenET.setText(DemoConfig.TOKEN_JC);
+        mSpecifiedDeviceET.setText(DemoConfig.DEVICE_JC);
+        mApiET.setText(mCurrentServerArea.openApiServer);
+        mAuthET.setText(mCurrentServerArea.openAuthApiServer);
+        onClickStartExperience(null);
     }
 
     /**
      * 跳转设备列表页面
      */
     private void jumpToCameraListActivity() {
-        Intent toCameraListIntent = new Intent(getApplicationContext(), EZCameraListActivity.class);
+        Intent toCameraListIntent = new Intent(getApplicationContext(), EZDeviceListActivity.class);
         startActivity(toCameraListIntent);
         finish();
     }
 
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     private void registerLoginResultReceiver() {
         if (mLoginResultReceiver == null) {
             mLoginResultReceiver = new BroadcastReceiver() {
@@ -154,13 +153,18 @@ public class MainActivity extends RootActivity {
                 public void onReceive(Context context, Intent intent) {
                     Log.i(TAG, "login success by h5 page");
                     unregisterLoginResultReceiver();
-                    saveLastSdkInitParams(mSdkInitParams);
+                    SpTool.storeValue(ValueKeys.SDK_INIT_PARAMS, mSdkInitParams.toString());
                     jumpToCameraListActivity();
                     finish();
                 }
             };
             IntentFilter filter = new IntentFilter(OAUTH_SUCCESS_ACTION);
-            registerReceiver(mLoginResultReceiver, filter);
+            // 添加版本兼容性判断
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {// Android 8.0及以上
+                registerReceiver(mLoginResultReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+            } else {
+                registerReceiver(mLoginResultReceiver, filter);
+            }
             Log.i(TAG, "registered login result receiver");
         }
     }
@@ -178,8 +182,9 @@ public class MainActivity extends RootActivity {
         if (!loadLastSdkInitParams()) {
             loadDefaultSdkInitParams();
         }
-        mInitParams.accessToken = null;
-        SdkInitTool.initSdk(getApplication(), mInitParams);
+        if (!TextUtils.isEmpty(mInitParams.appKey) && !TextUtils.isEmpty(mInitParams.token)) {
+            SdkInitTool.initSdk(getApplication(), mInitParams);
+        }
     }
 
     /**
@@ -201,7 +206,7 @@ public class MainActivity extends RootActivity {
      */
     private void loadDefaultSdkInitParams() {
         mInitParams = SdkInitParams.createBy(null);
-        mInitParams.appKey = APPKEY_JC;
+        mInitParams.appKey = DemoConfig.APPKEY_DEV;
         mInitParams.openApiServer = "https://open.ys7.com";
         mInitParams.openAuthApiServer = "https://openauth.ys7.com";
     }
@@ -251,15 +256,6 @@ public class MainActivity extends RootActivity {
     }
 
     /**
-     * 保存上次sdk初始化的参数
-     */
-    private void saveLastSdkInitParams(SdkInitParams sdkInitParams) {
-        // 不保存AccessToken
-        sdkInitParams.accessToken = null;
-        SpTool.storeValue(ValueKeys.SDK_INIT_PARAMS, sdkInitParams.toString());
-    }
-
-    /**
      * 获取上次sdk初始化的参数
      */
     private SdkInitParams getLastSdkInitParams() {
@@ -294,7 +290,7 @@ public class MainActivity extends RootActivity {
                     errMsg = getApplicationContext().getString(R.string.login_expire) + "\n" + e.getErrorInfo().description;
                     break;
             }
-            toast(errMsg);
+            showToast(errMsg);
         }
         return isValid;
     }
@@ -304,11 +300,11 @@ public class MainActivity extends RootActivity {
      */
     private boolean checkLoginInfo() {
         if (mAppKeyET.getText().toString().equals("")) {
-            toast("AppKey不能为空");
+            showToast("AppKey不能为空");
             return false;
         }
         if (mAccessTokenET.getText().toString().equals("")) {
-            toast("AccessToken不能为空");
+            showToast("AccessToken不能为空");
             return false;
         }
         return true;
@@ -365,8 +361,13 @@ public class MainActivity extends RootActivity {
                     showToast("AppKey is empty!");
                     return;
                 }
-                if (LocalInfo.getInstance().getEZAccesstoken() == null || LocalInfo.getInstance().getEZAccesstoken().getAccessToken() == null) {
-                    String tip = "AccessToken is empty!";
+                LocalInfo localInfo = LocalInfo.getInstance();
+                boolean isNotExistAccessToken = localInfo == null || localInfo.getEZAccesstoken() == null
+                        || localInfo.getEZAccesstoken().getAccessToken() == null;
+                boolean isNotExistTKToken = localInfo == null || localInfo.getEZAccesstoken() == null
+                        || localInfo.getEZAccesstoken().getHttpToken() == null;
+                if (isNotExistAccessToken && isNotExistTKToken) {
+                    String tip = "AccessToken/TKToken is empty!";
                     LogUtil.i(TAG, tip);
                     return;
                 }
@@ -497,7 +498,7 @@ public class MainActivity extends RootActivity {
     @Override
     public void onBackPressed() {
         if (isShowLoginAnim) {
-            toast(getApplicationContext().getString(R.string.cancel_init_sdk));
+            showToast(getApplicationContext().getString(R.string.cancel_init_sdk));
             showLoginAnim(false);
         } else {
             super.onBackPressed();

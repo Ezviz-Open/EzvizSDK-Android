@@ -450,7 +450,7 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="20dp"
             android:layout_toLeftOf="@+id/remoteplayback_full_down_btn"
-            android:background="@anim/play_full_multiple_anim_bg"
+            android:background="@drawable/play_full_multiple_anim_bg"
             android:gravity="center"
             android:orientation="vertical">
 

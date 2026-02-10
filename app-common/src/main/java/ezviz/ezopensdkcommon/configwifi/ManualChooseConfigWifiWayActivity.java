@@ -37,12 +37,12 @@ public class ManualChooseConfigWifiWayActivity extends RootActivity {
             }
             toApView.setOnClickListener(mChooseConfigWifiListener);
         }
-        View toApLinkView = findViewById(R.id.btn_to_aplink);
-        if (toApLinkView != null) {
+        View toApHttpView = findViewById(R.id.btn_to_aphttp);
+        if (toApHttpView != null) {
             if (isUsingFullSdk) {
-                toApLinkView.setVisibility(getIntent().getBooleanExtra(IntentConstants.EXTRA_SUPPORT_APLINK, false) ? View.VISIBLE : View.GONE);
+                toApHttpView.setVisibility(getIntent().getBooleanExtra(IntentConstants.EXTRA_SUPPORT_APHTTP, false) ? View.VISIBLE : View.GONE);
             }
-            toApLinkView.setOnClickListener(mChooseConfigWifiListener);
+            toApHttpView.setOnClickListener(mChooseConfigWifiListener);
         }
         View toSmartConfigView = findViewById(R.id.btn_to_smart_config);
         if (toSmartConfigView != null) {
@@ -83,12 +83,12 @@ public class ManualChooseConfigWifiWayActivity extends RootActivity {
                     presenterType = ConfigWifiTypeConstants.FULL_SDK_AP;
                     componentName = new ComponentName(mContext, ConfigWifiExecutingActivity.class);
                 }
-            } else if (id == R.id.btn_to_aplink) {
+            } else if (id == R.id.btn_to_aphttp) {
                 if (getIntent().getBooleanExtra(IntentConstants.USING_CONFIG_WIFI_SDK, false)) {
-                    presenterType = ConfigWifiTypeConstants.CONFIG_WIFI_SDK_APLINK;
+                    presenterType = ConfigWifiTypeConstants.CONFIG_WIFI_SDK_APHTTP;
                     componentName = new ComponentName(mContext, ManualInputDeviceHotspotInfoActivity.class);
                 } else {
-                    presenterType = ConfigWifiTypeConstants.FULL_SDK_APLINK;
+                    presenterType = ConfigWifiTypeConstants.FULL_SDK_APHTTP;
                     componentName = new ComponentName(mContext, ConfigWifiExecutingActivity.class);
                 }
             } else if (id == R.id.btn_to_smart_config) {

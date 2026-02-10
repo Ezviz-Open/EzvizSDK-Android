@@ -65,12 +65,12 @@ public class ModifyDeviceNameActivity extends RootActivity implements View.OnCli
     private PeripheralInfo mDetector;
 
     private WaitDialog mWaitDialog;
-    
+
     private String mDeviceNameString;
 
     private Handler mHandler;
     private int mType;
-	private Button mSaveButton = null;
+    private Button mSaveButton = null;
 
     private String mDeviceName;
     private String mDeviceSerial;
@@ -88,7 +88,7 @@ public class ModifyDeviceNameActivity extends RootActivity implements View.OnCli
 
     private void findViews() {
         mTitleBar = (TitleBar) findViewById(R.id.title_bar);
-        mTitleBar.setBackButton(R.drawable.common_title_cancel_selector);
+        mTitleBar.setBackButton(ezviz.ezopensdkcommon.R.drawable.common_title_cancel_selector);
         mNameText = (EditText) findViewById(R.id.name_text);
         mNameDelButton = (ImageButton) findViewById(R.id.name_del);
         mDetectorTypeView = (TextView) findViewById(R.id.detector_type);
@@ -180,21 +180,20 @@ public class ModifyDeviceNameActivity extends RootActivity implements View.OnCli
         mSaveButton.setOnClickListener(this);
     }
 
-	@Override
-	public void onClick(View view) {
-		switch(view.getId()) {
-			case R.id.btn_id_save_name:
-				modifyDeviceName();
-				break;
-		}
-	}
+    @Override
+    public void onClick(View view) {
+        int id = view.getId();
+        if (id == R.id.btn_id_save_name) {
+            modifyDeviceName();
+        }
+    }
 
     private void setSelectLabel(String input) {}
 
     private void modifyDeviceName() {
-    	if(TextUtils.isEmpty(mDeviceName)) {
-    		return;
-    	}
+        if(TextUtils.isEmpty(mDeviceName)) {
+            return;
+        }
         mDeviceNameString = mNameText.getText().toString().trim();
 
         if (TextUtils.isEmpty(mDeviceNameString)) {
@@ -218,7 +217,7 @@ public class ModifyDeviceNameActivity extends RootActivity implements View.OnCli
                 try {
                     EzvizApplication.getOpenSDK().setDeviceName(mDeviceSerial, mDeviceNameString);
                 } catch (BaseException e) {
-                	e.printStackTrace();
+                    e.printStackTrace();
 
                     ErrorInfo errorInfo = (ErrorInfo) e.getObject();
                     LogUtil.d("TAG", errorInfo.toString());

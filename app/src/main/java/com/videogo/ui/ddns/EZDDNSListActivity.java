@@ -1,20 +1,21 @@
-/* 
+/*
  * @ProjectName VideoGoJar
  * @Copyright null
- * 
+ *
  * @FileName CameraListActivity.java
  * @Description 这里对文件进行描述
- * 
+ *
  * @author xia xingsuo
  * @data 2015-11-5
- * 
+ *
  * @note 这里写本文件的详细功能描述和注释
  * @note 历史记录
- * 
+ *
  * @warning 这里写本文件的相关警告
  */
 package com.videogo.ui.ddns;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -25,6 +26,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -77,7 +79,7 @@ import java.util.List;
 import static com.videogo.EzvizApplication.getOpenSDK;
 
 public class EZDDNSListActivity extends Activity implements OnClickListener{
-    protected static final String TAG = "CameraListActivity";
+    protected static final String TAG = EZDDNSListActivity.class.getSimpleName();
     public final static int REQUEST_CODE = 100;
     public final static int RESULT_CODE = 101;
     private final static int SHOW_DIALOG_DEL_DEVICE = 1;
@@ -170,7 +172,7 @@ public class EZDDNSListActivity extends Activity implements OnClickListener{
         });
         mNoMoreView = getLayoutInflater().inflate(R.layout.no_device_more_footer, null);
         mAdapter = new EZDDNSListAdapter(this);
-        mListView = (PullToRefreshListView) findViewById(R.id.camera_listview);
+        mListView = (PullToRefreshListView) findViewById(R.id.device_listview);
         mListView.setLoadingLayoutCreator(new LoadingLayoutCreator() {
 
             @Override
@@ -200,11 +202,12 @@ public class EZDDNSListActivity extends Activity implements OnClickListener{
         mListView.setAdapter(mAdapter);
         mListView.getRefreshableView().removeFooterView(mNoMoreView);
 
-        mNoCameraTipLy = (LinearLayout) findViewById(R.id.no_camera_tip_ly);
-        mGetCameraFailTipLy = (LinearLayout) findViewById(R.id.get_camera_fail_tip_ly);
-        mCameraFailTipTv = (TextView) findViewById(R.id.get_camera_list_fail_tv);
+        mNoCameraTipLy = (LinearLayout) findViewById(R.id.no_device_tip_ly);
+        mGetCameraFailTipLy = (LinearLayout) findViewById(R.id.get_device_fail_tip_ly);
+        mCameraFailTipTv = (TextView) findViewById(R.id.get_device_list_fail_tv);
     }
 
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     private void initData() {
         mReceiver = new BroadcastReceiver() {
             @Override
@@ -218,7 +221,12 @@ public class EZDDNSListActivity extends Activity implements OnClickListener{
         };
         IntentFilter filter = new IntentFilter();
         filter.addAction(Constant.ADD_DEVICE_SUCCESS_ACTION);
-        registerReceiver(mReceiver, filter);
+        // 添加版本兼容性判断
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {// Android 8.0及以上
+            registerReceiver(mReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+        } else {
+            registerReceiver(mReceiver, filter);
+        }
     }
 
     @Override
@@ -282,14 +290,14 @@ public class EZDDNSListActivity extends Activity implements OnClickListener{
                             result = EZGlobalSDK.getInstance().getDDNSDeviceList(20, 0);
                         } else {
                             result = EZGlobalSDK.getInstance().getDDNSDeviceList(20,
-                                (mAdapter.getCount() / 20) + (mAdapter.getCount() % 20 > 0 ? 1 : 0));
+                                    (mAdapter.getCount() / 20) + (mAdapter.getCount() % 20 > 0 ? 1 : 0));
                         }
                     } else if (mLoadType == LOAD_SHARE_DEVICE) {
                         if (mHeaderOrFooter) {
                             result = EZGlobalSDK.getInstance().getShareDDNSDeviceList(20, 0);
                         } else {
                             result = EZGlobalSDK.getInstance().getShareDDNSDeviceList(20,
-                                (mAdapter.getCount() / 20) + (mAdapter.getCount() % 20 > 0 ? 1 : 0));
+                                    (mAdapter.getCount() / 20) + (mAdapter.getCount() % 20 > 0 ? 1 : 0));
                         }
                     }
 
@@ -352,10 +360,10 @@ public class EZDDNSListActivity extends Activity implements OnClickListener{
                     if (mAdapter.getCount() == 0) {
                         mListView.setVisibility(View.GONE);
                         mNoCameraTipLy.setVisibility(View.GONE);
-                        mCameraFailTipTv.setText(Utils.getErrorTip(EZDDNSListActivity.this, R.string.get_camera_list_fail, errorCode));
+                        mCameraFailTipTv.setText(Utils.getErrorTip(EZDDNSListActivity.this, R.string.get_device_list_fail, errorCode));
                         mGetCameraFailTipLy.setVisibility(View.VISIBLE);
                     } else {
-                        Utils.showToast(EZDDNSListActivity.this, R.string.get_camera_list_fail, errorCode);
+                        Utils.showToast(EZDDNSListActivity.this, R.string.get_device_list_fail, errorCode);
                     }
                     break;
             }
@@ -382,13 +390,9 @@ public class EZDDNSListActivity extends Activity implements OnClickListener{
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.camera_list_refresh_btn:
-            case R.id.no_camera_tip_ly:
-                refreshButtonClicked();
-                break;
-            default:
-                break;
+        int id = view.getId();
+        if (id == R.id.device_list_refresh_btn || id == R.id.no_device_tip_ly) {
+            refreshButtonClicked();
         }
     }
 
@@ -488,28 +492,28 @@ public class EZDDNSListActivity extends Activity implements OnClickListener{
 
     public void onLoaginFailed(int errorCode, String errorMsg) {
         int ERROR_NET_DVR_PASSWORD_ERROR =
-            1; //username or password is incorrect. The user name or password entered when registering is incorrect.
+                1; //username or password is incorrect. The user name or password entered when registering is incorrect.
         int ERROR_NET_DVR_PASSWORD_ERROR2 =
-            1100; //username or password is incorrect. The user name or password entered when registering is incorrect.
+                1100; //username or password is incorrect. The user name or password entered when registering is incorrect.
         if (errorCode == ERROR_NET_DVR_PASSWORD_ERROR || errorCode == ERROR_NET_DVR_PASSWORD_ERROR2) {
             new AlertDialog.Builder(this).setMessage(R.string.hc_net_account_pwd_error)
-                .setNegativeButton(R.string.cancel, null)
-                .setPositiveButton(R.string.retry, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        showLoginDialog(mAdapter.getItem(mCurrentSelectPosition));
-                    }
-                })
-                .show();
+                    .setNegativeButton(R.string.cancel, null)
+                    .setPositiveButton(R.string.retry, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            showLoginDialog(mAdapter.getItem(mCurrentSelectPosition));
+                        }
+                    })
+                    .show();
         } else {
             new AlertDialog.Builder(this).setMessage(getString(R.string.hc_net_error) + errorCode)
-                .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                })
-                .show();
+                    .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    })
+                    .show();
         }
     }
     private void toPlayActivity(final EZLoginDeviceInfo ezLoginDeviceInfo){
@@ -553,12 +557,12 @@ public class EZDDNSListActivity extends Activity implements OnClickListener{
 
     private void showNotSupportViewDailog() {
         new AlertDialog.Builder(this).setMessage(R.string.device_not_support_view)
-            .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
+                .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
 
-                }
-            });
+                    }
+                });
     }
     public void showLoginDialog(final EZHiddnsDeviceInfo hiddnsDeviceInfo) {
         if (mLoginDialog != null && mLoginDialog.isShowing()) {
@@ -569,59 +573,59 @@ public class EZDDNSListActivity extends Activity implements OnClickListener{
         final EditText loginName = (EditText) safeview.findViewById(R.id.login_name);
         final EditText loginPwd = (EditText) safeview.findViewById(R.id.login_pwd);
         mLoginDialog = new AlertDialog.Builder(this).setTitle(R.string.lan_device_login_title)
-            .setView(safeview)
-            .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                }
-            })
-            .setPositiveButton(R.string.certain, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    final String name = loginName.getText().toString();
-                    final String pwd = loginPwd.getText().toString();
-                    if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(pwd)) {
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    final EZLoginDeviceInfo ezLoginDeviceInfo = EZHCNetDeviceSDK.getInstance().loginDeviceWithUerName(name, pwd, hiddnsDeviceInfo.getDeviceIp(),hiddnsDeviceInfo.getUpnpMappingMode() == 0?hiddnsDeviceInfo.getHiddnsCmdPort():hiddnsDeviceInfo.getMappingHiddnsCmdPort());
-                                    if (ezLoginDeviceInfo != null) {
+                .setView(safeview)
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .setPositiveButton(R.string.certain, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        final String name = loginName.getText().toString();
+                        final String pwd = loginPwd.getText().toString();
+                        if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(pwd)) {
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        final EZLoginDeviceInfo ezLoginDeviceInfo = EZHCNetDeviceSDK.getInstance().loginDeviceWithUerName(name, pwd, hiddnsDeviceInfo.getDeviceIp(),hiddnsDeviceInfo.getUpnpMappingMode() == 0?hiddnsDeviceInfo.getHiddnsCmdPort():hiddnsDeviceInfo.getMappingHiddnsCmdPort());
+                                        if (ezLoginDeviceInfo != null) {
+                                            runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+
+                                                    onLoginSuccess(ezLoginDeviceInfo);
+                                                }
+                                            });
+                                        }else{
+                                            onLoaginFailed(-1,"login fail");
+                                        }
+                                    } catch (final BaseException e) {
+                                        e.printStackTrace();
                                         runOnUiThread(new Runnable() {
                                             @Override
                                             public void run() {
-
-                                                onLoginSuccess(ezLoginDeviceInfo);
+                                                onLoaginFailed(e.getErrorCode(),e.getMessage());
                                             }
                                         });
-                                    }else{
-                                        onLoaginFailed(-1,"login fail");
                                     }
-                                } catch (final BaseException e) {
-                                    e.printStackTrace();
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            onLoaginFailed(e.getErrorCode(),e.getMessage());
-                                        }
-                                    });
                                 }
-                            }
-                        }).start();
-                    } else {
-                        Toast.makeText(EZDDNSListActivity.this,"username or passwor is null",Toast.LENGTH_LONG).show();
-                        showLoginDialog(hiddnsDeviceInfo);
+                            }).start();
+                        } else {
+                            Toast.makeText(EZDDNSListActivity.this,"username or passwor is null",Toast.LENGTH_LONG).show();
+                            showLoginDialog(hiddnsDeviceInfo);
+                        }
                     }
-                }
-            })
-            .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                @Override
-                public void onCancel(DialogInterface dialog) {
+                })
+                .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
 
-                }
-            })
-            .setCancelable(false)
-            .create();
+                    }
+                })
+                .setCancelable(false)
+                .create();
         TextWatcher textWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -634,7 +638,7 @@ public class EZDDNSListActivity extends Activity implements OnClickListener{
             @Override
             public void afterTextChanged(Editable editable) {
                 if (!TextUtils.isEmpty(loginName.getText().toString().trim()) && !TextUtils.isEmpty(
-                    loginPwd.getText().toString().trim())) {
+                        loginPwd.getText().toString().trim())) {
                     mLoginDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
                 } else {
                     mLoginDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);

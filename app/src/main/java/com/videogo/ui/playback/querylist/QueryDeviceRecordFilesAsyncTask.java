@@ -1,14 +1,16 @@
 package com.videogo.ui.playback.querylist;
 
+import static com.videogo.EzvizApplication.getOpenSDK;
+import static com.videogo.openapi.EZConstants.EZVideoRecordLocation.EZ_VIDEO_RECORD_LOCATION_LOCAL;
+
 import android.app.Activity;
 
 import com.videogo.EzvizApplication;
-import com.videogo.device.DeviceReportInfo;
 import com.videogo.errorlayer.ErrorInfo;
 import com.videogo.exception.BaseException;
 import com.videogo.openapi.EZConstants;
-import com.videogo.openapi.EZGlobalSDK;
 import com.videogo.openapi.bean.EZDeviceRecordFile;
+import com.videogo.openapi.bean.EZDeviceRecordInfo;
 import com.videogo.openapi.bean.resp.CloudPartInfoFile;
 import com.videogo.ui.playback.RemoteListContant;
 import com.videogo.ui.playback.bean.CloudPartInfoFileEx;
@@ -18,7 +20,6 @@ import com.videogo.util.DateTimeUtil;
 import com.videogo.util.LogUtil;
 import com.videogo.util.Utils;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -78,16 +79,9 @@ public class QueryDeviceRecordFilesAsyncTask extends HikAsyncTask<String, Void, 
         }
     }
 
-    private String calendar2String(Calendar cal) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-        String dateStr = sdf.format(cal.getTime());
-
-        return dateStr;
-    }
-
     private void convertEZDeviceRecordFile2CloudPartInfoFile(CloudPartInfoFile dst, EZDeviceRecordFile src, int pos) {
-        dst.setStartTime(calendar2String(src.getStartTime()));
-        dst.setEndTime(calendar2String(src.getStopTime()));
+        dst.setStartTime(DateTimeUtil.calendarToYMDHMSCompactString(src.getStartTime()));
+        dst.setEndTime(DateTimeUtil.calendarToYMDHMSCompactString(src.getStopTime()));
         dst.setPosition(pos);
         dst.setBegin(src.getBegin());
         dst.setEnd(src.getEnd());
@@ -99,15 +93,8 @@ public class QueryDeviceRecordFilesAsyncTask extends HikAsyncTask<String, Void, 
         Date endDate = DateTimeUtil.endDate(queryDate);
         Calendar startTime = Calendar.getInstance();
         Calendar endTime = Calendar.getInstance();
-        startTime.setTime(queryDate);
-        endTime.setTime(queryDate);
-
-        startTime.set(Calendar.HOUR_OF_DAY, 0);
-        startTime.set(Calendar.MINUTE, 0);
-        startTime.set(Calendar.SECOND, 0);
-        endTime.set(Calendar.HOUR_OF_DAY, 23);
-        endTime.set(Calendar.MINUTE, 59);
-        endTime.set(Calendar.SECOND, 59);
+        startTime.setTime(beginDate);
+        endTime.setTime(endDate);
 
         List<EZDeviceRecordFile> tmpList = null;
         try {
@@ -132,6 +119,7 @@ public class QueryDeviceRecordFilesAsyncTask extends HikAsyncTask<String, Void, 
 
         if (CollectionUtil.isNotEmpty(convertCalendarFiles)) {
             Collections.sort(convertCalendarFiles);
+            Collections.reverse(convertCalendarFiles);
         }
         int length = convertCalendarFiles.size();
         int i = 0;
@@ -185,8 +173,8 @@ public class QueryDeviceRecordFilesAsyncTask extends HikAsyncTask<String, Void, 
             endCalender = Calendar.getInstance();
             endCalender.setTime(endDate);
         }
-        cloudPartInfoFile.setStartTime(new SimpleDateFormat("yyyyMMddHHmmss").format(beginCalender.getTime()));
-        cloudPartInfoFile.setEndTime(new SimpleDateFormat("yyyyMMddHHmmss").format(endCalender.getTime()));
+        cloudPartInfoFile.setStartTime(DateTimeUtil.calendarToYMDHMSCompactString(beginCalender));
+        cloudPartInfoFile.setEndTime(DateTimeUtil.calendarToYMDHMSCompactString(endCalender));
         return cloudPartInfoFile;
     }
 

@@ -1,13 +1,13 @@
 apply plugin: 'com.android.library'
 apply from: "../app-common/build_common.gradle"
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion rootProject.ext.compileVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
+        namespace 'ezviz.ezopensdkcommon'
         minSdkVersion rootProject.ext.minSdk
         targetSdkVersion rootProject.ext.targetSdk
         versionCode 1
@@ -20,6 +20,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    buildFeatures{
+        viewBinding true
+        buildConfig true
+    }
+
     sourceSets {
         main {
             jniLibs.srcDirs = ['libs']
@@ -29,8 +35,12 @@ android {
     lintOptions {
         abortOnError false
     }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
 }
 
 dependencies {
-    implementation 'io.github.ezviz-open:ezviz-sdk:5.12'
+    implementation 'io.github.ezviz-open:ezviz-sdk:5.27'
+    implementation "com.google.code.gson:gson:$gsonVersion"
 }

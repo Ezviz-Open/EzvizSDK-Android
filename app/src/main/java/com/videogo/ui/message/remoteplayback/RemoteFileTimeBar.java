@@ -34,7 +34,7 @@ import java.util.List;
 import ezviz.ezopensdk.R;
 
 public class RemoteFileTimeBar extends ImageView {
-    private static final String TAG = "RemoteFileTimeBar";
+    private static final String TAG = RemoteFileTimeBar.class.getSimpleName();
     private List<RemoteFileInfo> mFileList;
 
     private List<CloudFile> mCloudFileList;

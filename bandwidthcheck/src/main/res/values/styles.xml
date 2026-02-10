@@ -1,0 +1,17 @@
+<resources>
+
+    <!--通用配置-->
+    <style name="AppBaseTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <!--主要配置-->
+    <style name="AppTheme" parent="AppBaseTheme">
+    </style>
+
+    <!--指定配置-->
+    <style name="FullAppTheme" parent="AppBaseTheme">
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
+</resources>

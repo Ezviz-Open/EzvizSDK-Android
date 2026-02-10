@@ -5,13 +5,13 @@
     android:background="@color/white"
     android:clickable="true"
     android:gravity="center"
-    android:orientation="horizontal" >
+    android:orientation="horizontal">
 
     <RelativeLayout
         android:id="@+id/header_parent"
         android:layout_width="50dp"
         android:layout_height="fill_parent"
-        android:gravity="center_vertical|right" >
+        android:gravity="center_vertical|right">
 
         <ImageView
             android:layout_width="0.5dp"
@@ -36,25 +36,25 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:orientation="vertical">
 
         <LinearLayout
             android:id="@+id/layout"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal" >
+            android:orientation="horizontal">
 
             <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical" >
+                android:orientation="vertical">
 
                 <FrameLayout
                     android:id="@+id/img_area1"
                     android:layout_width="match_parent"
                     android:layout_height="65dp"
-                    android:background="@color/white" >
+                    android:background="@color/white">
 
                     <ImageView
                         android:id="@+id/image1"
@@ -75,7 +75,7 @@
                         android:id="@+id/local_l1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical|center_horizontal" >
+                        android:layout_gravity="center_vertical|center_horizontal">
 
                         <ImageView
                             android:id="@+id/local_alarm1"
@@ -95,13 +95,27 @@
                             android:textSize="@dimen/remotelist_item_local_time_size"
                             android:visibility="visible" />
                     </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/text1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="7dp"
+                        android:layout_marginTop="3dp"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/remotelist_time_text_size" />
+
+                    <TextView
+                        android:id="@+id/during1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="right"
+                        android:layout_marginTop="3dp"
+                        android:layout_marginRight="7dp"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/remotelist_time_text_size" />
                 </FrameLayout>
 
-                <TextView
-                    android:id="@+id/text1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="@dimen/remotelist_time_text_size" />
             </LinearLayout>
 
             <View
@@ -112,13 +126,13 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical" >
+                android:orientation="vertical">
 
                 <FrameLayout
                     android:id="@+id/img_area2"
                     android:layout_width="match_parent"
                     android:layout_height="65dp"
-                    android:background="@color/white" >
+                    android:background="@color/white">
 
                     <ImageView
                         android:id="@+id/image2"
@@ -139,7 +153,7 @@
                         android:id="@+id/local_l2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical|center_horizontal" >
+                        android:layout_gravity="center_vertical|center_horizontal">
 
                         <ImageView
                             android:id="@+id/local_alarm2"
@@ -159,13 +173,28 @@
                             android:textSize="@dimen/remotelist_item_local_time_size"
                             android:visibility="visible" />
                     </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/text2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="7dp"
+                        android:layout_marginTop="3dp"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/remotelist_time_text_size" />
+
+                    <TextView
+                        android:id="@+id/during2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="right"
+                        android:layout_marginTop="3dp"
+                        android:layout_marginRight="7dp"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/remotelist_time_text_size" />
+
                 </FrameLayout>
 
-                <TextView
-                    android:id="@+id/text2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="@dimen/remotelist_time_text_size" />
             </LinearLayout>
 
             <View
@@ -176,13 +205,13 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical" >
+                android:orientation="vertical">
 
                 <FrameLayout
                     android:id="@+id/img_area3"
                     android:layout_width="match_parent"
                     android:layout_height="65dp"
-                    android:background="@color/white" >
+                    android:background="@color/white">
 
                     <ImageView
                         android:id="@+id/image3"
@@ -203,7 +232,7 @@
                         android:id="@+id/local_l3"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical|center_horizontal" >
+                        android:layout_gravity="center_vertical|center_horizontal">
 
                         <ImageView
                             android:id="@+id/local_alarm3"
@@ -223,13 +252,27 @@
                             android:textSize="@dimen/remotelist_item_local_time_size"
                             android:visibility="visible" />
                     </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/text3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="7dp"
+                        android:layout_marginTop="3dp"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/remotelist_time_text_size" />
+
+                    <TextView
+                        android:id="@+id/during3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="right"
+                        android:layout_marginTop="3dp"
+                        android:layout_marginRight="7dp"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/remotelist_time_text_size" />
                 </FrameLayout>
 
-                <TextView
-                    android:id="@+id/text3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="@dimen/remotelist_time_text_size" />
             </LinearLayout>
 
             <View
@@ -245,7 +288,7 @@
             android:layout_weight="1"
             android:background="@drawable/playback_button"
             android:gravity="center"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/more_btn"

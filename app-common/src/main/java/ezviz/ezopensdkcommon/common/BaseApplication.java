@@ -7,8 +7,6 @@ import android.content.Intent;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 
-import ezviz.ezopensdkcommon.debug.LogFileUtil;
-
 public class BaseApplication extends Application {
 
     public static Application mInstance = null;
@@ -22,26 +20,12 @@ public class BaseApplication extends Application {
         ARouter.openDebug();
         ARouter.openLog();
         ARouter.init(this);
-
-        // 初始化日志文件进程
-        if (isMainProcess()){
-            LogFileUtil.startSaveLogToFile(getApplicationContext());
-        }
-    }
-
-    @Override
-    public void onTerminate() {
-        super.onTerminate();
-
-        if (isMainProcess()){
-            LogFileUtil.stopSaveLogToFile();
-        }
     }
 
     /**
      * 获取当前进程名
      */
-    private String getCurrentProcessName() {
+    public String getCurrentProcessName() {
         int pid = android.os.Process.myPid();
         String processName = "";
         ActivityManager manager = (ActivityManager) getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
@@ -56,13 +40,13 @@ public class BaseApplication extends Application {
     /**
      * 包名判断是否为主进程
      */
-    private boolean isMainProcess() {
+    public boolean isMainProcess() {
         return getApplicationContext().getPackageName().equals(getCurrentProcessName());
     }
 
-    public static void restartApp(Context context){
+    public static void restartApp(Context context) {
         final Intent intent = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
-        if (intent != null){
+        if (intent != null) {
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             context.startActivity(intent);
             System.exit(0);

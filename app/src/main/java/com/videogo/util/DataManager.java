@@ -13,19 +13,19 @@ public class DataManager {
 
     private static LruBitmapPool mBitmapPool;
 
-    private DataManager(){
+    private DataManager() {
         Map<String, String> mDeviceSerialVerifyCodeMap = new HashMap<String, String>();
     }
 
-   public static DataManager getInstance(){
-       if (mDataManager == null){
+    public static DataManager getInstance() {
+        if (mDataManager == null) {
             mDataManager = new DataManager();
-       }
+        }
         return mDataManager;
     }
 
-    public LruBitmapPool getBitmapPool(Context context){
-        if (mBitmapPool == null){
+    public LruBitmapPool getBitmapPool(Context context) {
+        if (mBitmapPool == null) {
             MemorySizeCalculator calculator = new MemorySizeCalculator(context);
             int defaultBitmapPoolSize = calculator.getBitmapPoolSize();
             mBitmapPool = new LruBitmapPool(defaultBitmapPoolSize);
@@ -33,12 +33,16 @@ public class DataManager {
         return mBitmapPool;
     }
 
-    public synchronized void setDeviceSerialVerifyCode(String deviceSerial,String verifyCode){
+    public synchronized void setDeviceSerialVerifyCode(String deviceSerial, String verifyCode) {
         SpTool.storeValue(deviceSerial, verifyCode);
     }
 
-    public synchronized String getDeviceSerialVerifyCode(String deviceSerial){
+    public synchronized String getDeviceSerialVerifyCode(String deviceSerial) {
         return SpTool.obtainValue(deviceSerial);
+    }
+
+    public synchronized void clearAllDeviceSerialVerifyCode() {
+        SpTool.clearAllValues();
     }
 }
 

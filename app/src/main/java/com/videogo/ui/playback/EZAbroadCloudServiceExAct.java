@@ -5,7 +5,6 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -28,12 +27,13 @@ import java.util.Date;
 import java.util.List;
 
 import ezviz.ezopensdk.R;
+import ezviz.ezopensdkcommon.common.RootActivity;
 
 import static com.videogo.EzvizApplication.getOpenSDK;
-import static com.videogo.util.DateTimeUtil.DAY_FORMAT;
-import static com.videogo.util.DateTimeUtil.TIME_FORMAT;
+import static com.videogo.util.DateTimeUtil.TIME_FORMAT_YMD;
+import static com.videogo.util.DateTimeUtil.TIME_FORMAT_YMDHMS;
 
-public class EZAbroadCloudServiceExAct extends AppCompatActivity {
+public class EZAbroadCloudServiceExAct extends RootActivity {
 
     private TitleBar mTitleBar;
     private ListView lv_api;
@@ -212,8 +212,8 @@ public class EZAbroadCloudServiceExAct extends AppCompatActivity {
                                     ((EZGlobalSDK) getOpenSDK()).getIncrCloudVideos(mCameraInfo.getDeviceSerial(),
                                             mCameraInfo.getCameraNo(),
                                             EZConstants.EZCloudVideoType.EZ_CLOUD_VIDEO_TYPE_ALL,
-                                            DateTimeUtil.formatDateToString(searchDate, DAY_FORMAT),
-                                            DateTimeUtil.formatDateToString(maxCreateTime, TIME_FORMAT));
+                                            DateTimeUtil.formatDateToString(searchDate, TIME_FORMAT_YMD),
+                                            DateTimeUtil.formatDateToString(maxCreateTime, TIME_FORMAT_YMDHMS));
                             String jsonString = new Gson().toJson(videoList);
                             runOnUiThread(() -> {
                                 this.videoList = videoList;

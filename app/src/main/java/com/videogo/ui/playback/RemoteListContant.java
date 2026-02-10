@@ -16,7 +16,7 @@ public class RemoteListContant {
     public static final String ALARM_TIME_INTENT_KEY = "alarmTime";
     // Progress MAX值
     public static final int PROGRESS_MAX_VALUE = 1000;
-    public static final String VIDEO_DUAR_BEGIN_INIT = "00:00:00";
+    public static final String VIDEO_DUAR_BEGIN_INIT = "00:00";
     public static final int REMOTE_LIST_MAX_TIMEOUT = 45;
 
     // 类型定义
