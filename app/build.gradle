@@ -26,8 +26,8 @@ android {
         namespace 'ezviz.ezopensdk'
         minSdkVersion rootProject.ext.minSdk
         targetSdkVersion rootProject.ext.targetSdk
-        versionCode 5270
-        versionName "v5.27"
+        versionCode 5273
+        versionName "v5.27.3"
         multiDexEnabled false
         ndk {
             abiFilters "armeabi-v7a", "arm64-v8a"
@@ -80,7 +80,7 @@ dependencies {
     /*萤石SDK核心模块，必须*/
     implementation 'androidx.constraintlayout:constraintlayout:2.1.0'
     implementation 'com.google.android.material:material:1.4.0'
-    implementation 'io.github.ezviz-open:ezviz-sdk:5.27'
+    implementation 'io.github.ezviz-open:ezviz-sdk:5.27.3'
     // 4.19.0版本之后需要自行依赖okhttp和gson库
     implementation 'com.squareup.okhttp3:okhttp:3.12.1'
     implementation "com.google.code.gson:gson:$gsonVersion"

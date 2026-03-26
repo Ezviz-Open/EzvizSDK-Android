@@ -44,7 +44,6 @@ import com.ezviz.sdk.configwifi.touchAp.GetTokenCallback;
 import com.ezviz.sdk.configwifi.touchAp.QueryPlatformBindStatusCallback;
 import com.ezviz.sdk.configwifi.touchAp.TouchApApi;
 import com.videogo.EzvizApplication;
-import com.videogo.global.GlobalKit;
 import com.videogo.util.LocalInfo;
 import com.videogo.util.LogUtil;
 import com.videogo.util.Utils;
